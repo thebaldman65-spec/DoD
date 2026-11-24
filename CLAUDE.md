@@ -4902,14 +4902,23 @@ same breath as the removal.
   lands, and both are paid from the warband's Malice, which the heroes' own damage and the warband's deaths fill — so a long fight fills the bar that
   pays for his healing and his raising — and his Noxious Fumes makes every hero likelier to miss for 3 turns. His zone's
   Rotfiends feed the same loop: each one's Corpse Explosion fills the bar a kill's worth, and he can stand it back up, once.
-- **THE WITHERED WARDEN, THE ASH-WROUGHT TYRANT AND THE ICEWROUGHT TITAN ARE TO BE REVISITED THE SAME WAY — RULED, NOT BUILT.**
-  Each is given a strategy of its own by a later batch, and nothing here says any of them has one. **THE HOLLOW CROWN, THE END
-  BOSS, IS A BOSS FIGHT TOO, AND IS OWED ONE LIKE THE THREE — RULED, NOT BUILT** (JW's reading, which the designer places). A
+- **THE WITHERED WARDEN, THE FOREST OF OLD's BOSS, IS THE SECOND BUILT TO IT (KE; the designer's ruling, *Kill the grove
+  first*) — A KILL-ORDER CHECK: cut its warband down first, then the Warden alone.** Rootbound: while any other body of its
+  warband stands, it takes a share less of every damage that reaches it — a blow, a tick, a reflect. A strike is cut where
+  `_resolve` computes its figure, beside Shielded; every other door call that prints or books its figure cuts it on the
+  line above the door (`_rootbound_precut`), so what is floated and credited is what lands; and the unit's two damage doors
+  (`BattleUnit._rootbound_cut`) cut whatever still reaches them whole. Break damage never. Alone, it takes the whole. The share is the designer's,
+  held in its data (`data/enemies.json`'s `rootbound`), and no other kind carries it. Its Wild Growth tends the grove and its
+  escort's menders Raise a fallen body, which keeps it rooted, so the menders fall first. **The chip is a display chip**,
+  so no dispel answers the question; only the kill order does. The bot marks past it while another body stands (DV38).
+- **THE ASH-WROUGHT TYRANT AND THE ICEWROUGHT TITAN ARE TO BE REVISITED THE SAME WAY — RULED, NOT BUILT.**
+  Each is given a strategy of its own by a later batch, and nothing here says either has one. **THE HOLLOW CROWN, THE END
+  BOSS, IS A BOSS FIGHT TOO, AND IS OWED ONE LIKE THE TWO — RULED, NOT BUILT** (JW's reading, which the designer places). A
   mini-boss is a composed elite fight, no boss kind, and not one.
 - **A BOSS AUTHORED FROM NOW ON IS AUTHORED TO IT**: its record names the strategy its fight asks for, and its kit is read
   against that strategy rather than against the other bosses' figures. `check_jw` §0 reads every zone boss `Run.ZONE_DEFS` names
-  and the end boss against this block — named in the bullet built to it, or in a bullet marked owed — so a zone added later reds
-  until its boss is placed.
+  and the end boss against this block — named in a bullet built to it, or in a bullet marked owed — so a zone added later reds
+  until its boss is placed; `check_ke` §5 holds the Warden's.
 - **WHY IT IS A VALUE AND NOT A FIGURE**: it says what a boss fight is for, and leaves the numbers to play (`docs/ways-of-working.md`,
   WHO OWNS WHAT). A strategy is the question; how hard it presses is tuning.
 

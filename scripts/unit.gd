@@ -216,6 +216,10 @@ var dead := false
 var next_time := 0.0        # position on the initiative timeline
 var is_ranged := false      # ranged units can't be parried; Tripwire skips them
 var is_boss := false        # bosses cannot be Stunned unless Broken
+# BATCH KE §1 — ROOTBOUND (the Withered Warden's; the designer's ruling, *Kill the grove first*): the share of the damage that
+# reaches this body it does not take while any other body of its warband stands (`rootbound_cb` answers that, asked at the two
+# doors by `_rootbound_cut`). 0 on every body whose data does not carry it. Break damage is never cut.
+var rootbound := 0.0
 var enemy_role := ""        # "tank"/"support"/"damage" — heal-AI priorities
 # BATCH BL §2 — the enemy's KIND ("shieldmaster"), set from the roster config so
 # the recap can aggregate three Shieldmasters into one row. `unit_name` happens
@@ -1315,6 +1319,13 @@ var damage_taken_cb := Callable()
 # credits to him lands", one definition for every source he has rather than a
 # list of his cards that a later card would slip past.
 var deal_gate_cb := Callable()
+# BATCH KE §1 — ROOTBOUND's QUESTION, asked at the same two doors just below the deal gate: (body) -> does any other body of
+# its warband stand? The battle answers off its own lists, live, so the cut can never read a board that has moved.
+var rootbound_cb := Callable()
+# BATCH KE §1 — THE STRIKE CUT IT ALREADY: `_resolve` cuts a blow on a Rootbound body inside its own computation (IC §1b's
+# rule, know before you compute), so the figure it floats, books and drains is the one that lands, and sets this just above
+# its door call; the door spends it and does not cut that blow twice.
+var rootbound_precut := false
 
 # BATCH BS §3 — KILN-FORGED asks the BOARD a question, which is the one thing
 # this file cannot answer for itself, so it asks back the way every other
@@ -4734,6 +4745,8 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 	# and is untouched (the rune says damage, and Break damage is its own word).
 	if amount > 0 and deal_gate_cb.is_valid():
 		amount = int(deal_gate_cb.call(self, amount))
+	# BATCH KE §1 — ROOTBOUND, below the gate and above everything else this door does (`_rootbound_cut`).
+	amount = _rootbound_cut(amount)
 	if amount > 0:
 		damaged_since_turn = true  # Unbroken Watch bookkeeping
 	# One Soul (Beastmaster capstone): a wound to ANY member of the bond
@@ -5303,6 +5316,33 @@ func set_ruin_stacks(n: int) -> void:
 			return
 
 
+# BATCH KE §1 — ROOTBOUND's CUT, IN THE TWO DOORS (`take_hit`, `take_tick_damage`), right below the deal gate and above
+# everything else either does — One Soul, a barrier, the covenant, the siphon, Vespers, the health write — so every damage
+# source meets it: a blow, a spell, a splash, an echo, a reflect, a tick, and a source written later without knowing it is
+# here (BL §2's and GO's one-door reason) — but a strike, which `_resolve` cut in its own computation and marked
+# (`rootbound_precut`), passes once uncut. It holds while `rootbound_cb` says another body of the warband stands. What lands
+# rounds to the nearest and is never under 1 (the strike's floor), so a cut never silences a blow. It floats nothing: a
+# figure a site floats is the one that lands (IA §0.6) — the sites cut first (`battle._rootbound_precut`) or print
+# `_landed`'s answer — so the door only logs what it kept. Break damage rides `pressure_add` and never reaches here.
+func _rootbound_cut(amount: int) -> int:
+	if rootbound_precut:
+		rootbound_precut = false
+		return amount
+	var landed := rootbound_landed(amount)
+	var kept := amount - landed
+	if kept > 0:
+		_proc_log("Rootbound — %s's warband stands: %d of the %d lands" % [unit_name, landed, amount])
+	return landed
+
+
+# BATCH KE §1 — WHAT THE CUT WOULD LAND, with nothing floated: the door's figure, asked by the battle's `_landed` (IC §2) so a
+# site that prints or books its own figure before the door prints and books what the door will land.
+func rootbound_landed(amount: int) -> int:
+	if amount <= 0 or rootbound <= 0.0 or not rootbound_cb.is_valid() or not bool(rootbound_cb.call(self)):
+		return amount
+	return maxi(int(round(amount * (1.0 - rootbound))), 1)
+
+
 func take_tick_damage(amount: int, label: String, color: Color) -> bool:
 	# BATCH HF — VOW OF SILENCE, as in `take_hit`: a tick its source may not
 	# deal is not dealt.
@@ -5315,6 +5355,9 @@ func take_tick_damage(amount: int, label: String, color: Color) -> bool:
 	if amount > 0 and deal_gate_cb.is_valid():
 		amount = int(deal_gate_cb.call(self, amount))
 		silenced = amount <= 0
+	# BATCH KE §1 — ROOTBOUND, as in `take_hit`: a tick is damage taken. It never takes a figure to nothing, so `silenced`
+	# above still means only the vow.
+	amount = _rootbound_cut(amount)
 	# BATCH GO — COVENANT AND SIPHON READ "DAMAGE TAKEN", AND A TICK IS DAMAGE
 	# TAKEN. Both run here too, in `take_hit`'s order. The half a bond hands the
 	# other body arrives through THIS function with the receiver's guard up, so it

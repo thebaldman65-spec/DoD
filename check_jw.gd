@@ -44,6 +44,8 @@ var _cache := {}
 const ZONE := "drowned_barrow"
 const ZONE_NAME := "The Drowned Barrow"
 const BOSS := "bone_shepherd"
+# BATCH KE — §0's BUILT BOSSES, a list since the Withered Warden was built to the value (the designer's ruling at KE).
+const BUILT_BOSSES := ["bone_shepherd", "withered_warden"]
 const SLOT := 2
 const OLD := "scarlands"
 const FOUR := ["mossback", "blight_speaker", "grave_husk", "carrion_pack"]
@@ -113,18 +115,18 @@ func _s0_the_record() -> void:
 		bosses.append(String(_run.ZONE_DEFS[z]["boss"]))
 	# AND THE END BOSS: a boss fight the ruling did not name, placed under the marker by JW's reading.
 	bosses.append(String(_run.END_BOSS_KIND))
-	# BUILT OR OWED, READ BY BULLET: the built boss in the bullet that says it is built to the value, every other in a bullet that
-	# carries the marker — a name anywhere else in the block (its reasoning) places nothing.
+	# BUILT OR OWED, READ BY BULLET: each built boss in a bullet that says it is built to the value (and carries no owed marker),
+	# every other in a bullet that carries the marker — a name anywhere else in the block (its reasoning) places nothing.
 	var built_text := ""
 	var owed_text := ""
 	for bullet in block.split(" - **"):
-		if String(bullet).contains("IS THE FIRST BUILT TO IT"):
+		if String(bullet).contains("BUILT TO IT") and not String(bullet).contains("RULED, NOT BUILT"):
 			built_text += String(bullet).to_upper()
 		if String(bullet).contains("RULED, NOT BUILT"):
 			owed_text += String(bullet).to_upper()
 	for b in bosses:
 		var name := String(Enemies._load().get(b, {}).get("unit_name", b))
-		if b == BOSS:
+		if BUILT_BOSSES.has(b):
 			if not built_text.contains(name.to_upper()):
 				unplaced.append("%s (built, not named as built)" % name)
 		elif not owed_text.contains(name.to_upper()):

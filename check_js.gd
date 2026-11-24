@@ -1175,6 +1175,9 @@ func _s5_not_done() -> void:
 		if data.has(k3):
 			for field in JR_PUT_BACK[k3]:
 				(data[k3] as Dictionary)[field] = (JR_PUT_BACK[k3][field] as Array).duplicate()
+	# BATCH KE — AND THE KEY ADDED SINCE: the Withered Warden's `rootbound` (KE §1) out before the digest, so it goes on asking
+	# whether anything else in the warband's data moved.
+	((data as Dictionary).get("withered_warden", {}) as Dictionary).erase("rootbound")
 	var d := JSON.stringify(data, "", true).md5_text()
 	print("    the warband's data without JS's seven and rosters 4 and 5, JR's three tags put back: %s" % d)
 	ok(d == WARBAND_AT_JQ_MD5, "§5: something in the warband's data moved besides JS's seven kinds and the two new roster tags — a move, a figure, a kind (C14)")

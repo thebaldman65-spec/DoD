@@ -898,6 +898,7 @@
   "stability": 100,
   "constitution": 150,
   "is_boss": true,
+  "rootbound": 0.5,
   "tint": [
    0.7,
    1.0,

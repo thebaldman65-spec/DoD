@@ -248,6 +248,9 @@ func _warband_as_landed() -> Dictionary:
 	for js_k in d:
 		if (d[js_k] as Dictionary).has("zones"):
 			(d[js_k] as Dictionary)["zones"] = ((d[js_k] as Dictionary)["zones"] as Array).filter(func(z): return not ROSTERS_SINCE.has(int(z)))
+	# BATCH KE — AND THE KEY ADDED SINCE: the Withered Warden's `rootbound` (KE §1) out before the digest, so it goes on asking
+	# whether anything else in the warband's data moved.
+	((d as Dictionary).get("withered_warden", {}) as Dictionary).erase("rootbound")
 	return d
 
 

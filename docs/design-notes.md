@@ -4,6 +4,21 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The Withered Warden: kill the grove first (Batch KE) — 2026-11-23
+
+**Why a kill order.** JW's value is that each boss fight asks the party one question of its own. The Bone Shepherd asks for
+burst. The Warden is a tank whose kit already tends its warband — Wild Growth heals one of them, Entrench hardens them all —
+so its question is the other way round: leave the boss until it stands alone. The designer chose it over a Break-timing
+fight (the Warden taking root, a Break tearing the root out) and a sustain fight (a poison that never wears off, which a
+draft can leave a party with no answer to). **Why every damage source is cut.** A strike is cut where it computes its figure,
+every other source before it prints and books, and the unit's two damage doors cut whatever still reaches them whole,
+so a party that poisons or burns the Warden from the first turn meets the same question as one that strikes it; a cut on
+blows alone would have made damage over time the way around it. Break damage is left whole: Break is its own word in this
+game, and a Broken Warden is still a reward for the hits that broke it. **Why a display chip.** A status can be dispelled,
+and a dispel would be a second answer the designer did not choose. **Why the bot learns it.** A sim whose bot struck the
+Warden first would measure a party that never reads the chip, so the bot's mark passes over it while another body stands,
+as a player's would.
+
 ## A relic belongs to one hero (Batch KD) — 2026-11-23
 
 **Why only twelve relics are handed out.** The ruling is that a relic belongs to one hero, and JZ answered its two

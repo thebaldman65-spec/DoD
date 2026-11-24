@@ -460,6 +460,9 @@ func _s1_the_carriers() -> void:
 		if as_head.has(kind):
 			for field in AS_HEAD[kind]:
 				(as_head[kind] as Dictionary)[field] = (AS_HEAD[kind][field] as Array).duplicate()
+	# BATCH KE — AND THE KEY ADDED SINCE: the Withered Warden's `rootbound` (KE §1) out before the digest, so it goes on asking
+	# whether anything else in the warband's data moved.
+	((as_head as Dictionary).get("withered_warden", {}) as Dictionary).erase("rootbound")
 	var d := JSON.stringify(as_head, "", true).md5_text()
 	print("    the warband's data with the three tags put back: %s" % d)
 	ok(d == WARBAND_AT_HEAD_MD5, "§1: something in the warband's data moved besides the three tags — a move, a figure, a kind")

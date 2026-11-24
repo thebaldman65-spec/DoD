@@ -310,6 +310,15 @@ A new damage source goes through one of the two functions; a new direct cost cal
     and prints and pays that. IC's report, §2, partitioned the sites and left three live; **II §1 closed them** — the
     damage-over-time tick's line, Blight the Well's line and credit, the bleedout burst's float and line — and its five
     dormant members are still listed there.
+  - **ROOTBOUND IS A CUT, NOT A GATE, AND OBEYS THE SAME RULE (KE §1).** A Rootbound body — the Withered Warden's,
+    `data/enemies.json`'s `rootbound` — takes a share less of what reaches it while another body of its warband stands.
+    The strike knows before it computes: `_resolve` cuts the blow beside Shielded and marks it (`rootbound_precut`), so the
+    credit, `total_dealt`, the float and the line all read the figure that lands, and its door passes it uncut. **A door
+    call outside the strike that prints or books its own figure cuts it on the line above its door**
+    (`_rootbound_precut`, which marks the door the same way), or prints `_landed`'s answer where it already asks it; and
+    **the two doors cut whatever reaches them whole**, so no source written later steps around the cut. The door floats
+    nothing of its own. Break damage is never cut. FOUND AT KE names the seven dormant door calls and the three lines that
+    state a rule's figure rather than a body's.
   - **THE SHAKE IS DAMAGE'S. A BLOW THAT LANDS NO DAMAGE DOES NOT SHAKE, EVEN A CRIT (ID §0.4, the designer's; it
     generalises the rule above from figures to feel).** A shake on a silenced crit promises damage that never happened —
     the same lie as a figure beside SILENT. *A silenced hit carries nothing* was REJECTED: its Break landed and the crit

@@ -661,6 +661,9 @@ func _s1_the_kit() -> void:
 	for js_k in (raw as Dictionary):
 		if ((raw as Dictionary)[js_k] as Dictionary).has("zones"):
 			raw[js_k]["zones"] = (raw[js_k]["zones"] as Array).filter(func(z): return not ROSTERS_SINCE.has(int(z)))
+	# BATCH KE — AND THE KEY ADDED SINCE: the Withered Warden's `rootbound` (KE §1) out before the digest, so it goes on asking
+	# whether anything else in the warband's data moved.
+	((raw as Dictionary).get("withered_warden", {}) as Dictionary).erase("rootbound")
 	var rest := JSON.stringify(_strip(raw, raised, "")).md5_text()
 	print("    the data, every cooldown and each raised move's damage aside: %s" % rest)
 	ok(rest == DATA_REST, "§1: a figure of the warband moved beside the raised moves' damage and bands (%s)" % rest)

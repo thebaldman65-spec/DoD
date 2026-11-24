@@ -1344,6 +1344,8 @@ func _ready() -> void:
 	_build_ui()
 	_build_sfx_pool()
 	_spawn_units()
+	# BATCH KE §1 — the warband as spawned: a Rootbound body with its grove standing wears the chip from the first turn.
+	_sync_rootbound()
 	if Run.readout_wanted():
 		_readout = load("res://scripts/readout.gd").new()
 		_readout.begin(Run, self, heroes, Run.readout_is_player())
@@ -2582,6 +2584,9 @@ func _make_unit(config: Dictionary, pos: Vector2, tint: Color,
 	# BATCH HF — VOW OF SILENCE'S DOOR, stamped where every unit passes for the
 	# same reason as the four above: any body can be struck.
 	u.deal_gate_cb = _deal_gate
+	# BATCH KE §1 — ROOTBOUND's QUESTION, stamped where every unit passes for the same reason: the two doors ask it of any body
+	# whose data carries the field (`BattleUnit._rootbound_cut`).
+	u.rootbound_cb = _rootbound_holds
 	# BATCH IH §0.2 — A CONJUNCTION's END, stamped where every unit passes for the same reason:
 	# a composition can stand on any body, and the readout reads why it left.
 	u.conj_end_cb = _on_conj_end
@@ -3409,7 +3414,8 @@ func _dot_pass(u: BattleUnit) -> void:
 			# COMPOSITION'S: read before the tick, because a killing tick takes
 			# the composition with the body.
 			var dot_comp: Dictionary = u.composition_of(dot_id)
-			var dot_died: bool = u.take_tick_damage(dot_dmg, "-%d %s" % [dot_dmg, info[0]], info[2])
+			# BATCH KE §1 — the label floats what lands (`dot_land`): a Rootbound body's cut parts it from the figure computed.
+			var dot_died: bool = u.take_tick_damage(dot_dmg, "-%d %s" % [dot_land, info[0]], info[2])
 			# A tick its layer's vow refuses names the vow and no figure (IC §1c's wording): nothing was
 			# rolled down to zero, so *0 damage* would be a second lie.
 			var dot_silenced := dot_dmg > 0 and dot_land == 0
@@ -3417,14 +3423,14 @@ func _dot_pass(u: BattleUnit) -> void:
 				if dot_silenced:
 					_log("%s's %s tick — silenced by %s" % [u.unit_name, info[0], _vow_name()], "#e08850")
 				else:
-					_log("%s takes %d %s damage%s" % [u.unit_name, dot_dmg, info[0],
+					_log("%s takes %d %s damage%s" % [u.unit_name, dot_land, info[0],
 						stack_tag], "#e08850")
 			elif dot_silenced:
 				_log("%s's %s ticks — the %s: silenced by %s" % [u.unit_name,
 					String(dot_comp.label), info[0], _vow_name()], "#e08850")
 			else:
 				_log("%s's %s ticks — the %s: %d damage%s" % [u.unit_name,
-					String(dot_comp.label), info[0], dot_dmg, stack_tag], "#e08850")
+					String(dot_comp.label), info[0], dot_land, stack_tag], "#e08850")
 			if dot_id == "burn" and not dot_comp.is_empty() and not dot_died \
 					and _conj_maker(dot_comp) == null:
 				_dot_tick_rider(u)
@@ -3481,11 +3487,11 @@ func _black_rot_tick(u: BattleUnit) -> void:
 	_dmg_frame(null, "Black Rot", br_src)
 	var br_land := _landed(u, br_dmg)
 	_sfx("hit", -14.0, 0.8)
-	var br_died: bool = u.take_tick_damage(br_dmg, "-%d Black Rot" % br_dmg, Color(0.45, 0.52, 0.30))
+	var br_died: bool = u.take_tick_damage(br_dmg, "-%d Black Rot" % br_land, Color(0.45, 0.52, 0.30))
 	if br_dmg > 0 and br_land == 0:
 		_log("%s's Black Rot tick — silenced by %s" % [u.unit_name, _vow_name()], "#e08850")
 	else:
-		_log("%s takes %d Black Rot damage%s" % [u.unit_name, br_dmg,
+		_log("%s takes %d Black Rot damage%s" % [u.unit_name, br_land,
 			" (x%d stacks)" % br_stacks if br_stacks > 1 else ""], "#e08850")
 	await _wait(0.5)
 	if br_died:
@@ -4332,6 +4338,7 @@ func _wasting_tick(u: BattleUnit) -> bool:
 	var ws_was_name := _dmg_src_name
 	_dmg_frame(null, ws_name, ws_name)
 	var ws_before := u.hp
+	ws_amt = _rootbound_precut(u, ws_amt)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 	var ws_died: bool = u.take_tick_damage(ws_amt, "-%d %s" % [ws_amt, ws_name.to_upper()],
 		Color(0.62, 0.66, 0.42))
 	_dmg_frame(ws_was_src, ws_was_label, ws_was_name)
@@ -5253,8 +5260,10 @@ func _autoplay_pick(u: BattleUnit) -> Array:
 	# does, so the kit card and the drafted hook below are still asked. Every door reaches the bot.
 	if not pick.is_empty() and pick[0] != u.abilities[0] and not _ability_usable(u, pick[0]):
 		var fb_foes := enemies.filter(func(e): return _pickable(e))
-		var fb_broken := fb_foes.filter(func(e): return e.broken)
-		pick = [u.abilities[0], _lowest_hp(fb_broken) if not fb_broken.is_empty() else _lowest_hp(fb_foes)]
+		# BATCH KE §2 — the mark passes over a Rootbound body while another stands (`_bot_mark_pool`).
+		var fb_mark := _bot_mark_pool(fb_foes)
+		var fb_broken := fb_mark.filter(func(e): return e.broken)
+		pick = [u.abilities[0], _lowest_hp(fb_broken) if not fb_broken.is_empty() else _lowest_hp(fb_mark)]
 	if pick.is_empty() or pick[0] != u.abilities[0]:
 		return pick
 	var kit_pick := _bot_class_kit_pick(u)
@@ -5285,9 +5294,11 @@ func _bot_class_kit_pick(u: BattleUnit) -> Array:
 	if foes.is_empty():
 		return []
 	var allies := heroes.filter(func(h): return not h.dead and not h.is_companion)
-	var broken_foes := foes.filter(func(e): return e.broken)
+	# BATCH KE §2 — the mark passes over a Rootbound body while another stands (`_bot_mark_pool`).
+	var mark_foes := _bot_mark_pool(foes)
+	var broken_foes := mark_foes.filter(func(e): return e.broken)
 	var mark: BattleUnit = _lowest_hp(broken_foes) if not broken_foes.is_empty() \
-		else _lowest_hp(foes)
+		else _lowest_hp(mark_foes)
 	match u.hero_key:
 		"warrior":
 			# The taunt is his only guard for the others; it goes up whenever
@@ -5754,9 +5765,11 @@ func _autoplay_pick_kit(u: BattleUnit) -> Array:
 	if foes.is_empty():
 		return [u.abilities[0], u]  # battle is over; the loop ends it
 	var allies := heroes.filter(func(h): return not h.dead)
-	var broken_foes := foes.filter(func(e): return e.broken)
+	# BATCH KE §2 — the mark passes over a Rootbound body while another stands (`_bot_mark_pool`).
+	var mark_foes := _bot_mark_pool(foes)
+	var broken_foes := mark_foes.filter(func(e): return e.broken)
 	var target_foe: BattleUnit = _lowest_hp(broken_foes) if not broken_foes.is_empty() \
-		else _lowest_hp(foes)
+		else _lowest_hp(mark_foes)
 	var weakest_ally := _lowest_hp(allies)
 	match u.hero_key:
 		"warrior":
@@ -6460,8 +6473,9 @@ func _use_item(item_id: String) -> void:
 			var bm_was_name := _dmg_src_name
 			_dmg_frame(null, String(Run.ITEM_INFO["bomb"][0]))
 			for e in enemies.filter(func(en): return _pickable(en)):
-				var result: Dictionary = e.take_hit(bomb_dmg, 0)
-				e.float_text(str(bomb_dmg), Color(1.0, 0.8, 0.4))
+				var bm_hit := _rootbound_precut(e, bomb_dmg)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
+				var result: Dictionary = e.take_hit(bm_hit, 0)
+				e.float_text(str(bm_hit), Color(1.0, 0.8, 0.4))
 				if result.died:
 					_message("%s falls!" % e.unit_name)
 					_log("† %s dies" % e.unit_name, "#e05050")
@@ -11478,6 +11492,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 						strike_target.unit_name)
 					if strike_target.is_hero:
 						_prev(strike_target, float(fr_dmg))
+						fr_dmg = _rootbound_precut(attacker, fr_dmg)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 						_stat("dmg_hero_" + _contrib_name(strike_target), fr_dmg)
 					var fr_res: Dictionary = attacker.take_hit(fr_dmg, 0)
 					attacker.float_text("-%d Feint" % fr_dmg, Color(0.45, 0.85, 1.0))
@@ -12854,6 +12869,15 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# Shielded: the Orc Shieldmaster's single-ally ward.
 			if strike_target.has_status("shielded"):
 				raw *= 0.75
+			# BATCH KE §1 — ROOTBOUND, ASKED ONCE A STRIKE ABOVE ITS FIGURE (IC §1b): while another body of its warband stands, the
+			# blow is cut here, beside Shielded, so every reader below — the credit, `total_dealt`, the float, the line — reads what
+			# lands; `rootbound_precut` (set at the door call) keeps the door from cutting it twice.
+			var rb_cut: float = strike_target.rootbound if strike_target.rootbound > 0.0 \
+				and _rootbound_holds(strike_target) else 0.0
+			if rb_cut > 0.0:
+				raw *= 1.0 - rb_cut
+				_log("   → Rootbound: %s's warband stands (-%d%%)" % [strike_target.unit_name,
+					int(round(rb_cut * 100.0))], "#8cc870")
 			if strike_target.has_status("exposed"):
 				raw *= 1.15
 			# High Guard: hardened stance after a parry.
@@ -13099,6 +13123,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# CONSUMED ON THE FIRST STRIKE — `raw` is recomputed per hit, so
 			# without the zeroing a multi-hit ability would pay it three times.
 			if attacker.aegis_bonus > 0 and ab.damage > 0 and not wall_parry:
+				# BATCH KE §1 — spent on a Rootbound body, the bonus is cut as the blow was (`rb_cut`).
+				if rb_cut > 0.0:
+					attacker.aegis_bonus = maxi(int(round(attacker.aegis_bonus * (1.0 - rb_cut))), 1)
 				final += attacker.aegis_bonus
 				# BATCH IC §1b — a figure the vow will silence is not printed as landing.
 				if silenced:
@@ -13119,6 +13146,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					and not wall_parry and ab == attacker.abilities[0] \
 					and attacker.redoubt_bank >= 1.0:
 				var rd_spent := int(round(attacker.redoubt_bank))
+				# BATCH KE §1 — spent on a Rootbound body, the bank is cut as the blow was (`rb_cut`).
+				if rb_cut > 0.0:
+					rd_spent = maxi(int(round(rd_spent * (1.0 - rb_cut))), 1)
 				final += rd_spent
 				attacker.redoubt_bank = 0.0
 				attacker.refresh_bars()
@@ -13418,6 +13448,8 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if attacker.sunder_shot > 0:
 					strike_target.sunder_shot = int(round(
 						attacker.sunder_shot * attacker.pierce_bonus))
+			# BATCH KE §1 — the blow was cut above (`rb_cut`): the door passes it once uncut.
+			strike_target.rootbound_precut = rb_cut > 0.0
 			var result: Dictionary = strike_target.take_hit(final, pr)
 			# BATCH EZ §2 — THE LONG WATCH. His Break damage carries to a
 			# SECOND enemy, and it carries as `take_hit(0, bd)` — the house
@@ -13650,6 +13682,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				# LANDED (HZ's ruling 6). Asked under the ground's own frame, the one the
 				# door's gate reads: a reflect its layer's vow silences prints no line
 				# and waters nothing, where both read the figure computed above it.
+				reflect = _rootbound_precut(attacker, reflect)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 				var cg_landed := 0 if _vow_silences(attacker) else reflect
 				if cg_landed > 0:
 					_log("   → Consecrated Ground reflects %d to %s%s" % [
@@ -14793,6 +14826,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					_log("   → Talent: %s — %d of the recoil paid as Mana" % [
 						"Perfect Conversion" if attacker.perfect_conversion > 0 \
 							else "Feedback Loop", fb_mana], "#b0a8e0")
+			recoil = _rootbound_precut(attacker, recoil)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 			var recoil_died := attacker.take_tick_damage(recoil, "-%d Recoil" % recoil,
 				Color(1.0, 0.4, 0.5))
 			_log("   → %s recoils for %d" % [attacker.unit_name, recoil], "#e08850")
@@ -15182,6 +15216,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				var tw_was_label := _dmg_label
 				var tw_was_name := _dmg_src_name
 				_dmg_frame(trapper, String(STATUS_INFO["tripwire"][0]), trapper.unit_name)
+				ret = _rootbound_precut(attacker, ret)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 				var ret_result: Dictionary = attacker.take_hit(ret, 0)
 				_stat("dmg_hero_" + trapper.unit_name, ret)
 				attacker.float_text("%d Tripwire" % ret, Color(0.8, 0.65, 0.35))
@@ -15695,6 +15730,7 @@ func _killing_cold_cast(caster: BattleUnit) -> void:
 		var kc_was_label := _dmg_label
 		var kc_was_name := _dmg_src_name
 		_dmg_frame(caster, "Rune: the Killing Cold", caster.unit_name)
+		kc_dmg = _rootbound_precut(e, kc_dmg)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 		var kc_died: bool = e.take_tick_damage(kc_dmg, "-%d" % kc_dmg,
 			Color(0.65, 0.88, 1.0))
 		_stat("dmg_hero_" + _contrib_name(caster), kc_dmg)
@@ -17078,6 +17114,7 @@ func _arcane_arrow_splash(attacker: BattleUnit, struck: BattleUnit,
 	_stamp_arrows_chip(attacker, left)
 	var splash := maxi(int(round(final * ARCANE_ARROW_SPLASH)), 1)
 	splash = maxi(int(round(splash * (1.0 - float(victim.resists.get("arcane", 0.0))))), 1)
+	splash = _rootbound_precut(victim, splash)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 	var res: Dictionary = victim.take_hit(splash, 0)
 	victim.float_text("%d" % splash, Color(0.72, 0.62, 0.95))
 	_stat("dmg_hero_" + _contrib_name(attacker), splash)
@@ -17126,6 +17163,7 @@ func _crossfire_splash(attacker: BattleUnit, struck: BattleUnit,
 		var splash := maxi(int(round(final * CROSSFIRE_SHARE)), 1)
 		splash = maxi(int(round(splash
 			* (1.0 - float(victim.resists.get("physical", 0.0))))), 1)
+		splash = _rootbound_precut(victim, splash)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 		var res: Dictionary = victim.take_hit(splash, 0)
 		victim.float_text("%d" % splash, Color(0.95, 0.55, 0.25))
 		_stat("dmg_hero_" + _contrib_name(attacker), splash)
@@ -17194,7 +17232,7 @@ func _umbral_sigil_echo(branded: BattleUnit, landed: int) -> void:
 		var echo_result: Dictionary = fellow.take_hit(echo, 0)
 		if sg_land > 0:
 			sg_landed = true
-			fellow.float_text("-%d Sigil" % echo, Color(0.65, 0.35, 0.80))
+			fellow.float_text("-%d Sigil" % sg_land, Color(0.65, 0.35, 0.80))
 		if echo_result.died:
 			_stat("enemy_deaths")
 			_sfx("death", -4.0)
@@ -17226,6 +17264,7 @@ func _arcane_echo_repeat(attacker: BattleUnit, ab: Ability, final: int) -> void:
 	var echo := maxi(int(round(final * ARCANE_ECHO_SHARE)), 1)
 	echo = maxi(int(round(echo
 		* (1.0 - float(mark.resists.get("arcane", 0.0))))), 1)
+	echo = _rootbound_precut(mark, echo)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 	var res: Dictionary = mark.take_hit(echo, 0)
 	mark.float_text("%d Echo" % echo, Color(0.72, 0.55, 1.0))
 	_stat("dmg_hero_" + _contrib_name(attacker), echo)
@@ -17535,6 +17574,8 @@ func _on_unit_died(u: BattleUnit) -> void:
 		# BATCH JW §3 — THE STALL RULE's SECOND HALF: when no pickable body of the warband stands, every submerged one surfaces,
 		# so while any enemy lives one can be picked.
 		_surface_if_alone()
+		# BATCH KE §1 — AND A BODY OF THE WARBAND FALLS: the last one standing beside a Rootbound body takes its chip off.
+		_sync_rootbound()
 		# BATCH JJ §2 — A BODY OF THE WARBAND FALLS: its pool fills by a kill's worth, whoever dealt it.
 		# BATCH JQ §1 — UNLESS IT DIES FORSAKEN, AND THEN THE KILL FEEDS NOTHING. Every death of the warband passes here, from
 		# `unit._die`, before the body's statuses are cleared — a strike's, a handler's, a tick's, a debug kill's — so the mark
@@ -17644,6 +17685,7 @@ func _echo_fire(caster: BattleUnit, ab: Ability, tally: Dictionary) -> void:
 		if dmg <= 0:
 			continue
 		_dmg_frame(caster, ab.display_name)
+		dmg = _rootbound_precut(victim, dmg)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 		var res: Dictionary = victim.take_hit(dmg, 0)
 		victim.float_text("%d Repeat" % dmg, Color(0.78, 0.62, 1.0))
 		_stat("dmg_hero_" + _contrib_name(caster), dmg)
@@ -17673,8 +17715,10 @@ func _bot_redoubt_pick(u: BattleUnit) -> Array:
 	var foes := enemies.filter(func(e): return _pickable(e))
 	if foes.is_empty():
 		return []
-	var broken_foes := foes.filter(func(e): return e.broken)
-	return [basic, _lowest_hp(broken_foes) if not broken_foes.is_empty() else _lowest_hp(foes)]
+	# BATCH KE §2 — the mark passes over a Rootbound body while another stands (`_bot_mark_pool`).
+	var mark_foes := _bot_mark_pool(foes)
+	var broken_foes := mark_foes.filter(func(e): return e.broken)
+	return [basic, _lowest_hp(broken_foes) if not broken_foes.is_empty() else _lowest_hp(mark_foes)]
 
 
 # Which of the two paid for that re-pick — for the log alone, so a player can
@@ -19025,14 +19069,14 @@ func _on_blight_heal(victim: BattleUnit, amount: int) -> void:
 	var bw_land := _landed(victim, amount)
 	if bw_land > 0:
 		_log("   → Blight the Well: the mending turns on %s for %d" % [
-			victim.unit_name, amount], "#a050b0")
+			victim.unit_name, bw_land], "#a050b0")
 	else:
 		_log("   → Blight the Well: the mending turns on %s — silenced by %s" % [
 			victim.unit_name, _vow_name()], "#a050b0")
 	var bw_credit := _layer_credit_name(bw_by)
 	if bw_credit != "":
 		_stat("dmg_hero_" + bw_credit, bw_land)
-	if victim.take_tick_damage(amount, "-%d" % amount, Color(0.7, 0.3, 0.6)):
+	if victim.take_tick_damage(amount, "-%d" % bw_land, Color(0.7, 0.3, 0.6)):
 		if not victim.is_hero:
 			_stat("enemy_deaths")
 			_sfx("death", -4.0)
@@ -19284,6 +19328,7 @@ func _mirror_guard_return(defender: BattleUnit, attacker: BattleUnit,
 	var mg_was_label := _dmg_label
 	var mg_was_name := _dmg_src_name
 	_dmg_frame(defender, Runes.display_name(Runes.config("mirror_guard")), defender.unit_name)
+	mg_dmg = _rootbound_precut(attacker, mg_dmg)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 	var mg_res: Dictionary = attacker.take_hit(mg_dmg, 0)
 	attacker.float_text("-%d Mirror" % mg_dmg, Color(0.55, 0.85, 1.0))
 	if defender.is_hero and not attacker.is_hero:
@@ -19551,6 +19596,9 @@ func _psychotic_support(u: BattleUnit) -> Array:
 func _ruin_focus(foes: Array, fallback: BattleUnit) -> BattleUnit:
 	if foes.is_empty():
 		return fallback
+	# BATCH KE §2 — THE FOCUS PASSES OVER A ROOTBOUND BODY WHILE ANOTHER STANDS (`_bot_mark_pool`, DV38): it ranks an unbroken
+	# boss first, which the Warden's grove answers. The bot's own aim, asked by the Cleric's rotation alone.
+	foes = _bot_mark_pool(foes)
 	for e in foes:
 		if e.is_boss and not e.broken:
 			return e
@@ -19959,7 +20007,7 @@ func _detonate_ruin(target: BattleUnit) -> void:
 	# refuses is booked and printed as what it landed. The feast below is paid off the blast
 	# itself, not off its figure, and is untouched.
 	var det_land := _landed(target, det_dmg)
-	var det_died := target.take_tick_damage(det_dmg, "-%d RUIN" % det_dmg,
+	var det_died := target.take_tick_damage(det_dmg, "-%d RUIN" % det_land,
 		Color(0.8, 0.3, 0.9))
 	_stat("dmg_hero_" + occ.unit_name, det_land)
 	_log("%s: Wrath of the Old Gods — Ruin detonates on %s for %s" % [
@@ -20357,9 +20405,10 @@ func _ward_detonate(holder: BattleUnit, how: String) -> void:
 		if not _pickable(wd_e):
 			continue
 		_dmg_frame(holder, "Detonating Ward")
-		var wd_res: Dictionary = wd_e.take_hit(wd_amt, 0)
-		wd_e.float_text("-%d Ward" % wd_amt, Color(0.40, 0.85, 0.95))
-		_stat("dmg_hero_" + _contrib_name(holder), wd_amt)
+		var wd_each := _rootbound_precut(wd_e, wd_amt)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
+		var wd_res: Dictionary = wd_e.take_hit(wd_each, 0)
+		wd_e.float_text("-%d Ward" % wd_each, Color(0.40, 0.85, 0.95))
+		_stat("dmg_hero_" + _contrib_name(holder), wd_each)
 		wd_hit.append(wd_e.unit_name)
 		if wd_res["died"]:
 			_stat("enemy_deaths")
@@ -20679,6 +20728,7 @@ func _burning_ground_tick(u: BattleUnit) -> void:
 		var bg_amt := maxi(int(round(bg_base
 			* (1.0 - float(bg_e.resists.get("holy", 0.0))))), 1)
 		_dmg_frame(u, "Burning Ground")
+		bg_amt = _rootbound_precut(bg_e, bg_amt)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 		var bg_died: bool = bg_e.take_tick_damage(bg_amt, "-%d Burning Ground" % bg_amt,
 			Color(0.95, 0.80, 0.45))
 		if not bg_e.is_hero:
@@ -21656,6 +21706,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 							cf_left - cf_spent)
 					cf_final *= CINDERFALL_SKIM_MULT
 					cf_turns += cf_spent
+				cf_final = _rootbound_precut(foe, cf_final)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 				var cf_hit: Dictionary = foe.take_hit(cf_final, ab.pressure)
 				_stat("dmg_hero_" + attacker.unit_name, cf_final)
 				_stat_bd(attacker, ab.pressure)
@@ -21724,6 +21775,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				wt_raw *= 1.0 - float(held.resists.get("frost", 0.0))
 				var wt_final := maxi(int(round(wt_raw
 					* (1.0 - held.effective_armor()))), 1)
+				wt_final = _rootbound_precut(held, wt_final)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 				var wt_res: Dictionary = held.take_hit(wt_final, ab.pressure)
 				_stat("dmg_hero_" + attacker.unit_name, wt_final)
 				held.float_text("%d Winter's Toll" % wt_final, Color(0.65, 0.88, 1.0))
@@ -21894,6 +21946,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					* randf_range(0.9, 1.1)
 				var th_final := maxi(int(round(th_raw
 					* (1.0 - target.effective_armor()))), 1)
+				th_final = _rootbound_precut(target, th_final)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 				var th_hit: Dictionary = target.take_hit(th_final, ab.pressure)
 				_stat("dmg_hero_" + attacker.unit_name, th_final)
 				_stat_bd(attacker, ab.pressure)
@@ -22109,6 +22162,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 						* attacker.attack * mult * randf_range(0.9, 1.1)
 					var gr_final := maxi(int(round(gr_raw
 						* (1.0 - target.effective_armor()))), 1) if gr_had > 0 else 0
+					gr_final = _rootbound_precut(target, gr_final)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 					var gr_res: Dictionary = target.take_hit(gr_final, ab.pressure)
 					if gr_final > 0:
 						_stat("dmg_hero_" + attacker.unit_name, gr_final)
@@ -22263,6 +22317,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					var ps_armor := 0.0 if attacker.has_status("open_guard") \
 						else target.effective_armor()
 					var ps_final := maxi(int(round(ps_raw * (1.0 - ps_armor))), 1)
+					ps_final = _rootbound_precut(target, ps_final)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 					var ps_res: Dictionary = target.take_hit(ps_final, ps_bd)
 					_stat("dmg_hero_" + attacker.unit_name, ps_final)
 					_stat_bd(attacker, ps_bd)
@@ -22302,6 +22357,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 						* randf_range(0.9, 1.1)
 					var ft_final := maxi(int(round(ft_raw
 						* (1.0 - target.effective_armor()))), 1)
+					ft_final = _rootbound_precut(target, ft_final)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 					var ft_res: Dictionary = target.take_hit(ft_final, FEINT_BD)
 					_stat("dmg_hero_" + attacker.unit_name, ft_final)
 					_stat_bd(attacker, FEINT_BD)
@@ -22476,6 +22532,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					* randf_range(0.9, 1.1)
 				var ss_final := maxi(int(round(ss_raw
 					* (1.0 - target.effective_armor()))), 1)
+				ss_final = _rootbound_precut(target, ss_final)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 				var ss_res: Dictionary = target.take_hit(ss_final, ab.pressure)
 				_stat("dmg_hero_" + attacker.unit_name, ss_final)
 				_stat_bd(attacker, ab.pressure)
@@ -23416,6 +23473,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				kf_raw *= 1.0 - kf_res
 				var kf_final := maxi(int(round(kf_raw
 					* (1.0 - foe.effective_armor()))), 1)
+				kf_final = _rootbound_precut(foe, kf_final)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 				var kf_hit: Dictionary = foe.take_hit(kf_final, ab.pressure)
 				_stat("dmg_hero_" + attacker.unit_name, kf_final)
 				_stat_bd(attacker, ab.pressure)
@@ -23597,6 +23655,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					pw_raw *= 1.0 - pw_res
 					var pw_final := maxi(int(round(pw_raw
 						* (1.0 - pw_mark.effective_armor()))), 1)
+					pw_final = _rootbound_precut(pw_mark, pw_final)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 					var pw_hit: Dictionary = pw_mark.take_hit(pw_final, ab.pressure)
 					_stat("dmg_hero_" + attacker.unit_name, pw_final)
 					pw_total += pw_final
@@ -24308,6 +24367,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					cu_raw *= 1.0 - float(cu_e.resists.get("nature", 0.0))
 					var cu_final: int = maxi(int(round(cu_raw \
 						* (1.0 - cu_e.effective_armor()))), 1)
+					cu_final = _rootbound_precut(cu_e, cu_final)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 					var cu_res: Dictionary = cu_e.take_hit(cu_final, 0)
 					cu_e.float_text("%d Cull" % cu_final, Color(0.45, 0.8, 0.3))
 					_stat("dmg_hero_" + attacker.unit_name, cu_final)
@@ -24544,6 +24604,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					hv_raw *= 1.0 - float(target.resists.get("nature", 0.0))
 					var hv_final := maxi(int(round(hv_raw \
 						* (1.0 - target.effective_armor()))), 1)
+					hv_final = _rootbound_precut(target, hv_final)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 					var hv_res: Dictionary = target.take_hit(hv_final, 0)
 					target.float_text("%d Harvest" % hv_final, Color(0.45, 0.8, 0.3))
 					var hv_heal: int = attacker.heal_amount(
@@ -25477,6 +25538,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				wf_raw *= 1.0 - wf_res
 				var wf_final := maxi(int(round(wf_raw \
 					* (1.0 - foe.effective_armor()))), 1)
+				wf_final = _rootbound_precut(foe, wf_final)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 				var wf_hit: Dictionary = foe.take_hit(wf_final, ab.pressure)
 				_stat("dmg_hero_" + attacker.unit_name, wf_final)
 				_stat_bd(attacker, ab.pressure)
@@ -26894,6 +26956,7 @@ func _ghost_hit(hunter: BattleUnit, kind: String, victim: BattleUnit,
 	var pen := clampf(((0.20 * l) if kind == "aguila" else 0.0), 0.0, 1.0)
 	var gh_armor := victim.effective_armor() * (1.0 - pen)
 	var final := maxi(int(round(raw * (1.0 - gh_armor))), 1)
+	final = _rootbound_precut(victim, final)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 	var result: Dictionary = victim.take_hit(final, 0)
 	# BATCH BB §4 — A BODILESS BLOW IS STILL THE HUNTER'S BLOW. AY §0 found this
 	# site booking NOTHING and correctly reported rather than fixed it, which
@@ -27149,6 +27212,7 @@ func _companion_hit(comp: BattleUnit, victim: BattleUnit, dmg: float, pr: int,
 	raw *= 1.0 - float(victim.resists.get("physical", 0.0))
 	var comp_armor := victim.effective_armor() * (1.0 - clampf(pen, 0.0, 1.0))
 	var final := maxi(int(round(raw * (1.0 - comp_armor))), 1)
+	final = _rootbound_precut(victim, final)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 	var result: Dictionary = victim.take_hit(final, pr)
 	# BATCH KB — VOLLEY: a companion's blow is an arrow (the designer's), and it never misses.
 	var vb_share := _volley_arrow(comp.pack_master, victim, true)
@@ -27803,6 +27867,7 @@ func _spring_trap(placer: BattleUnit, victim: BattleUnit, dmg: float,
 			* randf_range(0.9, 1.1)
 		tr_raw *= 1.0 - float(victim.resists.get("nature", 0.0))
 		var tr_final := maxi(int(round(tr_raw * (1.0 - victim.effective_armor()))), 1)
+		tr_final = _rootbound_precut(victim, tr_final)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 		var tr_res: Dictionary = victim.take_hit(tr_final, 0)
 		_stat("dmg_hero_" + placer.unit_name, tr_final)
 		victim.float_text("%d Trap" % tr_final, Color(0.75, 0.65, 0.30))
@@ -28693,7 +28758,7 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int,
 		var bleed_land := _landed(victim, bleed_dmg)
 		var bleed_result: Dictionary = victim.take_hit(bleed_dmg, 0)
 		if bleed_land > 0:
-			victim.float_text("BLEEDOUT %d" % bleed_dmg, Color(0.9, 0.15, 0.2), true)
+			victim.float_text("BLEEDOUT %d" % bleed_land, Color(0.9, 0.15, 0.2), true)
 		if not victim.is_hero:
 			# The battle's bleedout tally — every hero carries the counter
 			# (Scent of Blood reads it attacker-side).
@@ -28791,7 +28856,7 @@ func _add_bleed_with_burst(victim: BattleUnit, amount: int,
 						sc_h.bleedouts_this_battle], "#b0a8e0")
 		_sfx("crit", -5.0, 0.8)
 		if bleed_land > 0:
-			_log("   → %s BLEEDS OUT for %d" % [victim.unit_name, bleed_dmg], "#e05050")
+			_log("   → %s BLEEDS OUT for %d" % [victim.unit_name, bleed_land], "#e05050")
 		else:
 			_log("   → %s BLEEDS OUT — silenced by %s" % [victim.unit_name, _vow_name()], "#e05050")
 		if bleed_result.died:
@@ -29806,6 +29871,10 @@ func _open_live_payloads() -> void:
 
 
 func _on_unit_revived(u: BattleUnit) -> void:
+	# BATCH KE §1 — A BODY OF THE WARBAND STANDS BACK UP (a mender's Raise, Call the Drowned): the chip is re-read, so a
+	# Rootbound body that stood alone wears it again. Above the hero gate, which every line below it is for.
+	if u != null and not u.is_hero:
+		_sync_rootbound()
 	if u == null or not u.is_hero or u.is_companion:
 		return
 	_reread_live(true)
@@ -32178,8 +32247,70 @@ func _float_silent(victim: BattleUnit) -> void:
 # BATCH IC §2 — WHAT A DOOR CALL WILL LAND, ASKED BEFORE IT IS MADE: the figure, or 0 when the
 # vow refuses it under the frame standing now — the frame the door's gate will read. A site that
 # prints or pays its own figure prints and pays this, so it cannot disagree with the door.
+#
+# BATCH KE §1 — AND ROOTBOUND's CUT, the door's second act on a figure: what lands on a Rootbound body whose warband stands is
+# the figure less the cut (`BattleUnit.rootbound_landed`, the door's own arithmetic), so this answer stays the door's.
 func _landed(victim: BattleUnit, amount: int) -> int:
-	return 0 if amount > 0 and _vow_silences(victim) else amount
+	if amount > 0 and _vow_silences(victim):
+		return 0
+	return victim.rootbound_landed(amount) if victim != null else amount
+
+
+# BATCH KE §1 — ROOTBOUND KNOWN BEFORE A DOOR CALL OUTSIDE THE STRIKE PRINTS OR BOOKS (IA §0.6, IC §1b): the figure cut now,
+# by the door's own arithmetic (`BattleUnit.rootbound_landed`), and the door told (`rootbound_precut`), so what the site
+# floats, logs and books below is what lands, and the door does not cut it twice. Called on the line above the door call, so
+# no other door can spend the mark first. A body that is not Rootbound now gets its figure back untouched.
+func _rootbound_precut(victim: BattleUnit, amount: int) -> int:
+	if victim == null or amount <= 0:
+		return amount
+	var landed := victim.rootbound_landed(amount)
+	if landed != amount:
+		victim.rootbound_precut = true
+	return landed
+
+
+# ══ BATCH KE §1 — ROOTBOUND: THE WITHERED WARDEN's QUESTION (the designer's ruling, *Kill the grove first*) ═════════════
+# While any other body of its warband stands, a body whose data carries `rootbound` takes that share less of the damage that
+# reaches it; alone, it takes it whole. The cut is the unit's, in its two damage doors; the battle answers whether it holds,
+# and draws it.
+#
+# Does any other body of `u`'s warband stand? Every enemy that is not `u` and not dead — a submerged body stands, and a Raised
+# one stands again. Asked at every blow and every tick, so it is never stale. A hero is never Rootbound.
+func _rootbound_holds(u: BattleUnit) -> bool:
+	if u == null or u.is_hero:
+		return false
+	return enemies.any(func(o): return o != u and is_instance_valid(o) and not o.dead)
+
+
+# The chip, re-read off the board: a DISPLAY chip (IG §1), never a status, so nothing dispels, cleanses, purges, ticks or
+# counts it. Laid while the grove stands, taken off when the body stands alone, laid again when a body is Raised; its words
+# read the figure off the body (HO §0). Called at the spawn's end, at the one way down (`_on_unit_died`) and the one way back
+# up (`_on_unit_revived`) — every door the warband's standing changes through. A change is logged once.
+func _sync_rootbound() -> void:
+	for e in enemies:
+		if not is_instance_valid(e) or e.dead or e.rootbound <= 0.0:
+			continue
+		var holds: bool = _rootbound_holds(e)
+		var shown: bool = e.has_display_chip("rootbound")
+		var pct: int = int(round(e.rootbound * 100.0))
+		if holds and not shown:
+			e.set_display_chip("rootbound", "Rootbound", "-%d%%" % pct, Color(0.55, 0.8, 0.45),
+				"While any other of its warband stands,\nit takes %d%% less damage.\nAlone, it takes full damage." % pct)
+			_log("%s is Rootbound: while any other of its warband stands, it takes %d%% less damage" % [e.unit_name, pct],
+				"#8cc870")
+		elif shown and not holds:
+			e.remove_display_chip("rootbound")
+			_log("%s stands alone — Rootbound falls, and it takes full damage" % e.unit_name, "#8cc870")
+
+
+# BATCH KE §2 — THE BOT ANSWERS THE WARDEN's QUESTION, A POLICY (DV38 in the census of record): its MARK — Broken first, then
+# lowest health — passes over a body that is Rootbound now while another pickable body stands, as a player reading the chip
+# would. Asked at the bot's five mark sites only — the fallback's, the two kit branches', the Bastion's and the Cleric's Ruin
+# focus; a card's own aim, and a rule's own choice of the lowest-health foe (Long Watch, a companion's re-aim, the eagle's
+# dive), read `_lowest_hp` as they stand.
+func _bot_mark_pool(foes: Array) -> Array:
+	var open := foes.filter(func(e): return not (e.rootbound > 0.0 and _rootbound_holds(e)))
+	return open if not open.is_empty() else foes
 
 
 # The vow's name, for a line that says it refused a blow.
@@ -32287,6 +32418,7 @@ func _on_damage_taken(victim: BattleUnit, lost: int, hp_before: int, past_last :
 			var fb_was_name := _dmg_src_name
 			if fb_owner != null:
 				_dmg_frame(fb_owner, "Frostbind", fb_owner.unit_name)
+			fb_share = _rootbound_precut(fb_mate, fb_share)  # BATCH KE §1 — cut before this site prints and books (`_rootbound_precut`)
 			fb_mate.take_tick_damage(fb_share, "-%d" % fb_share,
 				Color(0.55, 0.80, 1.0))
 			# IT CREDITS THE CRYOMANCER WHO LAID THE BOND, which is BB §4's
@@ -32359,7 +32491,7 @@ func _on_damage_taken(victim: BattleUnit, lost: int, hp_before: int, past_last :
 		if pn_owner != "":
 			_stat("dmg_hero_" + pn_owner, pn_land)
 		_sfx("hit", -14.0, 0.7)
-		pn_owed.take_tick_damage(pn_share, "-%d PENANCE" % pn_share,
+		pn_owed.take_tick_damage(pn_share, "-%d PENANCE" % pn_land,
 			Color(0.70, 0.38, 0.78))
 		_log("   → Penance: %s pays for the blow — %s%s" % [
 			pn_owed.unit_name,

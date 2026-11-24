@@ -550,6 +550,9 @@ func _s1_nothing_else() -> void:
 	for js_k in (raw as Dictionary):
 		if ((raw as Dictionary)[js_k] as Dictionary).has("zones"):
 			raw[js_k]["zones"] = (raw[js_k]["zones"] as Array).filter(func(z): return not ROSTERS_SINCE.has(int(z)))
+	# BATCH KE — AND THE KEY ADDED SINCE: the Withered Warden's `rootbound` (KE §1) out before the digest, so it goes on asking
+	# whether anything else in the warband's data moved.
+	((raw as Dictionary).get("withered_warden", {}) as Dictionary).erase("rootbound")
 	var rest := rest_digest(raw, ten, hosts, FOLDED)
 	print("    the rest of the data, the ten's damage, the hosts' moved keys and the folded moves aside: %s (JN's %s; %d of the ten, %d hosts)" % [
 		rest, JN_REST, ten.size(), hosts.size()])

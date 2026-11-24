@@ -847,6 +847,9 @@ func _s4_not_done() -> void:
 	for js_k in (raw as Dictionary):
 		if ((raw as Dictionary)[js_k] as Dictionary).has("zones"):
 			raw[js_k]["zones"] = (raw[js_k]["zones"] as Array).filter(func(z): return not ROSTERS_SINCE.has(int(z)))
+	# BATCH KE — AND THE KEY ADDED SINCE: the Withered Warden's `rootbound` (KE §1) out before the digest, so it goes on asking
+	# whether anything else in the warband's data moved.
+	((raw as Dictionary).get("withered_warden", {}) as Dictionary).erase("rootbound")
 	var digest := JSON.stringify(_strip(raw)).md5_text()
 	print("    the data, every cooldown key aside: %s" % digest)
 	ok(digest == DATA_BEFORE, "§4: a figure of the warband moved beside its cooldowns (%s)" % digest)
