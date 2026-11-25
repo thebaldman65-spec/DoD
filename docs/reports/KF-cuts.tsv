@@ -1,0 +1,180 @@
+id	label	tag	cut	why
+slow	Slowed	Sl	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+chilled	Chilled	Ch	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+frozen	Frozen	Fz	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+burn	Burn	F	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+rupture	Rupture	Ru	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+sunder	Sunder	D	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+ward	Ward	W	buff	helps its bearer; its words name no harm to it
+fortify	Fortify	+D	buff	helps its bearer; its words name no harm to it
+barrier	Barrier	Ba	buff	helps its bearer; its words name no harm to it
+focus	Focus	Fo	buff	helps its bearer; its words name no harm to it
+renewal	Renewal	R+	buff	helps its bearer; its words name no harm to it
+surge	Surge	A+	buff	helps its bearer; its words name no harm to it
+mocked	Mocked	M!	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+poison	Poison	P	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+quickdraw	Quick Draw	QD	buff	helps its bearer; its words name no harm to it
+parry_up	Parry Up	P+	buff	helps its bearer; its words name no harm to it
+mana_shield	Mana Shield	MS	buff	helps its bearer; its words name no harm to it
+rampage	Rampage	Rp	buff	helps its bearer; its words name no harm to it
+unity	Unity	Un	buff	helps its bearer; its words name no harm to it
+bewitch	Bewitched	Bw	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+psychosis	Psychosis	Py	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+decay	Decay	Dc	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+ruin	Ruin	R1	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+ruin_primed	Ruin (primed)	R!	buff	an enemy's: the party's mark or a declared blow (DISPEL_NEVER); an enemy's plate is unframed
+hysteria	Mass Hysteria	MH	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+invig	Invigoration	Iv	buff	helps its bearer; its words name no harm to it
+devotion	Devotion Aura	DA	buff	helps its bearer; its words name no harm to it
+tripwire	Tripwire	TW	buff	helps its bearer; its words name no harm to it
+stunned	Stunned	St	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+shieldwall	Shieldwall	SW	buff	helps its bearer; its words name no harm to it
+empower	Empower	+A	buff	helps its bearer; its words name no harm to it
+exposed	Exposed	E	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+cripple	Cripple	Cr	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+hexed	Hexed	Hx	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+retaliate	Retaliation	Rt	buff	helps its bearer; its words name no harm to it
+dazed	Dazed	Dz	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+warband_rally	Rally	Ry	buff	an enemy's own boon; an enemy's plate is unframed
+warband_entrench	Entrenched	Et	buff	an enemy's own boon; an enemy's plate is unframed
+gall	Gall	Ga	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+sap	Sap	Sa	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+mire	Mire	Me	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+fester	Fester	Fr	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+black_rot	Black Rot	Rk	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+noxious_fumes	Noxious Fumes	Fu	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+submerged	Submerged	Su	buff	an enemy's own boon; an enemy's plate is unframed
+shielded	Shielded	Sh	buff	an enemy's own boon; an enemy's plate is unframed
+wrath	Divine Wrath	DW	buff	helps its bearer; its words name no harm to it
+umbral_sigil	Umbral Sigil	US	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+battle_shout	Battle Shout	BS	buff	helps its bearer; its words name no harm to it
+blood_price	Blood Price	Pr	buff	helps its bearer; its words name no harm to it
+scent	Scent of Blood	So	buff	helps its bearer; its words name no harm to it
+deathwish	Deathwish	Dh	buff	helps its bearer; its words name no harm to it
+undying_rage	Undying Rage	UR	buff	helps its bearer; its words name no harm to it
+shield_charges	Interpose	IP	buff	helps its bearer; its words name no harm to it
+high_guard	High Guard	HG	buff	helps its bearer; its words name no harm to it
+tempo	Pivot	Pv	buff	helps its bearer; its words name no harm to it
+killing_edge	Killing Edge	KE	buff	helps its bearer; its words name no harm to it
+bracing	Bracing	Br	buff	helps its bearer; its words name no harm to it
+elem_weak	Elemental Weakness	EW	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+hold_bd	Hold the Line	HL	buff	helps its bearer; its words name no harm to it
+undying	Undying	UD	buff	helps its bearer; its words name no harm to it
+intercession	Intercession	IC	buff	helps its bearer; its words name no harm to it
+bulwark_line	Split Shield	Bu	buff	helps its bearer; its words name no harm to it
+rally_heal	Rallied	Rl	buff	helps its bearer; its words name no harm to it
+immolate	Immolate	IM	buff	helps its bearer; its words name no harm to it
+seeding	Seeding Embers	SE	buff	helps its bearer; its words name no harm to it
+rime	Rime	Ri	buff	an enemy's: the party's mark or a declared blow (DISPEL_NEVER); an enemy's plate is unframed
+slow_burn	Slow Burn	SB	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+rimeguard	Hoarfrost Armor	HA	buff	helps its bearer; its words name no harm to it
+arcane_echo	Arcane Echo	AE	buff	an enemy's: the party's mark or a declared blow (DISPEL_NEVER); an enemy's plate is unframed
+suffering	Suffering	Sf	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+divine_presence	Divine Presence	DP	buff	helps its bearer; its words name no harm to it
+alms	Alms	Al	buff	helps its bearer; its words name no harm to it
+vespers	Vespers	Vs	buff	helps its bearer; its words name no harm to it
+breaking_darkness	Breaking Darkness	Dk!	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+penance	Penance	Pn	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+last_howl	Last Howl	LH	buff	helps its bearer; its words name no harm to it
+succession	Succession	Sc	buff	helps its bearer; its words name no harm to it
+reacquire	Reacquire	Rq	buff	an enemy's: the party's mark or a declared blow (DISPEL_NEVER); an enemy's plate is unframed
+fault_line	Fault Line	FL	buff	helps its bearer; its words name no harm to it
+stalking_horse	Stalking Horse	Hs	buff	helps its bearer; its words name no harm to it
+downwind	Downwind	Wd	buff	helps its bearer; its words name no harm to it
+frostbite	Frostbite	Fb	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+stabilized	Stabilized	St+	buff	helps its bearer; its words name no harm to it
+overcharged	Overcharged	OC	cost	Overcharge spent for the battle: the card's own cost, battle-long; no cleanse lifts it
+sanctified	Hallowed	Hw	buff	helps its bearer; its words name no harm to it
+capacitor	Holy Capacitor	HC	buff	helps its bearer; its words name no harm to it
+faith	Faith	Fa1	buff	helps its bearer; its words name no harm to it
+cons_ground	Consecrated Ground	CG	buff	helps its bearer; its words name no harm to it
+zeal	Blessing of Zeal	Z+	buff	helps its bearer; its words name no harm to it
+bulwark	Bulwark of Fortitude	BF	buff	helps its bearer; its words name no harm to it
+roar	Guardian's Roar	GR	buff	helps its bearer; its words name no harm to it
+loyalty	Loyalty	L	buff	helps its bearer; its words name no harm to it
+blind	Blind	Bd	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+elusive	Elusiveness	El	buff	helps its bearer; its words name no harm to it
+instinct	Hunter's Instinct	HI	buff	helps its bearer; its words name no harm to it
+bestial	Bestial Wrath	Wr	buff	helps its bearer; its words name no harm to it
+spirit_heal	Spirit Bond	Si	buff	helps its bearer; its words name no harm to it
+spirit_mana	Spirit Flow	SM	buff	helps its bearer; its words name no harm to it
+vigor	Vigor	Vg	buff	helps its bearer; its words name no harm to it
+keen_eyes	Eagle Eyes	EE	buff	helps its bearer; its words name no harm to it
+primal_surge	Primal Surge	PS	buff	helps its bearer; its words name no harm to it
+hunt_mark	Marked	Mk	buff	an enemy's: the party's mark or a declared blow (DISPEL_NEVER); an enemy's plate is unframed
+vengeance	Vengeance	Vn	buff	helps its bearer; its words name no harm to it
+held_breath	Held Breath	HB	buff	helps its bearer; its words name no harm to it
+snared	Snared	Sn	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+aper_rhythm	Rhythm	0/3	buff	helps its bearer; its words name no harm to it
+caught	Caught Fast	Ct	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+venom_coat	Venom Coating	VC	buff	helps its bearer; its words name no harm to it
+null_field	Null Field	NF	buff	helps its bearer; its words name no harm to it
+vow	Vow of Suffering	Vw	buff	helps its bearer; its words name no harm to it
+rite_return	Rite of Return	RR	buff	helps its bearer; its words name no harm to it
+blight	Blighted	Bg	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+covenant	Covenant of Ash	CA	buff	an enemy's: the party's mark or a declared blow (DISPEL_NEVER); an enemy's plate is unframed
+quarry	Quarry	Qy	buff	an enemy's: the party's mark or a declared blow (DISPEL_NEVER); an enemy's plate is unframed
+snare_line	Snare Line	Ln	buff	an enemy's: the party's mark or a declared blow (DISPEL_NEVER); an enemy's plate is unframed
+bloodbond	Bloodbond	Bb	buff	helps its bearer; its words name no harm to it
+ghostpack	Ghostpack	Gp	buff	helps its bearer; its words name no harm to it
+crossfire	Crossfire	Cf	buff	helps its bearer; its words name no harm to it
+bear_brunt	Bear the Brunt	Be	buff	helps its bearer; its words name no harm to it
+bring_it_down	Bring It Down	BiD	buff	helps its bearer; its words name no harm to it
+dug_in	Dug In	DI	buff	helps its bearer; its words name no harm to it
+heads_down	Heads Down	HD	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+thick_hide	Thick Hide	TH	buff	helps its bearer; its words name no harm to it
+salve	Salve	Sv	buff	helps its bearer; its words name no harm to it
+reckless_abandon	Reckless Abandon	RA	buff	helps its bearer; its words name no harm to it
+berserk	Berserk	Bk	buff	helps its bearer; its words name no harm to it
+berserk_risk	Berserk	Bk!	cost	Berserk's own cost: takes more damage; no cleanse lifts it
+blood_debt	Blood Debt	BD!	buff	an enemy's: the party's mark or a declared blow (DISPEL_NEVER); an enemy's plate is unframed
+battle_poise	Battle Poise	BP	buff	helps its bearer; its words name no harm to it
+feigned_guard	Feigned Guard	Fe	buff	helps its bearer; its words name no harm to it
+vendetta	Vendetta	Vd	buff	an enemy's: the party's mark or a declared blow (DISPEL_NEVER); an enemy's plate is unframed
+aegis_wall	Aegis Wall	AW	buff	helps its bearer; its words name no harm to it
+unslaked	Unslaked	Uk	buff	helps its bearer; its words name no harm to it
+spite	Spite	Sp	buff	helps its bearer; its words name no harm to it
+boil_over	Boil Over	Bo	cost	Boil Over's own cost: only Blood Frenzy's floor; no writer today (dormant since HZ §2)
+anvil	Anvil	Av	buff	helps its bearer; its words name no harm to it
+recompense	Recompense	Rc	buff	helps its bearer; its words name no harm to it
+turn_the_blade	Turn the Blade	TB	buff	helps its bearer; its words name no harm to it
+discipline	Discipline	Ds	buff	helps its bearer; its words name no harm to it
+answering_steel	Answering Steel	AS	buff	helps its bearer; its words name no harm to it
+formless	Formless	Fm	buff	helps its bearer; its words name no harm to it
+formless_recoil	Formless	Fm!	cost	Formless's own cost: both stances' downsides for two turns; no cleanse lifts it
+wheeling_guard	Wheeling Cut	WC-	buff	helps its bearer; its words name no harm to it
+wheeling_edge	Wheeling Cut	WC+	buff	helps its bearer; its words name no harm to it
+open_guard	Open Guard	OG	buff	helps its bearer; its words name no harm to it
+feinted	Feinted	Fn	buff	an enemy's: the party's mark or a declared blow (DISPEL_NEVER); an enemy's plate is unframed
+feint_guard	Feint	Fg	buff	helps its bearer; its words name no harm to it
+covering_guard	Covering Guard	Cv	buff	helps its bearer; its words name no harm to it
+eye_storm	Eye of the Storm	ES	buff	helps its bearer; its words name no harm to it
+mana_well	Mana Well	MW	buff	helps its bearer; its words name no harm to it
+mirror	Mirror Image	MI	buff	helps its bearer; its words name no harm to it
+exhorted	Exhortation	Ex	buff	helps its bearer; its words name no harm to it
+consecration	Consecration	Cs	buff	helps its bearer; its words name no harm to it
+unburdened	Unburdened	Ub	buff	helps its bearer; its words name no harm to it
+vigil	Undying Vigil	UV	buff	helps its bearer; its words name no harm to it
+arrows	Arcane Arrows	AA	buff	helps its bearer; its words name no harm to it
+camouflage	Camouflage	Cm	buff	helps its bearer; its words name no harm to it
+party_mark	Hunter's Mark	HM	buff	an enemy's: the party's mark or a declared blow (DISPEL_NEVER); an enemy's plate is unframed
+battle_trance	Battle Trance	BT	buff	helps its bearer; its words name no harm to it
+warcry	Warcry	Wc	buff	helps its bearer; its words name no harm to it
+ironclad	Ironclad	Ir	buff	helps its bearer; its words name no harm to it
+emberkeep	Emberkeep	Ek	buff	helps its bearer; its words name no harm to it
+frostbind	Frostbind	Bn	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+unmade	Unmaking	Um	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+resonant_field	Resonant Field	RF	buff	helps its bearer; its words name no harm to it
+threshold_lock	Threshold	Lk	cost	Threshold's own cost: Resonance can rise no more while it holds; no cleanse lifts it
+tracked	Tracked	Tr	buff	an enemy's: the party's mark or a declared blow (DISPEL_NEVER); an enemy's plate is unframed
+judged	Judged	Jd	buff	an enemy's: the party's mark or a declared blow (DISPEL_NEVER); an enemy's plate is unframed
+oathbound	Oathbound	Ob	buff	helps its bearer; its words name no harm to it
+forsaken	Forsaken	Fk	buff	an enemy's: the party's mark or a declared blow (DISPEL_NEVER); an enemy's plate is unframed
+broken	Broken	—	debuff	in DEBUFF_IDS — the Break meter's state; no cleanse lifts it and no count reads it (HU §4)
+bleed	Bleed	—	debuff	in DEBUFF_IDS — the Bleed meter's warning chip; the Cleansing Draught refuses it, and the meter lays it again
+melted	Melted	—	debuff	in DEBUFF_IDS — an enemy's display chip (Melt Armor); an enemy's plate is unframed
+anointed	Anointed	—	buff	a party ward laid by its own writer; helps its bearer
+fortified	Fortified	—	buff	a party ward laid by its own writer; helps its bearer
+standard	Standard Bearer	—	buff	the Standard Bearer's aura on an ally; helps its bearer
+unrelenting	Unrelenting Assault	—	buff	Constitution gained on the hero's own blows; helps its bearer
+charging	Charging	—	buff	an enemy's declared wind-up (DISPEL_NEVER); an enemy's plate is unframed

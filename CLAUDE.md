@@ -2355,6 +2355,17 @@ It supersedes the class-core half of FT §1's block below: **no class has a core
   · **THE VOW'S CHIP SAYS WHAT IT SILENCES THAT HE HOLDS (ID §4)** — his ground's reflect, the Ruin draught his blows would
     drink, Suffering's heal — each named only while he holds what pays it, the heal figure read off his payload; IN EFFECT
     while one is live (his ground laid, a Ruined enemy standing), ARMED otherwise.
+  · **A CHIP ON THE HERO SIDE SAYS WHICH WAY IT CUTS (KF §1, the designer's ask: *a distinction on the hero name plates
+    between buffs and debuffs*).** On a hero's or a companion's plate a harmful chip is framed red and thicker, a helpful one
+    green and thin, and its hover's first word names it. **`BattleUnit.status_cut` is the one answer, in three words**: a
+    *Debuff* is what `DEBUFF_IDS` names; a *Cost* is a status a hero's own card lays on him that harms him and that no cleanse
+    may lift (`PLATE_COST_IDS`); every other status is a *Buff*; a display chip cuts by its id as a status does, and none on the
+    hero side is in either list; a composition cuts as the worst of its ingredients. The engine chip states a held engine and stays unframed. The frame is never a second `ColorRect`, since
+    the row's readers count a chip as one, and it takes no mouse. **It is not a rune chip's border**: it wraps a status's
+    coloured chip and its letters, where a rune chip is a dark chip with a thin purple or grey border bearing ✦ at the row's right end. **An enemy's plate stays
+    unframed**: on that side a status the registry does not name is the enemy's own boon or the party's mark, and the unit
+    cannot tell the two apart. **Every status `STATUS_INFO` holds, and every one a line lays by its literal id, has its row in KF's census of record**
+    (`docs/reports/KF-cuts.tsv`), held to `status_cut` by `check_kf` §1, so a status written later reds until it is classed.
 
 ## STANDING RULE — THE SHEET SHOWS WHAT THE HERO IS; THE PANELS SHOW WHAT HE WEARS (Batch IH §0, the designer's)
 > **The hero sheet holds what the hero IS: his live stats, his class passive, his lineage's own engine and his talents.
@@ -4921,6 +4932,25 @@ same breath as the removal.
   until its boss is placed; `check_ke` §5 holds the Warden's.
 - **WHY IT IS A VALUE AND NOT A FIGURE**: it says what a boss fight is for, and leaves the numbers to play (`docs/ways-of-working.md`,
   WHO OWNS WHAT). A strategy is the question; how hard it presses is tuning.
+
+## STANDING DESIGN RULE — A ZONE FIELDS ITS OWN KINDS (Batch KF §2, KF's reading of the designer's word)
+> **A zone written after the Forest of Old and the Scarlands fields its own kinds and takes no other zone's.** The designer,
+> after playing the Frozen Plains and the Drowned Barrow with the Orcs in them (24 November): *"enemies are not showing up in
+> there correct zones"*. The rule is KF's reading of those words; the words are the designer's.
+
+- **WHAT IT RETIRED: JS's RULING 6**, under which every kind tagged for every old roster travelled to a new one, so ten Orc kinds,
+  the Orc Chief and the Hollow Crown stood in the Frozen Plains' roster from JS and in the Drowned Barrow's from JW. KF took the
+  ten out of both rosters (`data/enemies.json`); each of the two now fields its own six kinds and its own boss.
+- **TWO KINDS STAND IN EVERY ROSTER, EACH NAMED, WHILE THEY ARE RULED**: the Orc Chief, the game's one `elite`, without whom no
+  elite theme composes, and the Hollow Crown, the end boss, whose tags no node composes. What fields the two new zones' elite
+  nodes in the Chief's place, and whether the Drowned Barrow gets a mender of its own, are the designer's (KF's NEEDS A RULING).
+  `check_kf` §2 reds on any third kind of an old zone standing in a new one.
+- **THE FOREST OF OLD AND THE SCARLANDS SHARE THEIR ORCS, AND THAT IS THE DESIGNER's TO RULE**: both rosters were the Orcs'
+  before either new zone was written, and the Scarlands holds two kinds of its own beside them.
+- **A ZONE WRITTEN FROM NOW ON IS SHOWN TO COMPOSE ON ITS OWN KINDS**: a roster with no kind for a role empties every theme whose
+  minimum needs that role, so the batch shows that some theme of each node composes at every budget that node can roll —
+  `check_kf` §2 reads the zones off `Run.ZONE_ORDER`, asks it of every one and prints the themes each never fields, and holds
+  every zone past the first two to kinds no other zone fields — or says which nodes fall to `compose`'s plain fallback, and why.
 
 ## STANDING DESIGN RULE — THE PROTECTED CORE IS THE BASELINE (Batch EB §1)
 > **A protected core may be cheaper and faster than a comparable draft card. The core is the

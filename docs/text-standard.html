@@ -91,7 +91,8 @@ computed block</td><td>the post-prologue
 damage/BD + cooldown with turns remaining + initiative + Perfect</td><td><b>the live
 <code>BattleUnit</code> — the richest ctx in the game</b></td></tr>
 <tr><td>Status chip (<code>unit.gd</code>)</td><td>chip tooltip; the spec chip carries
-<code>passive_desc</code></td><td>the live <code>BattleUnit</code>. <b>Four specs rewrite
+<code>passive_desc</code>; on the hero side the tooltip's first word is the chip's cut, <i>Debuff</i>, <i>Cost</i> or <i>Buff</i>,
+read off <code>BattleUnit.status_cut</code> and never authored</td><td>the live <code>BattleUnit</code>. <b>Four specs rewrite
 theirs live</b> in <code>refresh_bars</code> — bloodrage, heavy plating, seasoned and (Batch
 CL) resonance</td></tr>
 </table>

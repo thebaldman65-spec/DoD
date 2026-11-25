@@ -4,6 +4,31 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A plate tells a buff from a debuff; a zone fields its own kinds (Batch KF) — 2026-11-24
+
+**Why the frame reads the debuff list.** The game already had a word for a debuff — the list Iron Will counts and most cleanses
+lift from — so the plate draws what the game already means. Three on that list no cleanse lifts (Broken, the Bleed warning, a
+sticky Poison), and they stay debuffs: the word is the game's list, not a promise of a cleanse. **Why a third word, Cost.** Four
+harms a hero's own card lays on him — Berserk's risk, Formless's recoil, Threshold's lock, a spent Overcharge — and a fifth with no
+writer today, Boil Over's spent floor, are not on that list at all (no cleanse may lift them, Iron Will does not count them); framing them as harm is right,
+and naming them apart keeps the debuff word the game's own, so their hover says *Cost*. **Why the display
+chips are framed.** Most of a hero's buffs are drawn as display chips (a talent's or a card's figure), and Berserk's own pair would
+otherwise read as an unframed chip beside a red one. **Why a frame and not a regrouping.** A chip keeps the place it landed in, so
+the row does not reshuffle every time an effect lands or fades; the frame's thickness differs as well as its colour, so it reads
+without colour. **Why heroes only.** On an enemy a status that is not a debuff is either its own boon or the party's mark on it,
+and the plate cannot tell the two apart; the designer asked for the hero plates. **Why the Orcs left the two new zones.** They
+came with the batches that wrote the zones (every kind in every old roster travelled), and in play the designer found them in the
+wrong zones: they made the Frozen Plains
+and the Drowned Barrow read as more Orc fights (the designer's playtest logs show fights there with no kind of the zone's own).
+**Why the Orc Chief stays.** Every elite fight is built around one elite enemy,
+and he is the only one; taking him out would turn those zones' elite fights into ordinary ones at an elite's reward, which is a
+balance question for the designer, not a correction. The same holds for the Drowned Barrow's healer: its own six kinds hold no
+mender, so outside the boss fight its fights heal only through a Rotfiend's burst and raise nowhere, and whether it gains one is
+the designer's. **What this
+narrows.** JS let every Orc travel to a new zone, JX gave each zone one roster with those Orcs in it, and JR's three hex carriers
+were met more often partly because two of them travelled; each stands for the Forest and the Scarlands and no longer for the two
+new zones.
+
 ## The Withered Warden: kill the grove first (Batch KE) — 2026-11-23
 
 **Why a kill order.** JW's value is that each boss fight asks the party one question of its own. The Bone Shepherd asks for

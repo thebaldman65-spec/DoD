@@ -17,6 +17,62 @@ heading stands in both files. **Since JE §3 it also takes what `CLAUDE.md` clos
 
 ---
 
+## ARCHIVED AT KF — 2026-11-24, FROM `docs/state.md` AS KE LEFT IT (`4709814`)
+
+*The designer played KE's build on 24 November against the look-list's fifteen open rows (KF's record, the look-list page's notes): thirteen LOOK RIGHT, and they come here byte for byte; the two left NOT YET stand in the live file.*
+
+### THE PLAYTEST'S OTHER FINDINGS — THE LOOK-LIST's ROWS PASSED ON 24 NOVEMBER (archived at KF; the section stays in `docs/state.md`)
+
+  · **A SECOND RUN, WITH A DIFFERENT PARTY** (IQ's ruling 1, carried through IR's and IS's): every figure in THE FIRST CLEAN
+    PLAYTHROUGH (above) is one run and one party. *Play.*
+  · **THE FIRST RUN's FRAMING CARD** (IR's ruling 6): placed by its own height at IR, its foot at y=690 — measured headless, never
+    seen. *One look, no play*: a new profile, the first map. *Since KD its dismissal opens the relic hand-out when a held
+    relic is owed.*
+  · **THE RELIC HAND-OUT** (KD §2): on a run's first map, on arrival (after *Take the road* only where the framing card
+    shows), one held relic at a time before any
+    hero's pick, each hero's button naming what he holds; the twelve texts naming *the hero holding it*; the map card's
+    *Relic held:* tooltip; an event's relic line. Driven headless, never seen. *One look*: a new run with two held relics
+    drafted, and a v16 save loaded.
+  · **ROOTBOUND ON THE WARDEN's PLATE** (KE §1): its chip while any other of its warband stands, its share on the tag, off when it stands
+    alone; every float on it the figure that lands (a strike's, a card's, a tick's label); the log's line when it holds and falls.
+    Driven headless, never seen. *One look*: the Forest's boss fight, its escort cut down.
+  · **THE MAP's ARRIVAL TOAST WRAPS** (IS §2a): a toast longer than the screen takes a second line, where it ran off both ends. *One
+    look*: load a run whose save names a removed card, or take a drop whose line runs long.
+  · **THE FALL's WORDS ON THREE SCREENS** (JD §2, §4): the framing card's heal line is a character wider than the card's widest was, and names no owner for its percentage, which would widen it further; the victory card adds its sentence on a hero left down (the next row); the pouch's Revive Potion refuses on the map. Read in the code, never
+    seen. *One look*: a new profile's first map, a won fight with a hero down, the pouch on the map.
+  · **THE RELIC CARDS AND THE VICTORY CARD** (JE §1): three relics read *every hero* again, and the victory card reads *A hero left down recovers N%.* or *does not.* Read in the code, never seen. *One look*: a won fight with a hero down and a relic held, and one with none.
+  · **COMMUNION ON THE CREST STRIP** (JG §3, re-keyed at JH §1): its chip ARMED and PAYING, the words *while every hero who stands wears 2 or more core runes* on one tooltip line FOUND AT JH names, the Peddler's row *for the crest* and the bag's; driven headless, never seen. *One look*: a fight wearing it with every hero on two cores, and one with a hero on one.
+  · **THE FROZEN PLAINS** (JS §1–§3): **its map, its events and its battles wear the Forest's backdrop**, a placeholder named in each
+    dict, so the zone reads as the Forest under another name until art lands; its six kinds are tinted orcs, under the themes' old names
+    (a Hailcaster in a *Poison Volley*); the Glacier Press and the Trampling Charge declare a *crush* on the plate; the Hailcaster's
+    Hailstorm lays Dazed on every ally; the Titan's Entomb, declared a plain strike, freezes a hero, whose plate reads Frozen — its chip
+    names the Cryomancer's hold — and whose turn passes by; the Hailcaster and the Warden are both frost white, so whether the six read
+    apart is a look, and so is whether the Rimehorn, at speed 68, ever buys its Rally (JL found the slow bodies bought none). Driven headless, never seen. *One look*: a new run that draws the Frozen Plains
+    (three runs in four since JX, at any stage), a fight there, an event there (the Forest's two no longer deal; the Withered Shrine's *warden of the
+    woods* and Ashfall still deal everywhere, as before JS) and its boss.
+  · **THE STAGES** (JX §1, §3): **a zone at a stage it never stood at** — the Scarlands or the Barrow first or last, the end boss's
+    board after either; the Forest or the Frozen Plains in the middle — its map's header and its next zone's name; the Forest
+    fielding the Ash Hurler at the first stage and the Frozen Plains its Rimehorn, Matron and Stillwrought there; **the Shepherd's
+    plate**: Bone Smash his swing, Soul Leech's **CD**; the debug jump's toast. Driven headless, never seen. *One look*: two new
+    runs, the third stage's zone in each.
+  · **THE RULINGS ANSWERED** (JZ §1–§4): Momentum's, Channel's and Sanctity's chips read *n/cap* where they read ★, their hover
+    a line or two longer; the covered ally's chip and its block line say *Split Shield*; a refused second Glacial Prison on a
+    held enemy says *Held*; Mark of the Hunt's card in eight lines and Kill Command's in twelve; the Rupture chip's three-line
+    rider and its Break line naming its maker's turn; Aper striking for Kill Command, Ghostpack and Call of the Wild; a held,
+    Ruptured enemy sitting Broken. Driven headless, never seen. *One look*: a Cryomancer with fire, a Beastmaster wearing Tusk and
+    Bristle, a Warden splitting his wall, and a Warrior's, a Mage's and a Cleric's engine chip.
+  · **THE KIT CARDS' NEW FIGURES** (KA §1; Heal KB §1): Nexus Ward's and Unburden's cards read 25% and 30% through their doors,
+    the Cleric's kit card reads *Heal*, 20% of the Cleric's maximum (26% on a Perfect), the *Unburdened* chip says 30% less,
+    and Magic Missiles' battle tooltip reads 5 Break damage a bolt. Driven headless, never seen. *One look*: a Mage's and a
+    Cleric's kit on the draft card and in a fight.
+  · **HEAL, VOLLEY, THE AMBUSHER AND THE CONVERSION** (KB §1–§5): Holy's card reads *Greater Heal* (its card, its log, Holy
+    Capacitor's and Empower's tooltips) and the Eleventh Hour names Heal; the action bar's *Overdraw +N (V)* button and the turn
+    bar's preview of the added initiative; Volley's and the Ambusher's rune texts; Common Foe's tracked mark and Pounce's state
+    on the rune chip row; a pre-KB save's former core moved off its slot, said. Driven headless, never seen. *One look*: a
+    Cleric's kit in a fight; a Hunter on Volley and the Ambusher overdrawing; a Hunter wearing Common Foe and Pounce.
+
+---
+
 ## ARCHIVED AT KD — 2026-11-23, FROM `docs/state.md` AS KC LEFT IT (`090687d`)
 
 *Per-hero relics are built at KD (`docs/reports/KD.md`): a relic on a battle-spawn stat hook pays only the hero it is handed to on the first map, at twice its figure (the designer's ruling at KD), and the thirteen others pay every hero. What recorded the build as owed, and what KD's edits closed, moved here word for word. CX's scope said every read would change signature and the save's one key its format; KD kept all four signatures and added a key (`relic_holders`, v17). CX counted thirteen texts worded party-wide; KD rewords twelve — nine of those and the three school relics, which named nobody — and the four on JY's ruling 12's hooks keep their words.*

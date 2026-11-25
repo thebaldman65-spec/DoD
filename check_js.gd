@@ -150,10 +150,17 @@ func _initialize() -> void:
 	_fresh_meta()
 	_s0_the_record()
 	# BATCH JX §1 — §1's DERIVATIONS REPLAY JS's WORLD: the roster tags as they stood before JX's fold go into the warband's own
-	# table (the composer reads it) for the zone's section, and JX's come back after it.
+	# table (the composer reads it) for the zone's section, and the live ones come back after it.
+	# BATCH KF §2 — AND THE LIVE TAGS COME BACK, NOT JX's (until KF, JX's came back here): since KF the two differ.
+	var live_zones := {}
+	for lk in Enemies._load():
+		live_zones[lk] = ((Enemies._load()[lk] as Dictionary).get("zones", []) as Array).duplicate()
 	Gate.rosters_before_jx(Enemies._load())
 	_s1_the_zone()
-	Gate.rosters_at_jx(Enemies._load())
+	for lk in live_zones:
+		(Enemies._load()[lk] as Dictionary)["zones"] = live_zones[lk]
+	var back := live_zones.keys().all(func(lk): return (Enemies._load()[lk] as Dictionary).get("zones", []) == live_zones[lk])
+	ok(back, "§1: the live roster tags did not come back after JS's replay — a later section reads rosters no build fields")
 	_s1_the_draw()
 	_s2_the_six()
 	_s3_the_titan_data()

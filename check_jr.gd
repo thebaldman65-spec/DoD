@@ -56,7 +56,7 @@ const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "r
 	"grave_husk", "mossback", "blight_speaker", "carrion_pack",
 	# BATCH JW §1 — AND THE DROWNED BARROW's THREE, set aside as JS's seven and JU's four are.
 	"rotfiend", "fen_lurker", "bone_shepherd"]
-# BATCH JW §1 — and roster 6, the Drowned Barrow's, which the travelling core takes as it took 4 and 5.
+# BATCH JW §1 — and roster 6, the Drowned Barrow's, which the travelling core took as it took 4 and 5, until KF §2.
 const ROSTERS_SINCE := [4, 5, 6]
 # AND WHAT THE SEVEN ADD TO TWO OF THIS GATE's LISTS: the Stillwrought lays Sap on its blow (Sap's second carrier), and the
 # Icewrought Titan is fielded by a rule (the Frozen Plains' boss).
@@ -358,7 +358,11 @@ func _s1_the_carriers() -> void:
 	print("\n§1 — the three rare carriers fielded more often, derived off the data; every hex on its carrier; no rule-fielded kind drawn")
 	var data: Dictionary = Enemies._load()
 	# BATCH JX §1 — JR's RATES ARE OF ROSTERS 1, 2 AND 3, which JX folded (3 into 1, 5 into 4): the tags as they stood before JX go
-	# into the warband's own table, which the composer reads, for this section, and JX's come back at its end.
+	# into the warband's own table, which the composer reads, for this section, and the live ones come back at its end (KF §2:
+	# since KF the live tags are not JX's).
+	var live_zones := {}
+	for lk in data:
+		live_zones[lk] = ((data[lk] as Dictionary).get("zones", []) as Array).duplicate()
 	Gate.rosters_before_jx(data)
 	# THE TAGS, AS JR SET THEM.
 	for kind in AS_JR:
@@ -466,7 +470,10 @@ func _s1_the_carriers() -> void:
 	var d := JSON.stringify(as_head, "", true).md5_text()
 	print("    the warband's data with the three tags put back: %s" % d)
 	ok(d == WARBAND_AT_HEAD_MD5, "§1: something in the warband's data moved besides the three tags — a move, a figure, a kind")
-	Gate.rosters_at_jx(data)
+	for lk in live_zones:
+		(data[lk] as Dictionary)["zones"] = live_zones[lk]
+	var back := live_zones.keys().all(func(lk): return (data[lk] as Dictionary).get("zones", []) == live_zones[lk])
+	ok(back, "§1: the live roster tags did not come back after JR's replay — a later section reads rosters no build fields")
 
 
 # ── §2 — A CITATION IS THE TEXT ───────────────────────────────────────────────

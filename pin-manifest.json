@@ -2,13 +2,13 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 2438,
+  "total": 2443,
   "source": 1479,
   "other": 363,
-  "document": 596
+  "document": 601
  },
  "floor": {
-  "pins": 2438
+  "pins": 2443
  },
  "falls": [],
  "source_residency": {
@@ -13262,7 +13262,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jr.gd#459",
+   "g": "check_jr.gd#465",
    "expr": "_flat"
   },
   {
@@ -13274,7 +13274,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_jr.gd#516",
+   "g": "check_jr.gd#522",
    "expr": "LEDGER_STALE"
   },
   {
@@ -13286,7 +13286,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_jr.gd#516",
+   "g": "check_jr.gd#522",
    "expr": "LEDGER_SAYS"
   },
   {
@@ -13298,7 +13298,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_jr.gd#520",
+   "g": "check_jr.gd#526",
    "expr": "RELICS_STALE"
   },
   {
@@ -13310,7 +13310,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "derived",
-   "g": "check_jr.gd#520",
+   "g": "check_jr.gd#526",
    "expr": "RELICS_SAYS"
   },
   {
@@ -13322,7 +13322,7 @@
    "r": "runtime",
    "k": "composed",
    "how": "read",
-   "g": "check_jr.gd#507"
+   "g": "check_jr.gd#513"
   },
   {
    "s": "check_jr.gd",
@@ -13333,7 +13333,7 @@
    "r": "runtime",
    "k": "composed",
    "how": "read",
-   "g": "check_jr.gd#507"
+   "g": "check_jr.gd#513"
   },
   {
    "s": "check_jr.gd",
@@ -13344,7 +13344,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_jr.gd#512"
+   "g": "check_jr.gd#518"
   },
   {
    "s": "check_jr.gd",
@@ -13355,7 +13355,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_jr.gd#518"
+   "g": "check_jr.gd#524"
   },
   {
    "s": "check_js.gd",
@@ -13366,7 +13366,7 @@
    "r": "runtime",
    "k": "composed",
    "how": "param",
-   "g": "check_js.gd#98"
+   "g": "check_js.gd#104"
   },
   {
    "s": "check_js.gd",
@@ -13377,7 +13377,7 @@
    "r": "code",
    "k": "literal",
    "how": "param",
-   "g": "check_js.gd#102"
+   "g": "check_js.gd#108"
   },
   {
    "s": "check_js.gd",
@@ -13388,7 +13388,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_js.gd#170",
+   "g": "check_js.gd#176",
    "expr": "ANSWERED"
   },
   {
@@ -13400,7 +13400,7 @@
    "r": "runtime",
    "k": "composed",
    "how": "read",
-   "g": "check_js.gd#164"
+   "g": "check_js.gd#170"
   },
   {
    "s": "check_js.gd",
@@ -13411,7 +13411,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_js.gd#168"
+   "g": "check_js.gd#174"
   },
   {
    "s": "check_js.gd",
@@ -13422,7 +13422,7 @@
    "r": "missing-file",
    "k": "format",
    "how": "read",
-   "g": "check_js.gd#415"
+   "g": "check_js.gd#421"
   },
   {
    "s": "check_js.gd",
@@ -13433,7 +13433,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_js.gd#416",
+   "g": "check_js.gd#422",
    "alt": true
   },
   {
@@ -13445,7 +13445,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_js.gd#416",
+   "g": "check_js.gd#422",
    "alt": true
   },
   {
@@ -13457,7 +13457,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_js.gd#285",
+   "g": "check_js.gd#291",
    "expr": "String"
   },
   {
@@ -13469,7 +13469,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_js.gd#557",
+   "g": "check_js.gd#563",
    "expr": "RECORD_SAYS"
   },
   {
@@ -13481,7 +13481,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_js.gd#566"
+   "g": "check_js.gd#572"
   },
   {
    "s": "check_jx.gd",
@@ -13749,6 +13749,63 @@
    "k": "literal",
    "how": "read",
    "g": "check_ke.gd#336"
+  },
+  {
+   "s": "check_kf.gd",
+   "fn": "_s3_record",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_kf.gd#334",
+   "expr": "ZONE_BLOCK"
+  },
+  {
+   "s": "check_kf.gd",
+   "fn": "_s3_record",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_kf.gd#338",
+   "expr": "CHIP_WORDS"
+  },
+  {
+   "s": "check_kf.gd",
+   "fn": "_s3_record",
+   "h": "CLAUDE.md",
+   "n": "\n## ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_kf.gd#335"
+  },
+  {
+   "s": "check_kf.gd",
+   "fn": "_s3_record",
+   "h": "CLAUDE.md",
+   "n": "Drowned Barrow",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_kf.gd#337"
+  },
+  {
+   "s": "check_kf.gd",
+   "fn": "_s3_record",
+   "h": "CLAUDE.md",
+   "n": "Frozen Plains",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_kf.gd#337"
   },
   {
    "s": "test_batch_ah.gd",

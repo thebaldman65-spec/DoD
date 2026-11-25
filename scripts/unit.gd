@@ -4359,18 +4359,23 @@ func _refresh_chips() -> void:
 			x0 += float(widths[i]) + 2.0
 			shown = i + 1
 	var x := 0.0
+	# BATCH KF §1 — the engine chips stand first and are never cut: each states a held engine, not something done to the hero.
+	var first_cut := engine_chips.size()
 	for i in shown:
 		var s: Dictionary = row[i]
 		var tip := "%s (%s turn%s left)\n%s" % [s.label, s.turns, "" if s.turns == 1 else "s", s.desc]
 		if s.id == "broken" or s.turns < 0:
 			tip = "%s\n%s" % [s.label, s.desc]
+		var cut := status_cut(s) if is_hero and i >= first_cut else ""
+		if cut != "":
+			tip = "%s: %s" % [PLATE_CUT_WORDS[cut], tip]
 		# Batch Z: a chip surfaces its glossary line when it has one and the
 		# chip's own text doesn't already say the same thing — the highest-
 		# value contextual door into the glossary.
 		var gl_short := Glossary.status_short(String(s.id))
 		if gl_short != "" and gl_short != String(s.desc):
 			tip += "\n— %s (see Glossary)" % gl_short
-		x += _draw_chip(String(s.short), s.color, tip, x, float(widths[i])) + 2.0
+		x += _draw_chip(String(s.short), s.color, tip, x, float(widths[i]), cut) + 2.0
 	if shown < count:
 		var hidden := PackedStringArray()
 		for i2 in range(shown, count):
@@ -4378,6 +4383,43 @@ func _refresh_chips() -> void:
 		var more := "+%d" % (count - shown)
 		_draw_chip(more, Color(0.62, 0.6, 0.66), "%d more:\n%s" % [count - shown, "\n".join(hidden)],
 			x, _chip_width(more))
+
+
+# BATCH KF §1 — A CHIP ON THE HERO SIDE SAYS WHICH WAY IT CUTS (the designer's ask, 24 November: *"a distinction on the hero
+# name plates between buffs and debuffs"*). `status_cut` is the one answer, and it has three words. A DEBUFF is what
+# `DEBUFF_IDS` names — the game's own registry, which *Iron Will* counts and most cleanses lift (Broken and the Bleed meter's
+# chip are in it, and no cleanse lifts either: the word is the registry, not a promise of a cleanse). A COST is a status a
+# hero's own card lays on him that harms him and that no cleanse may lift, outside that list: `PLATE_COST_IDS`, one of them
+# (Boil Over's) with no writer today. A composition
+# cuts as the worst of its ingredients. Every other status, and every display chip, is a BUFF. A debuff and a cost take the
+# red frame, thicker, so harm reads apart from help without colour; the hover's first word tells the two harms apart.
+# **The hero side only** — heroes and companions: on an enemy a status that is not a debuff is its own boon or the party's
+# mark (`battle.gd`'s `DISPEL_NEVER`), which this file cannot tell apart, so an enemy's plate is drawn as it was. An engine
+# chip states a held engine and is drawn unframed. Every status `STATUS_INFO` holds, and every one a line lays by its literal
+# id, is classed in KF's census of record (`docs/reports/KF-cuts.tsv`), which `check_kf` §1 holds to this function, so a new
+# status reds until it is classed.
+const PLATE_COST_IDS := ["berserk_risk", "formless_recoil", "threshold_lock", "overcharged", "boil_over"]
+const PLATE_CUT_WORDS := {"debuff": "Debuff", "cost": "Cost", "buff": "Buff"}
+const PLATE_DEBUFF_FRAME := Color(0.93, 0.20, 0.18)
+const PLATE_BUFF_FRAME := Color(0.42, 0.88, 0.44)
+const PLATE_DEBUFF_FRAME_W := 2.0
+const PLATE_BUFF_FRAME_W := 1.0
+
+
+static func status_cut(s: Dictionary) -> String:
+	if s.has("parts"):
+		var worst := "buff"
+		for p in s["parts"]:
+			var c := status_cut(p)
+			if c == "debuff":
+				return "debuff"
+			if c == "cost":
+				worst = "cost"
+		return worst
+	var id := String(s.get("id", ""))
+	if DEBUFF_IDS.has(id):
+		return "debuff"
+	return "cost" if PLATE_COST_IDS.has(id) else "buff"
 
 
 # BATCH IH §6 — a chip's width is its tag's at the chip's font, with a margin; never under 12.
@@ -4394,7 +4436,9 @@ func _chip_width(tag: String) -> float:
 
 
 # One chip on the row: a filled box and its tag, the tag parented before it is sized. Returns its width.
-func _draw_chip(tag_text: String, color: Color, tip: String, x: float, w: float) -> float:
+# BATCH KF §1 — `cut` ("debuff", "cost" or "buff"; "" for none) frames the box: a `ReferenceRect` between the fill and the
+# tag, never a second `ColorRect` (the row's readers count a chip as one), and it takes no mouse, so a click is the chip's.
+func _draw_chip(tag_text: String, color: Color, tip: String, x: float, w: float, cut := "") -> float:
 	var chip := ColorRect.new()
 	chip.color = color
 	chip.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -4403,6 +4447,15 @@ func _draw_chip(tag_text: String, color: Color, tip: String, x: float, w: float)
 	chip.gui_input.connect(_on_plate_input)
 	chip.tooltip_text = tip
 	_put(_chips_root, chip, Vector2(x, 0), Vector2(w, PLATE_CHIP_H))
+	if cut != "":
+		var harms := cut != "buff"
+		var frame := ReferenceRect.new()
+		frame.editor_only = false
+		frame.border_color = PLATE_DEBUFF_FRAME if harms else PLATE_BUFF_FRAME
+		frame.border_width = PLATE_DEBUFF_FRAME_W if harms else PLATE_BUFF_FRAME_W
+		frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		frame.set_meta("chip_cut", cut)
+		_put(_chips_root, frame, Vector2(x, 0), Vector2(w, PLATE_CHIP_H))
 	var tag := Label.new()
 	tag.add_theme_font_size_override("font_size", CHIP_FONT_LONG if tag_text.length() > 2 else CHIP_FONT_SHORT)
 	tag.add_theme_color_override("font_color", Color(0.05, 0.05, 0.08))

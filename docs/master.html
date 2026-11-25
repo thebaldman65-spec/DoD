@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-11-23 (Batch KE &mdash; the Withered Warden: kill the grove first)</b></p>
+<p align="right"><b>Last updated: 2026-11-24 (Batch KF &mdash; a plate tells a buff from a debuff; a zone fields its own kinds)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -420,7 +420,10 @@ each stage draws one zone. A zone is for variety: any zone can stand at any stag
 of the heroes &mdash; its stat multiplier and its tier ladder (§4.3) &mdash; whichever zone stands there, while each zone's boss
 and kinds bring their own base figures (§9). A zone def carries
 its name, its boss and its one roster: the Forest of Old (roster 1), the Scarlands (roster 2), the Frozen Plains (roster 4)
-and the Drowned Barrow (roster 6). Every run draws three different zones of the four at random, one a stage, so a run
+and the Drowned Barrow (roster 6). <b>The Frozen Plains and the Drowned Barrow field their own kinds</b> and no other zone's;
+the Orcs stand in the Forest of Old and the Scarlands, and the Orc Chief, the one elite, leads the elite fights in every zone
+(&sect;9). A zone's fights are set when its map is made, so a run saved inside a zone keeps that zone's fights. Every run draws
+three different zones of the four at random, one a stage, so a run
 takes one of 24 shapes; a simulator draws as the player's run does, and a simulator can hold the first three
 (DOD_ZONE_ROTATION=0: the Forest, the Scarlands, the Frozen Plains); every zone keeps the same 16-slot generated shape. The Frozen Plains and the Drowned Barrow show the Forest's art
 on their maps, their events and their battles: neither has any of its own. Enemies past the first stage are tinted redder, and the
@@ -704,7 +707,8 @@ its own turns, and its plate's <b>CD</b> chip shows it (&sect;9).</li>
 <li><b>Malice:</b> the warband's one pool, filled by what the heroes do to it; every heal the warband casts costs a point of it
 for every point of health it restores, it buys a Raise, a Rally or an Entrench, and its strip stands above the warband's plates (&sect;9).</li>
 <li><b>Buff / Debuff (keywords):</b> a DEBUFF is any negative status effect, a BUFF any
-positive one. The talent that counts debuffs (the tree's Iron Will)
+positive one, as the game's debuff list names them; a hero's plate frames each, and a COST &mdash; a harm a hero's own card
+lays on him that the list does not name and no cleanse lifts &mdash; is framed red as a debuff is and named apart. The talent that counts debuffs (the tree's Iron Will)
 uses this classification &mdash; and <b>Broken</b>, the Break meter's state rather than an affliction
 anyone lays, is not one of the debuffs it counts, as it is not one any breadth count reads.</li>
 <li><b>Crit:</b> 10% base + 25% vs Broken targets + 1% per Arcanist Resonance stack + talent/spec
@@ -3153,7 +3157,7 @@ no blow, card, spell or area attack can pick it, though it still acts; when the 
 it surfaces at once.</p>
 <table border="1" cellpadding="4">
 <tr><th>Enemy</th><th>Pw</th><th>Roles</th><th>Zones</th><th>HP</th><th>Kit sketch (beside the Malice spend each holds, above)</th></tr>
-<tr><td>Orc Raider</td><td>1</td><td>skirmisher</td><td>1·2·4·6</td><td>140</td><td>Slash;
+<tr><td>Orc Raider</td><td>1</td><td>skirmisher</td><td>1·2</td><td>140</td><td>Slash;
 Sundering Strike (60% Sunder 2t). Physical resist 10% — otherwise the neutral
 baseline orc.</td></tr>
 <tr><td>Orc Whelp (pale)</td><td>1</td><td>skirmisher</td><td>1</td><td>90</td><td>Fast,
@@ -3165,15 +3169,15 @@ fingers).</td></tr>
 <tr><td>Orc Totemist (teal)</td><td>1</td><td>mender</td><td>1</td><td>90</td><td>Weak
 support: Totem Jab; Healing Wave (25% max to the most wounded hurt ally, tanks and supports first, paid in Malice). Nature resist
 25%; soft to shadow (spirit-open).</td></tr>
-<tr><td>Orc Archer (red)</td><td>1</td><td>sniper·hexer</td><td>1·2·4·6</td><td>110</td>
+<tr><td>Orc Archer (red)</td><td>1</td><td>sniper·hexer</td><td>1·2</td><td>110</td>
 <td>Arrow Shot; Poison Arrow (70% Poison 3t); Gall, a blow on every ally that galls each. Physical resist 5%; soft to frost.</td></tr>
-<tr><td>Orc Shieldmaster (orange)</td><td>2</td><td>bulwark</td><td>1·2·4·6</td><td>150</td>
+<tr><td>Orc Shieldmaster (orange)</td><td>2</td><td>bulwark</td><td>1·2</td><td>150</td>
 <td>Strike; Shielding (25% ward, one ally at a time, always re-cast). Physical resist 15%;
 soft to arcane (the shield stops steel, not raw magic).</td></tr>
-<tr><td>Orc Shaman (blue)</td><td>2</td><td>mender</td><td>1·2·4·6</td><td>110</td><td>Chain
+<tr><td>Orc Shaman (blue)</td><td>2</td><td>mender</td><td>1·2</td><td>110</td><td>Chain
 Lightning (nature, every ally); Healing Wave, paid in Malice. Resists fire/frost 25%, nature 50%; soft to
 shadow (corruptible spirits).</td></tr>
-<tr><td>Orc Hexer (purple)</td><td>2</td><td>hexer·sniper</td><td>1·2·4·6</td><td>120</td><td>Ranged
+<tr><td>Orc Hexer (purple)</td><td>2</td><td>hexer·sniper</td><td>1·2</td><td>120</td><td>Ranged
 shadow caster: Hex Bolt; Withering Hex (70% Exposed 2t); Bone Rattle (34 BD, lays Sap). Resists
 shadow 50%; soft to holy AND nature.</td></tr>
 <tr><td>Wolfrider (grey)</td><td>2</td><td>skirmisher</td><td>1·2</td><td>130</td><td>Speed
@@ -3181,26 +3185,26 @@ shadow 50%; soft to holy AND nature.</td></tr>
 (living companion — poison rips through).</td></tr>
 <tr><td>Ashblade (ember)</td><td>2</td><td>skirmisher</td><td>2</td><td>135</td><td>Cinder
 Slash (fire); Flame Lick (60% Burn 2t). Fire resist 50%; soft to frost.</td></tr>
-<tr><td>Orc Ritual Chanter (pale gold)</td><td>2</td><td>mender</td><td>1·2·4·6</td><td>105</td>
+<tr><td>Orc Ritual Chanter (pale gold)</td><td>2</td><td>mender</td><td>1·2</td><td>105</td>
 <td>Fast (speed 105) ranged support: Warding Chant; Cleansing Rite — strips the
 longest-lasting debuff from EACH ally (Chilled thaws one stack at a time, never the pile, inside a Rupture as
 anywhere; sticky poisons and meters hold). Holy resist 25%; soft to shadow AND physical — kill it
 first, or play around it.</td></tr>
-<tr><td>Orc Bloodcaller (crimson)</td><td>2</td><td>hexer</td><td>1·2·4·6</td><td>125</td>
+<tr><td>Orc Bloodcaller (crimson)</td><td>2</td><td>hexer</td><td>1·2</td><td>125</td>
 <td>Ragged Cut; Blood Tribute (shadow) — +25% damage and Break damage per ally fallen this
 battle: unremarkable fresh, hits like a Chief as the last one standing. The kill-order
 question, stated as an enemy. Shadow resist 25%; soft to holy AND nature.</td></tr>
-<tr><td>Grave Totem (dusk, large)</td><td>2</td><td>mender·hexer</td><td>1·2·4·6</td><td>80</td>
+<tr><td>Grave Totem (dusk, large)</td><td>2</td><td>mender·hexer</td><td>1·2</td><td>80</td>
 <td>Speed 130, trivially Broken (Con 60): Grasping Roots (nature, 60% Cripple 2t); Dark
 Vigil — every living ally regains 6% of its OWN max health, paid in Malice; Mire, a blow that mires. Physical resist 35%, shadow
 50%; soft to fire AND holy at 50% — a resist puzzle, not a stat check.</td></tr>
-<tr><td>Orc Brute (brown, large)</td><td>3</td><td>brute</td><td>1·2·4·6</td><td>260</td>
+<tr><td>Orc Brute (brown, large)</td><td>3</td><td>brute</td><td>1·2</td><td>260</td>
 <td>Smash; Overhead Crush (50 BD). Physical resist 10%; soft to shadow (dumb muscle, weak
 mind).</td></tr>
 <tr><td>Bog Troll (green, large)</td><td>3</td><td>brute·bulwark</td><td>1</td><td>300</td>
 <td>Claw; Swampy Grasp (70% Slowed 2t); Regenerate (25% self-heal when hurt, paid in Malice). Nature
 resist 50%; soft to fire.</td></tr>
-<tr><td>Rot Behemoth (dun, large)</td><td>3</td><td>brute·hexer</td><td>1·2·4·6</td><td>280</td>
+<tr><td>Rot Behemoth (dun, large)</td><td>3</td><td>brute·hexer</td><td>1·2</td><td>280</td>
 <td>Rotting Fist (50% Poison 3t); Wretched Bellow (nature + BD, every ally, lays Fester). Nature 50%,
 shadow 25%; soft to holy.</td></tr>
 <tr><td>Ash Hurler (ember, large)</td><td>3</td><td>brute·sniper</td><td>1·2</td><td>190</td>
@@ -3310,7 +3314,14 @@ every unit's readouts live on a <b>172px nameplate</b> in a stack behind its sid
 heroes' plates along the LEFT edge, enemies' along the RIGHT, each stack spaced so no plate reaches the next. A plate holds a
 <b>portrait</b> in a column of its own (for every hero the close-up of his class sheet's figure, whatever
 his battle art, so every hero wears one kind of face; an enemy's from its own sprite), the unit's name, HP bar, resource bar(s), Break meter with numeric x/100
-readout, and its status chips (hover for tooltips; Bleed buildup is a chip). <b>Nothing on a plate is drawn
+readout, and its status chips (hover for tooltips; Bleed buildup is a chip). <b>On a hero's plate, and a companion's, a
+harmful chip is framed red and thick and a helpful one green and thin</b>, and its hover begins with its word: <i>Debuff:</i>
+for a harmful effect the game counts as a debuff (most can be cleansed; Broken and the Bleed warning cannot), <i>Cost:</i> for
+a harm a hero's own card lays on him that no
+cleanse lifts &mdash; Berserk's risk (its <i>Bk!</i> chip), Formless's recoil (<i>Fm!</i>), Threshold's lock (<i>Lk</i>) and a spent
+Overcharge (<i>OC</i>) &mdash; and <i>Buff:</i> for every
+other effect and every chip that shows a figure the hero holds. The engine's chip is unframed, and so is every chip on an
+enemy's plate. <b>Nothing on a plate is drawn
 over anything else on it</b>: every figure sits inside its own bar, whole, and a figure too wide for its bar
 is set a size smaller inside it &mdash; one size, no further: a figure still too wide at that size (a deep
 Resonance) shows its count alone and carries the whole line on its hover; each chip is as wide as its letters,
