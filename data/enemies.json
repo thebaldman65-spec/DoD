@@ -806,9 +806,7 @@
   ],
   "zones": [
    1,
-   2,
-   4,
-   6
+   2
   ],
   "enemy_role": "damage",
   "max_hp": 250,
@@ -1806,6 +1804,75 @@
    }
   ]
  },
+ "rimeclad_warlord": {
+  "unit_name": "Rimeclad Warlord",
+  "power": 4,
+  "roles": [
+   "elite"
+  ],
+  "zones": [
+   4
+  ],
+  "enemy_role": "damage",
+  "max_hp": 250,
+  "attack": 100,
+  "armor": 0.2,
+  "speed": 80.0,
+  "stability": 100,
+  "constitution": 130,
+  "resource_name": "Rage",
+  "resource": 0,
+  "max_resource": 100,
+  "tint": [
+   0.5,
+   0.7,
+   0.95
+  ],
+  "sprite_scale": 3.9,
+  "resists": {
+   "frost": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Frostbrand Cut",
+    "damage": 28,
+    "pressure": 26,
+    "resource_gain": 15,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "frost"
+   },
+   {
+    "display_name": "Glacial Hew",
+    "cooldown": 2,
+    "cost": 30,
+    "damage": 54,
+    "pressure": 40,
+    "delay": 4.0,
+    "anim": "attack02",
+    "dmg_type": "frost"
+   },
+   {
+    "display_name": "Avalanche Maul",
+    "cost": 20,
+    "damage": 34,
+    "pressure": 56,
+    "delay": 4.0,
+    "anim": "attack02",
+    "dmg_type": "frost"
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
  "grave_husk": {
   "unit_name": "Grave Husk",
   "power": 1,
@@ -2244,6 +2311,132 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Stands a fallen body of its warband back\nup at {=Battle.MALICE_RAISE_PCT*100}% of its maximum health, for\nthat health in Malice (once a body, a fight)."
+   }
+  ]
+ },
+ "drowned_thane": {
+  "unit_name": "Drowned Thane",
+  "power": 4,
+  "roles": [
+   "elite"
+  ],
+  "zones": [
+   6
+  ],
+  "enemy_role": "damage",
+  "max_hp": 250,
+  "attack": 100,
+  "armor": 0.2,
+  "speed": 80.0,
+  "stability": 100,
+  "constitution": 130,
+  "resource_name": "Rage",
+  "resource": 0,
+  "max_resource": 100,
+  "tint": [
+   0.6,
+   0.7,
+   0.58
+  ],
+  "sprite_scale": 3.9,
+  "resists": {
+   "shadow": 0.5,
+   "holy": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Drowned Blade",
+    "damage": 28,
+    "pressure": 26,
+    "resource_gain": 15,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "shadow"
+   },
+   {
+    "display_name": "Sunken Cleave",
+    "cooldown": 2,
+    "cost": 30,
+    "damage": 54,
+    "pressure": 40,
+    "delay": 4.0,
+    "anim": "attack02",
+    "dmg_type": "shadow"
+   },
+   {
+    "display_name": "Barrow Maul",
+    "cost": 20,
+    "damage": 34,
+    "pressure": 56,
+    "delay": 4.0,
+    "anim": "attack02",
+    "dmg_type": "shadow"
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "peat_witch": {
+  "unit_name": "Peat Witch",
+  "power": 2,
+  "roles": [
+   "mender"
+  ],
+  "zones": [
+   6
+  ],
+  "enemy_role": "support",
+  "max_hp": 110,
+  "attack": 50,
+  "armor": 0.01,
+  "speed": 100.0,
+  "stability": 100,
+  "constitution": 80,
+  "is_ranged": true,
+  "tint": [
+   0.6,
+   0.48,
+   0.58
+  ],
+  "resists": {
+   "fire": 0.25,
+   "frost": 0.25,
+   "nature": 0.5,
+   "shadow": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Marshlight Chain",
+    "damage": 30,
+    "pressure": 15,
+    "delay": 3.0,
+    "anim": "attack02",
+    "dmg_type": "nature",
+    "aoe": true
+   },
+   {
+    "display_name": "Healing Wave",
+    "special": "healing_wave",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Mends the most wounded of its warband\nfor 25% of their max HP, paid in\nMalice (tanks and supports first)."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 2,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
    }
   ]
  }

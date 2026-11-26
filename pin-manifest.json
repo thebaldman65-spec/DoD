@@ -2,13 +2,13 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 2443,
+  "total": 2448,
   "source": 1479,
   "other": 363,
-  "document": 601
+  "document": 606
  },
  "floor": {
-  "pins": 2443
+  "pins": 2448
  },
  "falls": [],
  "source_residency": {
@@ -12321,7 +12321,7 @@
    "s": "check_jj.gd",
    "fn": "_s5_the_bellow",
    "h": "check_ji.gd",
-   "n": "const TUNED := {}",
+   "n": "const TUNED := {",
    "p": "+",
    "r": "code",
    "k": "literal",
@@ -13759,7 +13759,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_kf.gd#334",
+   "g": "check_kf.gd#335",
    "expr": "ZONE_BLOCK"
   },
   {
@@ -13771,7 +13771,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_kf.gd#338",
+   "g": "check_kf.gd#339",
    "expr": "CHIP_WORDS"
   },
   {
@@ -13783,7 +13783,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_kf.gd#335"
+   "g": "check_kf.gd#336"
   },
   {
    "s": "check_kf.gd",
@@ -13794,7 +13794,7 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_kf.gd#337"
+   "g": "check_kf.gd#338"
   },
   {
    "s": "check_kf.gd",
@@ -13805,7 +13805,63 @@
    "r": "code",
    "k": "literal",
    "how": "derived",
-   "g": "check_kf.gd#337"
+   "g": "check_kf.gd#338"
+  },
+  {
+   "s": "check_kg.gd",
+   "fn": "_s4_record",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_kg.gd#248",
+   "expr": "ZONE_BLOCK"
+  },
+  {
+   "s": "check_kg.gd",
+   "fn": "_s4_record",
+   "h": "CLAUDE.md",
+   "n": "\n## ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_kg.gd#249"
+  },
+  {
+   "s": "check_kg.gd",
+   "fn": "_s4_record",
+   "h": "CLAUDE.md",
+   "n": "Drowned Thane",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "derived",
+   "g": "check_kg.gd#252"
+  },
+  {
+   "s": "check_kg.gd",
+   "fn": "_s4_record",
+   "h": "CLAUDE.md",
+   "n": "Peat Witch",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "derived",
+   "g": "check_kg.gd#252"
+  },
+  {
+   "s": "check_kg.gd",
+   "fn": "_s4_record",
+   "h": "CLAUDE.md",
+   "n": "Rimeclad Warlord",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "derived",
+   "g": "check_kg.gd#252"
   },
   {
    "s": "test_batch_ah.gd",

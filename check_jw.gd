@@ -3,8 +3,9 @@
 #   §0   THE RECORD: JV's rulings stand archived, not owed; the standing value (every boss fight has a strategy of its own) stands
 #        in `CLAUDE.md`, and every zone boss `Run.ZONE_DEFS` names is built to it or named there as owed
 #   §1   THE ZONE: the Drowned Barrow is a zone of the order with one roster of its own (since JX any zone stands at any stage, the
-#        designer's ruling; JW made it slot 2's second candidate); the roster is the travelling core,
-#        JU's four (moved, in no other roster) and the Barrow's three; the Barrow is drawn at every stage on a player's road and a
+#        designer's ruling; JW made it slot 2's second candidate); the roster is the kinds every roster holds (the travelling
+#        core until KF §2, the Hollow Crown alone since), JU's four (moved, in no other roster), the Barrow's three and, since
+#        KG §1, its own elite and mender; the Barrow is drawn at every stage on a player's road and a
 #        sim's, and `DOD_ZONE_ROTATION=0` holds a sim to the order's first three, the Barrow outside them; every node of a Barrow map composes from its roster, the
 #        boss node fields the Bone Shepherd; the backdrops name it; the Scarland Mirage is the Scarlands' alone
 #   §2   THE BONE SHEPHERD, DRIVEN: Soul Leech heals half of what it lands, no more than the pool holds unspent, paid point for
@@ -50,6 +51,8 @@ const SLOT := 2
 const OLD := "scarlands"
 const FOUR := ["mossback", "blight_speaker", "grave_husk", "carrion_pack"]
 const KINDS := ["rotfiend", "fen_lurker"]
+# BATCH KG §1 — the Barrow's own elite and mender (the designer's (a)), in roster 6 alone.
+const OWN_SINCE := ["drowned_thane", "peat_witch"]
 const BACKDROPS := ["scripts/battle.gd", "scripts/map_screen.gd", "scripts/event_screen.gd"]
 const STATE := "res://docs/state.md"
 const ARCHIVE := "res://DoD-archive/state-archive.md"
@@ -171,13 +174,15 @@ func _s1_the_zone(data: Dictionary) -> void:
 	want.append_array(FOUR)
 	want.append_array(KINDS)
 	want.append(BOSS)
+	# BATCH KG §1 — REPAIRED TO ITS INTENT: the roster is its own kinds and the ones every roster holds; KG added the zone's elite and mender.
+	want.append_array(OWN_SINCE)
 	want.sort()
 	var have: Array = Enemies.kinds_for_roster(roster).duplicate()
 	have.sort()
 	print("    roster %d holds %d kinds: %s" % [roster, have.size(), ", ".join(PackedStringArray(have))])
-	ok(have == want, "§1: roster %d holds %s, not the core, JU's four and the Barrow's three (%s)" % [roster, str(have), str(want)])
+	ok(have == want, "§1: roster %d holds %s, not the core, JU's four, the Barrow's three and KG's two (%s)" % [roster, str(have), str(want)])
 	var strays: Array = []
-	for k2 in FOUR + KINDS + [BOSS]:
+	for k2 in FOUR + KINDS + [BOSS] + OWN_SINCE:
 		if _zones(data[k2]) != [roster]:
 			strays.append("%s %s" % [k2, str(_zones(data[k2]))])
 	ok(strays.is_empty(), "§1: a kind of the Barrow's stands in another roster too: %s" % str(strays))

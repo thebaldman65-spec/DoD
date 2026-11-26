@@ -31,11 +31,12 @@ const Gate = preload("res://gate_fixture.gd")
 # THE RULE: a move worth 1.4 times its own basic or more takes a cooldown — 2 under 2x, 3 under 3x, 4 past.
 const LINE := 1.4
 # A DESIGNER's HAND-TUNE OF ONE MOVE, held beside the line ("kind/Move": its cooldown), so §1a reads it as the data's (JI's ruling 2, accepted at JJ §0).
-# **IT HOLDS NONE SINCE JN §1.** The Bellow took a 2 by hand at JJ §0, the designer's, because it priced 1.37 — 0.03 under the line —
+# **IT HELD NONE FROM JN §1 UNTIL KG §1.** The Bellow took a 2 by hand at JJ §0, the designer's, because it priced 1.37 — 0.03 under the line —
 # and was the warband's one big area blow with no rhythm. JN §1 raised every kind's second damaging move to the line: the Bellow's
 # 14 became 15, it prices 1.46, and the rule gives it the same 2. With its reason gone the hand-tune went with it (DR §2: an exception
 # is deleted with its reasons, not kept beside a rule that now says the same); the table stays, for the next hand-tune.
-const TUNED := {}
+# BATCH KG §1 — the two Maul copies, uncooled as the Chief's, the designer's (RECORD_KG, answer 1: *None, as the Chief*).
+const TUNED := {"rimeclad_warlord/Avalanche Maul": 0, "drowned_thane/Barrow Maul": 0}
 const FIGURES := [[2.0, 2], [3.0, 3]]
 const TOP := 4
 # JO §1 — A POINT OF BREAK DAMAGE IS PRICED AT A HERO TURN's DAMAGE DIVIDED BY THE BREAK METER's SIZE (the designer's). A filled meter
@@ -52,7 +53,9 @@ const BREAK_SEATS := ["berserker", "cryomancer", "inquisitor", "beastmaster"]
 # held here is read by `check_jk` §2, which prices the spends.
 const HELD := {"totemist/Healing Wave": 3, "bog_troll/Regenerate": 3, "chief/Chieftain's Maul": 0, "grave_totem/Dark Vigil": 4,
 	"totemist/Raise": 4, "shaman/Entrench": 2, "wolfrider/Rally": 2, "bog_troll/Entrench": 4, "hollow_crown/Entrench": 3,
-	"bone_shepherd/Call the Drowned": 4}
+	"bone_shepherd/Call the Drowned": 4,
+	# BATCH KG §1 — the Peat Witch's Entrench at the Shaman's 2, the designer's (RECORD_KG, answer 5: *2, as the Shaman*).
+	"peat_witch/Entrench": 2}
 # An area blow reaches the party's four heroes; so does an every-ally heal.
 const REACH := 4
 # A heal is priced as the health it restores, a share of the body healed (the three arms of `_resolve_special`).
@@ -84,8 +87,10 @@ const MOVED_SINCE := {"grave_totem": {"zones": [1.0, 3.0]}, "behemoth": {"zones"
 const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan",
 	"grave_husk", "mossback", "blight_speaker", "carrion_pack",
 	# BATCH JW §1 — AND THE DROWNED BARROW's THREE, set aside as JS's seven and JU's four are.
-	"rotfiend", "fen_lurker", "bone_shepherd"]
-# BATCH JW §1 — and roster 6, the Drowned Barrow's, which the travelling core takes as it took 4 and 5.
+	"rotfiend", "fen_lurker", "bone_shepherd",
+	# BATCH KG §1 — AND EACH NEW ZONE's OWN ELITE AND THE BARROW's MENDER, set aside as JW's three are.
+	"rimeclad_warlord", "drowned_thane", "peat_witch"]
+# BATCH JW §1 — and roster 6, the Drowned Barrow's, which the travelling core took as it took 4 and 5, until KF §2.
 const ROSTERS_SINCE := [4, 5, 6]
 const DECK_CLOSED_AT := 25
 const FOE := {"type": "fight", "theme": "Warband", "enemies": ["whelp", "raider", "archer"]}

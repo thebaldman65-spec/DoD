@@ -55,7 +55,9 @@ const RULE_FIELDED := ["chief", "withered_warden", "ash_tyrant", "hollow_crown"]
 const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan",
 	"grave_husk", "mossback", "blight_speaker", "carrion_pack",
 	# BATCH JW §1 — AND THE DROWNED BARROW's THREE, set aside as JS's seven and JU's four are.
-	"rotfiend", "fen_lurker", "bone_shepherd"]
+	"rotfiend", "fen_lurker", "bone_shepherd",
+	# BATCH KG §1 — AND EACH NEW ZONE's OWN ELITE AND THE BARROW's MENDER, set aside as JW's three are.
+	"rimeclad_warlord", "drowned_thane", "peat_witch"]
 # BATCH JW §1 — and roster 6, the Drowned Barrow's, which the travelling core took as it took 4 and 5, until KF §2.
 const ROSTERS_SINCE := [4, 5, 6]
 # AND WHAT THE SEVEN ADD TO TWO OF THIS GATE's LISTS: the Stillwrought lays Sap on its blow (Sap's second carrier), and the
@@ -63,7 +65,8 @@ const ROSTERS_SINCE := [4, 5, 6]
 # BATCH JU §1 — the Blight-Speaker's Canker Litany lays Fester beside the Rot Behemoth's Bellow.
 const CARRIERS_SINCE := {"sap": ["stillwrought"], "fester": ["blight_speaker"]}
 # BATCH JW §2 — and the Bone Shepherd, the Drowned Barrow's boss.
-const RULE_FIELDED_SINCE := ["icewrought_titan", "bone_shepherd"]
+# BATCH KG §1 — and the two new zones' own elites, fielded by the elite themes as the Chief is.
+const RULE_FIELDED_SINCE := ["icewrought_titan", "bone_shepherd", "rimeclad_warlord", "drowned_thane"]
 # THE WARBAND's DATA AS JQ LANDED IT — `check_jq` §5's digest. With the three tags put back as they were, the tree's data must
 # read it: nothing else in a kind moved (C15).
 const WARBAND_AT_HEAD_MD5 := "f261e6345f22f42bc41a7f81276e066b"

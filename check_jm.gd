@@ -59,7 +59,9 @@ const KIT_PIN := "res://docs/reports/JO-kit.json"
 const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan",
 	"grave_husk", "mossback", "blight_speaker", "carrion_pack",
 	# BATCH JW §1 — AND THE DROWNED BARROW's THREE, set aside as JS's seven and JU's four are.
-	"rotfiend", "fen_lurker", "bone_shepherd"]
+	"rotfiend", "fen_lurker", "bone_shepherd",
+	# BATCH KG §1 — AND EACH NEW ZONE's OWN ELITE AND THE BARROW's MENDER, set aside as JW's three are.
+	"rimeclad_warlord", "drowned_thane", "peat_witch"]
 # THE TREE JM's FIVE RE-READS STAND FOR (§3), its digest as `check_jm` took it on JM's commit.
 const JM_TREE := "c2c74d46e931d8be168cf759e9e83353"
 const FOE := {"type": "fight", "theme": "Warband", "enemies": ["archer", "hexer", "raider", "shieldmaster"]}

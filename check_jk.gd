@@ -38,7 +38,9 @@ const JI = preload("res://check_ji.gd")
 const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan",
 	"grave_husk", "mossback", "blight_speaker", "carrion_pack",
 	# BATCH JW §1 — AND THE DROWNED BARROW's THREE, set aside as JS's seven and JU's four are.
-	"rotfiend", "fen_lurker", "bone_shepherd"]
+	"rotfiend", "fen_lurker", "bone_shepherd",
+	# BATCH KG §1 — AND EACH NEW ZONE's OWN ELITE AND THE BARROW's MENDER, set aside as JW's three are.
+	"rimeclad_warlord", "drowned_thane", "peat_witch"]
 const KINDS := 21
 # JK's fifty, and since JO §2 Gall and Mire among them, each a blow given damage (Sap and Fester ride two of the fifty).
 const MOVES_BEFORE := 52

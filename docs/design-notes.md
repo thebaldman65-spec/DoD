@@ -4,6 +4,21 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Each new zone's own elite, and the Drowned Barrow's mender (Batch KG) — 2026-11-24
+
+**Why each zone's own elite.** After KF took the Orcs out of the Frozen Plains and the Drowned Barrow, the Orc Chief still led
+every elite fight there, because every elite theme needs an elite and he was the only one. The designer chose a new elite for
+each zone and a healer for the Barrow (KF's option (a)) over keeping the Chief or letting one Orc Shaman stay. **Why copies and
+not new designs.** The copies keep the numbers the game has already been played and balanced on — the Chief's body, Rage and
+four moves, the Shaman's three — so what changes is who the zone fields, while its types and resists, and the Barrow's new
+healer, still change how its fights play; the designer ruled each figure that could have moved (the Maul's cooldown, the
+healer's second attack, her Entrench's cooldown) to stay as the original's. **Why the zone's damage type and resists.** Every Frozen Plains kind resists
+frost and is soft to fire, so its elite takes that signature; the Barrow's kinds share none, so its elite takes the
+Blight-Speaker's, the zone's shadow caster's — and a hero whose spec resists frost or shadow now meets the zone's elite as he
+meets its other kinds. **Why the Healing Wave keeps its name.** The warband's support logic finds the heal by that name, and the Sleetveil
+Matron already shares it, so a renamed heal would never be cast. **What this changes in play.** The Barrow's fights could not
+field Ritual or Lightning Storm, nor its elite nodes Elite Patrol, without a healer; now every theme can roll in every zone.
+
 ## A plate tells a buff from a debuff; a zone fields its own kinds (Batch KF) — 2026-11-24
 
 **Why the frame reads the debuff list.** The game already had a word for a debuff — the list Iron Will counts and most cleanses

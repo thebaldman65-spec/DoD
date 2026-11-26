@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-11-24 (Batch KF &mdash; a plate tells a buff from a debuff; a zone fields its own kinds)</b></p>
+<p align="right"><b>Last updated: 2026-11-24 (Batch KG &mdash; each new zone's own elite, and the Drowned Barrow's mender)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -421,8 +421,8 @@ of the heroes &mdash; its stat multiplier and its tier ladder (§4.3) &mdash; wh
 and kinds bring their own base figures (§9). A zone def carries
 its name, its boss and its one roster: the Forest of Old (roster 1), the Scarlands (roster 2), the Frozen Plains (roster 4)
 and the Drowned Barrow (roster 6). <b>The Frozen Plains and the Drowned Barrow field their own kinds</b> and no other zone's;
-the Orcs stand in the Forest of Old and the Scarlands, and the Orc Chief, the one elite, leads the elite fights in every zone
-(&sect;9). A zone's fights are set when its map is made, so a run saved inside a zone keeps that zone's fights. Every run draws
+the Orcs stand in the Forest of Old and the Scarlands, where the Orc Chief leads the elite fights; the Rimeclad Warlord leads
+the Frozen Plains' and the Drowned Thane the Drowned Barrow's, whose healer is the Peat Witch (&sect;9). A zone's fights are set when its map is made, so a run saved inside a zone keeps that zone's fights. Every run draws
 three different zones of the four at random, one a stage, so a run
 takes one of 24 shapes; a simulator draws as the player's run does, and a simulator can hold the first three
 (DOD_ZONE_ROTATION=0: the Forest, the Scarlands, the Frozen Plains); every zone keeps the same 16-slot generated shape. The Frozen Plains and the Drowned Barrow show the Forest's art
@@ -1089,7 +1089,7 @@ hero is Broken they exploit it
 with their hardest affordable hit that is not cooling. Mocked enemies must attack the taunting Warrior — a taunt
 also overrides support casts. <b>Support behaviors run before attacks:</b> a healer heals
 whenever its warband's pool, Malice, can pay and one of its warband is missing at least half of what the heal would
-restore &mdash; the Orc Totemist's and the Orc Shaman's Healing Wave the most wounded (friendly tanks and supports first), the
+restore &mdash; the Orc Totemist's, the Orc Shaman's, the Sleetveil Matron's and the Peat Witch's Healing Wave the most wounded (friendly tanks and supports first), the
 Withered Warden's Wild Growth the most wounded (itself included), the Bog Troll's Regenerate itself, and the Grave Totem's Dark Vigil
 when two are hurt (&sect;9); the Orc Shieldmaster ALWAYS casts Shielding when no ally carries its ward
 (lowest-HP ally first, itself included). <b>And beside whatever it chooses, a body buys what its kind buys with Malice, free</b>
@@ -1098,7 +1098,7 @@ rallied or has declared one, an Entrench while none is entrenched or has declare
 its price set aside until it lands; it is bought first when the body's turn comes and costs the body nothing, and a taunted body buys nothing.
 <b>A hex rides a blow</b>: the move that lays one deals damage, so it is chosen as any attack is, aimed through the draws and the
 evasions, and a single blow can miss; on a hit it lays its hex, and an area blow lays it on every ally it strikes (&sect;9).
-The Chief and the Ash-Wrought Tyrant build and spend Rage like a Warrior. <b>A move still cooling when its turn
+The Orc Chief, the Rimeclad Warlord, the Drowned Thane and the Ash-Wrought Tyrant build and spend Rage like a Warrior. <b>A move still cooling when its turn
 comes is never chosen</b> (&sect;9).</p>
 <h3>4.9 Enemy intent</h3>
 <p><b>Every enemy shows what it is about to do.</b> A fight is a planning puzzle rather than a
@@ -3114,9 +3114,9 @@ Regenerate, the Rot Behemoth's Wretched Bellow, the Orc Chief's Heavy Strike, th
 Ash-Wrought Tyrant's Immolating Wave and Tyrant's Verdict, the Ash Hurler's Siege Stone, the Orc Bloodcaller's Blood Tribute,
 the Grave Totem's Dark Vigil and Mire, the Hollow Crown's Hollow Wail and The Long Dark, in the Frozen Plains the Frostbitten
 Thrall's Hobbling Bite, the Icebound Bulwark's Glacier Press, the Hailcaster's Hailstorm, the Rimehorn's Trampling Charge, the Sleetveil
-Matron's Healing Wave, the Stillwrought's Leaching Stillness and the Icewrought Titan's Entomb, and in the Drowned Barrow the Grave Husk's
+Matron's Healing Wave, the Stillwrought's Leaching Stillness, the Icewrought Titan's Entomb and the Rimeclad Warlord's Glacial Hew, and in the Drowned Barrow the Grave Husk's
 Shambling Lurch, the Mossback's Silt Smother, the Blight-Speaker's Canker Litany, the Carrion Pack's Worrying Bites, the Rotfiend's
-Corpse Explosion, the Fen Lurker's Lacerate and the Bone Shepherd's Soul Leech and Noxious Fumes. A basic attack never cools, so every enemy always has a move. An enemy
+Corpse Explosion, the Fen Lurker's Lacerate, the Bone Shepherd's Soul Leech and Noxious Fumes and the Drowned Thane's Sunken Cleave. A basic attack never cools, so every enemy always has a move. An enemy
 never declares a move that will still be cooling when its turn comes, and while one cools its plate carries a <b>CD</b>
 chip: the fewest of its own turns until a move is back, its hover naming each. Encumbered binds these too.</p>
 <p><b>The warband shares one pool, Malice.</b> It fills by a point for every 10 points of damage the heroes deal it, by 25 when one
@@ -3125,14 +3125,14 @@ hero is credited with, fill only by their kills), and it holds 150; its bar stan
 warband's plates, its count beside it, and a fight opens with it empty (a quit fight too). <b>A body that dies Forsaken feeds the warband
 no Malice</b> &mdash; not the kill's worth, and not what the killing blow spent past its last; the damage dealt it still fills
 (a Cleric's Forsake lays the mark, for 3 turns, and a death clears it). <b>Every heal the warband casts costs a point
-of Malice for every point of health it restores</b> &mdash; the Orc Totemist's, the Orc Shaman's and the Sleetveil Matron's Healing Wave, the Bog Troll's
+of Malice for every point of health it restores</b> &mdash; the Orc Totemist's, the Orc Shaman's, the Sleetveil Matron's and the Peat Witch's Healing Wave, the Bog Troll's
 Regenerate, the Withered Warden's Wild Growth and the Grave Totem's Dark Vigil &mdash; so the warband never heals more than its pool
 has been given; a heal on a body under Blight the Well restores nothing, so it costs nothing. A healer heals whenever the pool can pay and one of its warband is missing at least half of what the heal would restore
 (two of them, for the Grave Totem's Dark Vigil);
 it declares only a heal the pool can pay, and sets the price aside until the heal lands. Two more heals ride a blow and pay the
 same way when it lands, out of what the pool holds that no declared heal has set aside &mdash; nothing is declared or set aside for
 them: the Bone Shepherd's Soul Leech, half of what it deals, and the Rotfiend's Corpse Explosion, 15% of a neighbour's maximum health.</p>
-<p><b>The pool buys three things beside a heal, each a move on its kind's list.</b> A Raise stands a fallen body of the warband back up at 40% of its maximum health, once a body a fight, for the health it stands it up with; a Rally makes every standing body of the warband deal 30% more damage with its blows for 3 turns, for 40 Malice; an Entrench multiplies their armor by 2 for 3 turns, for 30 Malice. Every kind holds one: a Rally the Orc Raider, the Orc Whelp, the Orc Slinger, the Orc Archer, the Orc Hexer, the Wolfrider, the Ashblade, the Orc Brute, the Rot Behemoth, the Orc Chief, the Ash-Wrought Tyrant, the Ash Hurler, the Orc Bloodcaller, the Frostbitten Thrall, the Hailcaster, the Rimehorn, the Grave Husk, the Blight-Speaker, the Carrion Pack, the Rotfiend and the Fen Lurker; an Entrench the Orc Shieldmaster, the Orc Shaman, the Bog Troll, the Withered Warden, the Hollow Crown, the Icebound Bulwark, the Stillwrought, the Icewrought Titan and the Mossback; a Raise and an Entrench the Orc Totemist, the Orc Ritual Chanter, the Grave Totem and the Sleetveil Matron; and a Raise alone the Bone
+<p><b>The pool buys three things beside a heal, each a move on its kind's list.</b> A Raise stands a fallen body of the warband back up at 40% of its maximum health, once a body a fight, for the health it stands it up with; a Rally makes every standing body of the warband deal 30% more damage with its blows for 3 turns, for 40 Malice; an Entrench multiplies their armor by 2 for 3 turns, for 30 Malice. Every kind holds one: a Rally the Orc Raider, the Orc Whelp, the Orc Slinger, the Orc Archer, the Orc Hexer, the Wolfrider, the Ashblade, the Orc Brute, the Rot Behemoth, the Orc Chief, the Ash-Wrought Tyrant, the Ash Hurler, the Orc Bloodcaller, the Frostbitten Thrall, the Hailcaster, the Rimehorn, the Rimeclad Warlord, the Grave Husk, the Blight-Speaker, the Carrion Pack, the Rotfiend, the Fen Lurker and the Drowned Thane; an Entrench the Orc Shieldmaster, the Orc Shaman, the Bog Troll, the Withered Warden, the Hollow Crown, the Icebound Bulwark, the Stillwrought, the Icewrought Titan, the Mossback and the Peat Witch; a Raise and an Entrench the Orc Totemist, the Orc Ritual Chanter, the Grave Totem and the Sleetveil Matron; and a Raise alone the Bone
 Shepherd, called Call the Drowned. Each cools like any move, on its worth against its own kind's basic, and costs its body no turn: it rides the body's declared move, is bought first when the body's turn comes, and the body then acts as it declared &mdash; one a turn; a raised body rises un-Broken, its first turn a basic swing after it rises, at its own speed, and a body is raised once a fight. A Rally's clock counts down at each body's turn start, as every buff's but Eye of the Storm's does, so each rallied body strikes rallied twice, and the body that bought it three times, since it buys first on its own turn. A hero's Dispel strips a body's Rally and Entrenched, as it strips a ward.</p>
 <p><b>The warband lays four hexes on the heroes, each riding a blow.</b> Gall cuts the healing every hero receives by 50% for 3 turns; Sap cuts what a hero's resource bar gains by 50% for 3 turns; Mire makes a hero act 25% slower for 3 turns; Fester deals 3% of its applier's Attack a stack at each of the hero's turn starts and gains a stack each turn, until it is cleansed. The Orc Archer's Gall strikes every ally and galls each it hits; the Orc Hexer's Bone Rattle and the Stillwrought's Leaching Stillness lay Sap; the Grave Totem's Mire strikes one ally and mires it; the Rot Behemoth's Wretched Bellow lays Fester on every ally it strikes, and the Blight-Speaker's Canker Litany on the one
 ally it strikes. No enemy move lays an affliction on the heroes without dealing damage, so each hex is a blow like any other: chosen as the attacks are, aimed through the draws and the evasions, a single blow able to miss, laid on a hit, and cooling on its worth as a blow &mdash; each of the four waits between uses. Every hex is an affliction, so every cleanse reaches it, the Cleric's Unburden among them, and Fester grows until one does. <b>A
@@ -3212,7 +3212,7 @@ shadow 25%; soft to holy.</td></tr>
 Ember Lob (fire); Siege Stone, a visible wind-up that lands NEXT turn as heavy ally-wide
 damage — Breaking, Freezing, or Stunning the charger cancels the throw outright. Softest
 Break target of any power-3 (Con 90), by design. Fire resist 50%; soft to frost.</td></tr>
-<tr><td>Orc Chief (elite)</td><td>4</td><td>elite</td><td>1·2·4·6</td><td>250</td><td>Rage
+<tr><td>Orc Chief (elite)</td><td>4</td><td>elite</td><td>1·2</td><td>250</td><td>Rage
 user: Strike (+15 Rage); Heavy Strike 30R; Chieftain&rsquo;s Maul 20R (56 BD). Physical resist 15%;
 soft to arcane (magic pierces plate).</td></tr>
 <tr><td>Withered Warden (boss)</td><td>7</td><td>boss</td><td>1</td><td>500</td><td>Unique
@@ -3247,6 +3247,9 @@ caster: Stillbolt (frost); Leaching Stillness (shadow, lays Sap). Frost resist 5
 <tr><td>Icewrought Titan (boss)</td><td>7</td><td>boss</td><td>4</td><td>460</td><td>The Frozen Plains' boss:
 Glacier Fist (frost); Entomb (frost, freezes one hero solid: a turn lost, unless a Block, a miss, Ironclad or Hallowed stops it, and a
 cleanse lifts it). Frost resist 50%; soft to fire.</td></tr>
+<tr><td>Rimeclad Warlord (elite, deep ice)</td><td>4</td><td>elite</td><td>4</td><td>250</td><td>The Frozen Plains' elite,
+the Orc Chief's figures in frost: Rage user: Frostbrand Cut (frost, +15 Rage); Glacial Hew 30R (frost); Avalanche Maul 20R (frost,
+56 BD); Rally. Frost resist 50%; soft to fire.</td></tr>
 <tr><td>Rotfiend (bog green)</td><td>1</td><td>skirmisher</td><td>6</td><td>90</td><td>Fast, frail: Sodden Claw; Corpse
 Explosion (every ally, a stack of Black Rot each; it dies, and the neighbour with the lower share of its health heals 15% of its maximum, paid in Malice
 &mdash; only at half its health or less); Rake (a small blow, a stack of Black Rot). Soft to nature AND shadow.</td></tr>
@@ -3257,6 +3260,12 @@ acting). Physical resist 10%; soft to shadow.</td></tr>
 basic; Soul Leech (shadow, cooling; heals him half of what it deals, paid in Malice); Noxious Fumes (nature, every ally, each 25
 points likelier to miss for 3 turns).
 No resist; soft to holy.</td></tr>
+<tr><td>Drowned Thane (elite, drowned green)</td><td>4</td><td>elite</td><td>6</td><td>250</td><td>The Drowned Barrow's elite,
+the Orc Chief's figures in shadow: Rage user: Drowned Blade (shadow, +15 Rage); Sunken Cleave 30R (shadow); Barrow Maul 20R
+(shadow, 56 BD); Rally. Shadow resist 50%; soft to holy.</td></tr>
+<tr><td>Peat Witch (peat mauve)</td><td>2</td><td>mender</td><td>6</td><td>110</td><td>The Drowned Barrow's healer, the Orc
+Shaman's figures: Marshlight Chain (nature, every ally); Healing Wave, paid in Malice; Entrench. Resists fire/frost 25%, nature
+50%; soft to shadow.</td></tr>
 </table>
 <p><b>Compositions — the power-budget system:</b> every battle rolls a power budget that is
 ALWAYS spent exactly. Fight budgets climb a <b>continuous ramp</b> across the zone: a

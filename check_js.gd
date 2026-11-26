@@ -44,7 +44,9 @@ const BOSS := "icewrought_titan"
 # the kind each of the six stands for reads the kinds JS stood among, and §5's digest is the warband beside JS's additions.
 const ADDED_SINCE := ["grave_husk", "mossback", "blight_speaker", "carrion_pack",
 	# BATCH JW §1 — AND THE DROWNED BARROW's THREE.
-	"rotfiend", "fen_lurker", "bone_shepherd"]
+	"rotfiend", "fen_lurker", "bone_shepherd",
+	# BATCH KG §1 — AND EACH NEW ZONE's OWN ELITE AND THE BARROW's MENDER, set aside as JW's three are.
+	"rimeclad_warlord", "drowned_thane", "peat_witch"]
 # THE SLOTS JS GAVE IT (1-based), replayed in §1, and the slot it never took: slot 2. Since JX it stands at every stage.
 const HOSTS := [1, 3]
 const NOT_HOST := 2
@@ -364,7 +366,9 @@ func _s1_the_zone() -> void:
 		for r in OLD_ROSTERS:
 			if not z.has(r):
 				everywhere = false
-		var is_new: bool = SIX.has(k) or String(k) == BOSS
+		# BATCH KG §1 — a kind written since JS (`ADDED_SINCE`) is its zone's own, never a traveller: the Rimeclad Warlord keeps his
+		# `[4]` through JX's replay, since JX-rosters.tsv was written before him.
+		var is_new: bool = SIX.has(k) or String(k) == BOSS or ADDED_SINCE.has(String(k))
 		if everywhere:
 			core.append(k)
 			for r2 in ids:
@@ -827,7 +831,8 @@ func _s2_the_kept_table(data: Dictionary, dot: Dictionary, price: float) -> void
 		if String(second.get("special", "")) in JI.HEALS:
 			var bodies: Array = []
 			for k2 in data:
-				if not bool((data[k2] as Dictionary).get("is_boss", false)):
+				# BATCH KG §1 — the kept table is priced on the board JS left: the kinds written since stand aside (KG's three move it).
+				if not bool((data[k2] as Dictionary).get("is_boss", false)) and not ADDED_SINCE.has(String(k2)):
 					bodies.append(float(data[k2]["max_hp"]))
 			sw = float(JI.HEALS[String(second["special"])]) * _median(bodies)
 		else:

@@ -17,6 +17,37 @@ heading stands in both files. **Since JE §3 it also takes what `CLAUDE.md` clos
 
 ---
 
+## ARCHIVED AT KG — 2026-11-24, FROM `docs/state.md` AS KF LEFT IT (`1b1694d`)
+
+*The designer answered KF's balance question in conversation on 24 November (*"Each zone's own (a)"*, and four figures after it, `RECORD_KG.md` in KG's work folder; `docs/reports/KG.md` §0): KF's question 0, struck in place and its text here; and FOUND AT KF's comments item, which KG closed. Every other line the answer touched stays in `docs/state.md`, re-worded in place.*
+
+### KF's RULINGS OWED — ITS CLOSED ITEMS (archived at KG; the section stays in `docs/state.md`)
+
+0. **WHAT THE TWO NEW ZONES FIELD BESIDE THEIR OWN SIX KINDS — A BALANCE QUESTION, PUT BEFORE THE DESIGNER WITH ITS OPTIONS, NOT TAKEN
+   (KA's word).** The Orc Chief is the game's one `elite`, and every elite theme needs one, so he stays in both rosters as built and
+   leads every elite and mini-boss fight there (the designer's readouts of 24 November show him on every one in the Barrow). The
+   Drowned Barrow's own six kinds hold no mender, so two of its fight themes and one elite theme never compose there, and outside
+   the boss fight its fights heal only through a Rotfiend's burst and raise nowhere; the Frozen Plains' elite at budget 6 is one warband (the Chief and two Thralls). **KF's sweep, testing the code** (`docs/reports/KF.md`): as the bot plays them, both zones are kinder on their own kinds — at budget 12 the Frozen Plains won 45 of 50 against HEAD's 31 and the Barrow 43 against 27, the Frozen Plains with about half the deaths and the Barrow two-thirds — and the Frozen Plains' fights run longer (its six resist frost).
+   **(a) Recommended — each zone's own**: an elite for each zone written on the Orc Chief's figures and a mender for the Barrow
+   written on the Orc Shaman's, each dressed in its zone (a name, a tint, the moves renamed, their damage type the zone's), a later
+   batch's work — **and three figures come with it, each the designer's**: the copy of Chieftain's Maul cools 2 (the line's band)
+   or takes a held band (JO's ruling 2 held the Orc Chief's at 0, by kind); the Shaman's kit holds one damaging move (JN's content
+   hole), so its copy is a fifth such kind or takes a second move; and a zone's damage type moves what each blow does against a resist.
+   **(b) A named exception**: the Chief stays as built and one Orc healer (the Shaman) stands in
+   the Barrow's roster beside him. **(c) As built**: the Chief the elite of every zone, the Barrow with no mender. Nothing is built
+   on it until the designer answers. **And the content question beside it, the designer's**: whether the Forest and the Scarlands
+   go on sharing their Orcs (the Scarlands holds two kinds of its own) and whether the Ash Hurler belongs to the Scarlands alone.
+
+### FOUND AT KF AND NOT FIXED — ITS CLOSED ITEMS (archived at KG; the section stays in `docs/state.md`)
+
+- **SIX GATE COMMENTS STILL SAY THE TRAVELLING CORE TAKES ROSTER 6** (`check_ji`, `check_jn`, `check_jo`, `check_jp` and
+  `check_jq` headers, and `check_jw`'s *the roster is the travelling core* — `check_jr`'s, which KF opened, is marked), and `check_jw` §1's *the core* now
+  derives the Orc Chief and the Hollow Crown alone, so the arm passes asking less than its comment says. History in those files,
+  each true when written; repaired when a batch opens one.
+  *Closed at KG: KG opened the five headers and `check_jw`'s and marked all six as `check_jr`'s is; `check_jw` §1's roster arm names the Barrow's own kinds since KG (`edits/gate_kg.py` in KG's work folder).*
+
+---
+
 ## ARCHIVED AT KF — 2026-11-24, FROM `docs/state.md` AS KE LEFT IT (`4709814`)
 
 *The designer played KE's build on 24 November against the look-list's fifteen open rows (KF's record, the look-list page's notes): thirteen LOOK RIGHT, and they come here byte for byte; the two left NOT YET stand in the live file.*

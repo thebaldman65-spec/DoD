@@ -61,8 +61,10 @@ const MOVED_SINCE := {"grave_totem": {"zones": [1.0, 3.0]}, "behemoth": {"zones"
 const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan",
 	"grave_husk", "mossback", "blight_speaker", "carrion_pack",
 	# BATCH JW §1 — AND THE DROWNED BARROW's THREE, set aside as JS's seven and JU's four are.
-	"rotfiend", "fen_lurker", "bone_shepherd"]
-# BATCH JW §1 — and roster 6, the Drowned Barrow's, which the travelling core takes as it took 4 and 5.
+	"rotfiend", "fen_lurker", "bone_shepherd",
+	# BATCH KG §1 — AND EACH NEW ZONE's OWN ELITE AND THE BARROW's MENDER, set aside as JW's three are.
+	"rimeclad_warlord", "drowned_thane", "peat_witch"]
+# BATCH JW §1 — and roster 6, the Drowned Barrow's, which the travelling core took as it took 4 and 5, until KF §2.
 const ROSTERS_SINCE := [4, 5, 6]
 const DECK_MD5 := "1d1f37491e4611bb78f94577074ede99"
 const CLERIC_CUT := 0.5

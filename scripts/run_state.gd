@@ -323,7 +323,7 @@ func note_debug(action: String, taken: String) -> void:
 # its boss kind and its roster id — the id the "zones" tags in enemies.json mean. `DOD_ZONE_ROTATION=0` holds a SIM to the
 # order's first three zones, and a player's run never reads it (IW §0.3: a flag that changes what a run contains is the sim's).
 # Adding a zone = ZONE_DEFS entry + ZONE_ORDER + roster tags in enemies.json (its own kinds only, KF §2: no other zone's kind
-# but the Orc Chief and the Hollow Crown, `CLAUDE.md`'s A ZONE FIELDS ITS OWN KINDS) + zone_name keys in the background dicts — the
+# but the Hollow Crown, and an elite of its own since KG §1, `CLAUDE.md`'s A ZONE FIELDS ITS OWN KINDS) + zone_name keys in the background dicts — the
 # battle's, the map's and the event screen's; each falls back to the Forest's art — and a `zone` key on each event written for
 # one zone alone.
 const SLOT_COUNT := 3

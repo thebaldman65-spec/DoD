@@ -50,7 +50,9 @@ const DECK_CLOSED_AT := 25
 const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "rimehorn", "hoarfrost_warden", "stillwrought", "icewrought_titan",
 	"grave_husk", "mossback", "blight_speaker", "carrion_pack",
 	# BATCH JW §1 — AND THE DROWNED BARROW's THREE, set aside as JS's seven and JU's four are.
-	"rotfiend", "fen_lurker", "bone_shepherd"]
+	"rotfiend", "fen_lurker", "bone_shepherd",
+	# BATCH KG §1 — AND EACH NEW ZONE's OWN ELITE AND THE BARROW's MENDER, set aside as JW's three are.
+	"rimeclad_warlord", "drowned_thane", "peat_witch"]
 const KINDS := 21
 # JK's fifty, and since JO §2 Gall and Mire among them, each a blow given damage (Sap and Fester ride two of the fifty).
 const MOVES := 52
@@ -747,7 +749,9 @@ func _s5_the_bellow() -> void:
 	# gave, and the hand-tune went with its reason: `check_ji` §1a derives the band and holds no tune for it (`check_jn` §1 the raise);
 	# since JO §2 Fester rides the Bellow and the rule gives it 3, read above off the hexes' table.
 	var tuned := Gate.strip_comments(FileAccess.get_file_as_string("res://check_ji.gd"))
-	ok(tuned.contains("const TUNED := {}") and not tuned.contains("behemoth/Wretched Bellow"),
+	# BATCH KG §1 — REPAIRED TO ITS INTENT: the table held none from JN until KG, which put the designer's two Maul copies in it
+	# (`check_ji`'s `TUNED`); the arm asks what JN decided — the table stands, and the Bellow's hand-tune is not in it.
+	ok(tuned.contains("const TUNED := {") and not tuned.contains("behemoth/Wretched Bellow"),
 		"§5: a hand-tune of the Bellow still stands beside the rule, which gives it its band since JN §1")
 
 

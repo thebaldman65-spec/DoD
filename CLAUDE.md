@@ -4940,11 +4940,25 @@ same breath as the removal.
 
 - **WHAT IT RETIRED: JS's RULING 6**, under which every kind tagged for every old roster travelled to a new one, so ten Orc kinds,
   the Orc Chief and the Hollow Crown stood in the Frozen Plains' roster from JS and in the Drowned Barrow's from JW. KF took the
-  ten out of both rosters (`data/enemies.json`); each of the two now fields its own six kinds and its own boss.
-- **TWO KINDS STAND IN EVERY ROSTER, EACH NAMED, WHILE THEY ARE RULED**: the Orc Chief, the game's one `elite`, without whom no
-  elite theme composes, and the Hollow Crown, the end boss, whose tags no node composes. What fields the two new zones' elite
-  nodes in the Chief's place, and whether the Drowned Barrow gets a mender of its own, are the designer's (KF's NEEDS A RULING).
-  `check_kf` §2 reds on any third kind of an old zone standing in a new one.
+  ten out of both rosters (`data/enemies.json`); each of the two fielded its own six kinds and its own boss, and since KG §1
+  its own elite too, and the Barrow its own mender.
+- **ONE KIND STANDS IN EVERY ROSTER, NAMED, WHILE IT IS RULED**: the Hollow Crown, the end boss, whose tags no node composes.
+  **The Orc Chief stood in every roster too until KG §1**, the game's one `elite` then, without whom no elite theme composed;
+  `check_kf` §2 reds on any other kind of an old zone standing in a new one.
+- **EACH NEW ZONE's ELITE IS ITS OWN, AND THE DROWNED BARROW's MENDER (KG §1, the designer's (a): *"Each zone's own"*).** The
+  **Rimeclad Warlord** leads the Frozen Plains' elite nodes and the **Drowned Thane** the Barrow's, both written on the Orc
+  Chief's figures; the **Peat Witch** is the Barrow's mender, written on the Orc Shaman's. The Chief is the Forest's and the
+  Scarlands' elite alone. With a mender of its own the Barrow composes every theme its nodes roll (`check_kg` §2 prints what
+  each zone never fields).
+  · **A KIND WRITTEN ON ANOTHER's FIGURES KEEPS THEM, AND ITS ZONE DRESSES IT (KG §1: the designer's (a), each kind *written
+    on* its original's figures, and five answers).** Every figure of the original stands — its body, its bar, its moves in
+    their order, each move's damage, Break damage, delay, cost and cooldown — and only the name, the zone, the tint, the moves'
+    names, the damage type its renamed blows deal (the zone's: frost, shadow) and the resists (the zone's) are its own. **A
+    copy's figure the line would price otherwise is the designer's like the rest, and kept where the combat rules keep one**:
+    the Maul's copies uncooled by the designer's hand (`check_ji`'s `TUNED`), the Witch's Entrench at the Shaman's 2
+    (`HELD`, the one place `check_jk` §2 reads a spend's band). *Healing Wave* keeps its name, because
+    `_enemy_support_action` finds a heal by it; Rally and Entrench keep the names every kind's spends share. `check_kg` §1
+    holds each copy to its original key by key.
 - **THE FOREST OF OLD AND THE SCARLANDS SHARE THEIR ORCS, AND THAT IS THE DESIGNER's TO RULE**: both rosters were the Orcs'
   before either new zone was written, and the Scarlands holds two kinds of its own beside them.
 - **A ZONE WRITTEN FROM NOW ON IS SHOWN TO COMPOSE ON ITS OWN KINDS**: a roster with no kind for a role empties every theme whose

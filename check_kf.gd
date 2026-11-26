@@ -14,16 +14,17 @@
 #       a composition the worst of its ingredients. Rime's row a buff holds it out of the registry (S4-177).
 #   §2  THE ROSTERS: the zones read off `Run.ZONE_ORDER`; no kind of a zone past the Forest and the Scarlands stands in either of
 #       theirs or in another new zone's, but
-#       the Orc Chief (the one elite) and the Hollow Crown (never composed); at every budget a node of each kind can roll, some
-#       theme of that node composes in every zone's roster, so no node falls to the plain fallback; twenty maps of each of the two
-#       zones compose every fight, elite and boss node from that zone's roster, none empty, no Orc but the Chief among them, and
+#       the Hollow Crown (never composed) — since KG §1 the Orc Chief is the old zones' elite alone; at every budget a node of each
+#       kind can roll, some theme of that node composes in every zone's roster, so no node falls to the plain fallback; twenty maps
+#       of each of the two zones compose every fight, elite and boss node from that zone's roster, none empty, no Orc among them,
+#       every elite node fielding its zone's own elite, and
 #       every boss node the zone's own boss and no other boss-tagged kind (S2-090, GI's rule; the Hollow Crown is in both rosters).
 #   §3  THE RECORD: `CLAUDE.md` holds the zone rule's block and the chip bullet.
 #   §4  The player's files are as this gate found them.
 #
 # What it cannot assert, said so it is not mistaken for coverage: whether a player reads the frames at a glance — the frame's
 # colours and widths are the batch's, the designer's to re-rule; and what fields an elite node in the two zones is the
-# designer's (KF's NEEDS A RULING): §2 holds what is built, the Chief.
+# designer's (KF's NEEDS A RULING), answered (a) and built at KG §1: §2 holds each zone's own elite.
 extends SceneTree
 
 const Gate = preload("res://gate_fixture.gd")
@@ -35,8 +36,9 @@ const SCRATCH_PROFILE := "user://kf_profile.json"
 const SCRATCH_RELICS := "user://kf_relics.json"
 # The two zones whose rosters the Orcs held first; every zone `Run.ZONE_ORDER` holds past them is a new zone, read off the order.
 const ZONES_OLD := ["forest", "scarlands"]
-# The two kinds that may stand in an old zone's roster and a new one's: the one elite, and the end boss no node composes.
-const MAY_TRAVEL := ["chief", "hollow_crown"]
+# The kind that may stand in an old zone's roster and a new one's: the end boss no node composes. BATCH KG §1 — the Orc Chief
+# travelled too until each new zone took its own elite (the designer's (a)); repaired to its intent, never deleted.
+const MAY_TRAVEL := ["hollow_crown"]
 const ZONE_BLOCK := "## STANDING DESIGN RULE — A ZONE FIELDS ITS OWN KINDS"
 const CHIP_WORDS := "A CHIP ON THE HERO SIDE SAYS WHICH WAY IT CUTS"
 const CUTS := "res://docs/reports/KF-cuts.tsv"
@@ -324,7 +326,7 @@ func _s2_rosters() -> void:
 	for z in ZONES_OLD:
 		print("    %-15s roster %d: %d kinds" % [z, _roster_of(z), Enemies.kinds_for_roster(_roster_of(z)).size()])
 	ok(strays.is_empty(), "§2: a kind of the Forest's or the Scarlands' roster stands in a new zone's: %s" % str(strays))
-	# AND NO NEW ZONE's KIND STANDS IN ANOTHER NEW ZONE's ROSTER, the two named kinds aside.
+	# AND NO NEW ZONE's KIND STANDS IN ANOTHER NEW ZONE's ROSTER, the named kind aside.
 	var shared: Array = []
 	for i in ZONES_OWN.size():
 		for j in range(i + 1, ZONES_OWN.size()):
@@ -379,7 +381,9 @@ func _s2_rosters() -> void:
 		var outside: Array = []
 		var orcs: Array = []
 		var elites := 0
-		var chief_elites := 0
+		var own_elites := 0
+		# BATCH KG §1 — each new zone's own elite: a kind of its roster tagged `elite` that no old zone's roster holds.
+		var own_elite_kinds: Array = Enemies.kinds_for_roster(r).filter(func(k): return Enemies.roles(String(k)).has("elite") and not old.has(String(k)))
 		var bosses := 0
 		var boss_wrong: Array = []
 		var named_boss := String(_run.ZONE_DEFS[z]["boss"])
@@ -403,19 +407,21 @@ func _s2_rosters() -> void:
 							boss_wrong.append("%s %s" % [z, str(en)])
 					if ty in ["elite", "miniboss"]:
 						elites += 1
-						if en.has("chief"):
-							chief_elites += 1
+						if en.any(func(k): return own_elite_kinds.has(String(k))) and not en.has("chief"):
+							own_elites += 1
 					for e in en:
 						if not Enemies.kinds_for_roster(r).has(String(e)):
 							outside.append(String(e))
 						if old.has(String(e)) and not MAY_TRAVEL.has(String(e)):
 							orcs.append(String(e))
-		print("    20 %s maps: %d fight, elite and boss nodes; %d empty; %d bodies outside roster %d; %d of the Forest's or the Scarlands'; %d of %d elite nodes field the Chief" % [
-			z, nodes, empty.size(), outside.size(), r, orcs.size(), chief_elites, elites])
+		print("    20 %s maps: %d fight, elite and boss nodes; %d empty; %d bodies outside roster %d; %d of the Forest's or the Scarlands'; %d of %d elite nodes field %s" % [
+			z, nodes, empty.size(), outside.size(), r, orcs.size(), own_elites, elites, ", ".join(PackedStringArray(own_elite_kinds))])
 		ok(nodes >= 100 and empty.is_empty(), "§2: a %s node composed no warband: %s" % [z, str(empty.slice(0, 5))])
 		ok(outside.is_empty(), "§2: a %s node fields a kind outside its roster: %s" % [z, str(outside.slice(0, 5))])
 		ok(orcs.is_empty(), "§2: a %s node fields an old zone's kind: %s" % [z, str(orcs.slice(0, 5))])
-		ok(elites > 0 and chief_elites == elites, "§2: %d of %s's %d elite nodes field the Chief" % [chief_elites, z, elites])
+		# BATCH KG §1 — REPAIRED TO ITS INTENT: the arm held what KF built (the Chief on every elite node); since KG each new zone
+		# fields its own, one kind, and no elite node fields the Chief.
+		ok(own_elite_kinds.size() == 1 and elites > 0 and own_elites == elites, "§2: %d of %s's %d elite nodes field its own elite %s" % [own_elites, z, elites, str(own_elite_kinds)])
 		print("    %d boss nodes, each fielding %s and no other boss-tagged kind: %s" % [bosses, named_boss, "yes" if boss_wrong.is_empty() else "NO"])
 		ok(bosses >= 20 and boss_wrong.is_empty(), "§2: a boss node fields %s" % str(boss_wrong.slice(0, 3)) if not boss_wrong.is_empty() else "§2: a boss node fields nothing — %d boss nodes in 20 maps" % bosses)
 	_run.active = false
