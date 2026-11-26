@@ -2,13 +2,13 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 2448,
+  "total": 2453,
   "source": 1479,
   "other": 363,
-  "document": 606
+  "document": 611
  },
  "floor": {
-  "pins": 2448
+  "pins": 2453
  },
  "falls": [],
  "source_residency": {
@@ -13366,7 +13366,7 @@
    "r": "runtime",
    "k": "composed",
    "how": "param",
-   "g": "check_js.gd#104"
+   "g": "check_js.gd#107"
   },
   {
    "s": "check_js.gd",
@@ -13377,7 +13377,7 @@
    "r": "code",
    "k": "literal",
    "how": "param",
-   "g": "check_js.gd#108"
+   "g": "check_js.gd#111"
   },
   {
    "s": "check_js.gd",
@@ -13388,7 +13388,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_js.gd#176",
+   "g": "check_js.gd#179",
    "expr": "ANSWERED"
   },
   {
@@ -13400,7 +13400,7 @@
    "r": "runtime",
    "k": "composed",
    "how": "read",
-   "g": "check_js.gd#170"
+   "g": "check_js.gd#173"
   },
   {
    "s": "check_js.gd",
@@ -13411,7 +13411,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_js.gd#174"
+   "g": "check_js.gd#177"
   },
   {
    "s": "check_js.gd",
@@ -13422,7 +13422,7 @@
    "r": "missing-file",
    "k": "format",
    "how": "read",
-   "g": "check_js.gd#421"
+   "g": "check_js.gd#424"
   },
   {
    "s": "check_js.gd",
@@ -13433,7 +13433,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_js.gd#422",
+   "g": "check_js.gd#425",
    "alt": true
   },
   {
@@ -13445,7 +13445,7 @@
    "r": "missing-file",
    "k": "literal",
    "how": "read",
-   "g": "check_js.gd#422",
+   "g": "check_js.gd#425",
    "alt": true
   },
   {
@@ -13457,7 +13457,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_js.gd#291",
+   "g": "check_js.gd#294",
    "expr": "String"
   },
   {
@@ -13469,7 +13469,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_js.gd#563",
+   "g": "check_js.gd#566",
    "expr": "RECORD_SAYS"
   },
   {
@@ -13481,7 +13481,7 @@
    "r": "runtime",
    "k": "format",
    "how": "read",
-   "g": "check_js.gd#572"
+   "g": "check_js.gd#575"
   },
   {
    "s": "check_jx.gd",
@@ -13862,6 +13862,62 @@
    "k": "loop-list",
    "how": "derived",
    "g": "check_kg.gd#252"
+  },
+  {
+   "s": "check_kh.gd",
+   "fn": "_s4_record",
+   "h": "CLAUDE.md",
+   "n": null,
+   "p": "+",
+   "r": "runtime",
+   "k": "non-literal",
+   "how": "read",
+   "g": "check_kh.gd#267",
+   "expr": "ZONE_BLOCK"
+  },
+  {
+   "s": "check_kh.gd",
+   "fn": "_s4_record",
+   "h": "CLAUDE.md",
+   "n": "\n## ",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "read",
+   "g": "check_kh.gd#268"
+  },
+  {
+   "s": "check_kh.gd",
+   "fn": "_s4_record",
+   "h": "CLAUDE.md",
+   "n": "Antlered Huntmaster",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "derived",
+   "g": "check_kh.gd#271"
+  },
+  {
+   "s": "check_kh.gd",
+   "fn": "_s4_record",
+   "h": "CLAUDE.md",
+   "n": "Grove Tender",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "derived",
+   "g": "check_kh.gd#271"
+  },
+  {
+   "s": "check_kh.gd",
+   "fn": "_s4_record",
+   "h": "CLAUDE.md",
+   "n": "THE ORCS STAND IN THE SCARLANDS",
+   "p": "+",
+   "r": "code",
+   "k": "loop-list",
+   "how": "derived",
+   "g": "check_kh.gd#271"
   },
   {
    "s": "test_batch_ah.gd",

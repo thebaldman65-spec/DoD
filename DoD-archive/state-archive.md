@@ -17,6 +17,22 @@ heading stands in both files. **Since JE §3 it also takes what `CLAUDE.md` clos
 
 ---
 
+## ARCHIVED AT KH — 2026-11-25, FROM `docs/state.md` AS KG LEFT IT (`af93e82`)
+
+*The designer answered KG's content question in conversation on 25 November (*"lets move the orcs to scarlands and lets come up with enemies for the forest of old"*, and four answers after it, `RECORD_KH.md` in KH's work folder; `docs/reports/KH.md` §0): KG's item 0's content question, struck in place and its text here, and the `CLAUDE.md` bullet the answer superseded, recorded rather than deleted. Every other line the answer touched stays in `docs/state.md`, re-worded in place.*
+
+### KG's RULINGS OWED — ITEM 0's CONTENT QUESTION, AS IT STOOD (archived at KH; the item stays in `docs/state.md`, struck)
+
+   **The content question KF put beside it is not answered and stays the designer's**: whether the Forest and the Scarlands go on
+   sharing their Orcs, and whether the Ash Hurler belongs to the Scarlands alone.
+
+### `CLAUDE.md`'s ZONE BLOCK — THE BULLET THE ANSWER REPLACED (recorded at KH; *THE ORCS STAND IN THE SCARLANDS, AND THE FOREST OF OLD FIELDS ITS OWN* stands in its place)
+
+- **THE FOREST OF OLD AND THE SCARLANDS SHARE THEIR ORCS, AND THAT IS THE DESIGNER's TO RULE**: both rosters were the Orcs'
+  before either new zone was written, and the Scarlands holds two kinds of its own beside them.
+
+---
+
 ## ARCHIVED AT KG — 2026-11-24, FROM `docs/state.md` AS KF LEFT IT (`1b1694d`)
 
 *The designer answered KF's balance question in conversation on 24 November (*"Each zone's own (a)"*, and four figures after it, `RECORD_KG.md` in KG's work folder; `docs/reports/KG.md` §0): KF's question 0, struck in place and its text here; and FOUND AT KF's comments item, which KG closed. Every other line the answer touched stays in `docs/state.md`, re-worded in place.*

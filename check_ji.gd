@@ -36,7 +36,9 @@ const LINE := 1.4
 # 14 became 15, it prices 1.46, and the rule gives it the same 2. With its reason gone the hand-tune went with it (DR §2: an exception
 # is deleted with its reasons, not kept beside a rule that now says the same); the table stays, for the next hand-tune.
 # BATCH KG §1 — the two Maul copies, uncooled as the Chief's, the designer's (RECORD_KG, answer 1: *None, as the Chief*).
-const TUNED := {"rimeclad_warlord/Avalanche Maul": 0, "drowned_thane/Barrow Maul": 0}
+# BATCH KH §1 — and the Antlered Huntmaster's, the Chief's Maul copied with his every figure, the designer's (RECORD_KH,
+# answer 3: *Each copies its Orc*).
+const TUNED := {"rimeclad_warlord/Avalanche Maul": 0, "drowned_thane/Barrow Maul": 0, "antlered_huntmaster/Antler Rend": 0}
 const FIGURES := [[2.0, 2], [3.0, 3]]
 const TOP := 4
 # JO §1 — A POINT OF BREAK DAMAGE IS PRICED AT A HERO TURN's DAMAGE DIVIDED BY THE BREAK METER's SIZE (the designer's). A filled meter
@@ -55,7 +57,10 @@ const HELD := {"totemist/Healing Wave": 3, "bog_troll/Regenerate": 3, "chief/Chi
 	"totemist/Raise": 4, "shaman/Entrench": 2, "wolfrider/Rally": 2, "bog_troll/Entrench": 4, "hollow_crown/Entrench": 3,
 	"bone_shepherd/Call the Drowned": 4,
 	# BATCH KG §1 — the Peat Witch's Entrench at the Shaman's 2, the designer's (RECORD_KG, answer 5: *2, as the Shaman*).
-	"peat_witch/Entrench": 2}
+	"peat_witch/Entrench": 2,
+	# BATCH KH §1 — the Grove Tender's Entrench at the Shaman's 2 and the Bristleback's Rally at the Wolfrider's 2, the
+	# designer's (RECORD_KH, answer 3: *Each copies its Orc* — "Same ... cooldowns").
+	"grove_tender/Entrench": 2, "bristleback/Rally": 2}
 # An area blow reaches the party's four heroes; so does an every-ally heal.
 const REACH := 4
 # A heal is priced as the health it restores, a share of the body healed (the three arms of `_resolve_special`).
@@ -89,7 +94,9 @@ const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "r
 	# BATCH JW §1 — AND THE DROWNED BARROW's THREE, set aside as JS's seven and JU's four are.
 	"rotfiend", "fen_lurker", "bone_shepherd",
 	# BATCH KG §1 — AND EACH NEW ZONE's OWN ELITE AND THE BARROW's MENDER, set aside as JW's three are.
-	"rimeclad_warlord", "drowned_thane", "peat_witch"]
+	"rimeclad_warlord", "drowned_thane", "peat_witch",
+	# BATCH KH §1 — AND THE FOREST OF OLD's OWN SEVEN, set aside as KG's three are.
+	"thornling", "bristleback", "spore_lobber", "heartwood_sentinel", "grove_tender", "blightcap", "antlered_huntmaster"]
 # BATCH JW §1 — and roster 6, the Drowned Barrow's, which the travelling core took as it took 4 and 5, until KF §2.
 const ROSTERS_SINCE := [4, 5, 6]
 const DECK_CLOSED_AT := 25

@@ -61,7 +61,9 @@ const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "r
 	# BATCH JW §1 — AND THE DROWNED BARROW's THREE, set aside as JS's seven and JU's four are.
 	"rotfiend", "fen_lurker", "bone_shepherd",
 	# BATCH KG §1 — AND EACH NEW ZONE's OWN ELITE AND THE BARROW's MENDER, set aside as JW's three are.
-	"rimeclad_warlord", "drowned_thane", "peat_witch"]
+	"rimeclad_warlord", "drowned_thane", "peat_witch",
+	# BATCH KH §1 — AND THE FOREST OF OLD's OWN SEVEN, set aside as KG's three are.
+	"thornling", "bristleback", "spore_lobber", "heartwood_sentinel", "grove_tender", "blightcap", "antlered_huntmaster"]
 # THE TREE JM's FIVE RE-READS STAND FOR (§3), its digest as `check_jm` took it on JM's commit.
 const JM_TREE := "c2c74d46e931d8be168cf759e9e83353"
 const FOE := {"type": "fight", "theme": "Warband", "enemies": ["archer", "hexer", "raider", "shieldmaster"]}
@@ -330,7 +332,8 @@ func _s0_the_carrier() -> void:
 	var car := _carriers()
 	print("    the hexers met: %s; the most, %s (%d fights); Gall on %s, Sap on %s" % [str(met), best, most, str(car.get("gall", [])), str(car.get("sap", []))])
 	ok(met.size() >= 5 and best != "", "§0: the kept drive table does not say how often each hexer met the heroes: %s" % str(met))
-	ok(car.get("gall", []) == [best], "§0: Gall is not carried by the hexer the heroes meet most (%s), but by %s" % [best, str(car.get("gall", []))])
+	# BATCH KH §1 — the kinds added since set aside, as the Sap arm below sets them: the Spore Lobber carries the Archer's Gall.
+	ok((car.get("gall", []) as Array).filter(func(k): return not ADDED_SINCE.has(String(k))) == [best], "§0: Gall is not carried by the hexer the heroes meet most (%s), but by %s" % [best, str(car.get("gall", []))])
 	ok((car.get("sap", []) as Array).filter(func(k): return not ADDED_SINCE.has(String(k))) == ["hexer"], "§0: Sap is not the Orc Hexer's alone: %s" % str(car.get("sap", [])))
 
 

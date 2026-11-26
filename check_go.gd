@@ -1604,6 +1604,9 @@ func _stretch(tag: String, specs: Array, engines: Array) -> void:
 	for e in foes:
 		e.max_hp = 100000
 		e.hp = e.max_hp
+		# BATCH KH — AND THEY STRIKE AT HALF THEIR ATTACK: on KH's dice the party fell before three engines fired; a blow still
+		# lands, is blocked, parried or absorbed, and what it takes off a hero is half.
+		e.attack = int(e.attack / 2)
 		if fragile == null and not e.is_ranged:
 			fragile = e
 	s.set("debug_enemies_off", false)
@@ -1655,8 +1658,11 @@ func _stretch(tag: String, specs: Array, engines: Array) -> void:
 		for h in heroes:
 			if hold and not h.dead and h.hp < int(h.max_hp * 0.75):
 				h.hp = h.max_hp
-			elif not h.dead and h.hp < int(h.max_hp * 0.3):
-				h.hp = int(h.max_hp * 0.6)
+			# BATCH KH — THE PARTY STANDS: a hero under three quarters of his health stands back at full each frame (it was under 30%
+			# back to 60% until KH, and KH's dice felled the four between frames) — the hold's own heal above, since KH; the hold
+			# keeps its Mock.
+			elif not h.dead and h.hp < int(h.max_hp * 0.75):
+				h.hp = h.max_hp
 		if fragile != null:
 			if fragile.dead:
 				down_for += 1

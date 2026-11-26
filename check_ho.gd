@@ -91,8 +91,9 @@ const NEAR_MISSES := {
 	# The Grave Husk joined at JU §1: the designer's kind name, its near-miss named (JU's ruling 5).
 	"Gravesong": ["enemy:Grave Husk", "enemy:Grave Totem", "relic:Gravelight Lantern", "relic:Gravewrought Coin"],
 	"Empty Pulpit": [],
+	# The Heartwood Sentinel joined at KH §1: the name as the designer was shown it, its near-miss named.
 	"Cold Hearth": ["ability:Cold Iron", "rune:Cold Snap", "rune:Deep Cold", "rune:Killing Cold",
-		"rune:Rune of the Killing Cold"],
+		"rune:Rune of the Killing Cold", "enemy:Heartwood Sentinel"],
 }
 
 # ...and the strings in the game's own scripts that spell one of the two that ship

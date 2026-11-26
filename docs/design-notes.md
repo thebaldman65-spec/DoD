@@ -4,6 +4,20 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The Orcs to the Scarlands, and the Forest of Old's own enemies (Batch KH) — 2026-11-25
+
+**Why.** KF and KG gave the two new zones enemies of their own and left the Forest of Old and the Scarlands sharing the Orcs, an
+open question for the designer, who answered it: the Orcs go to the Scarlands, and the Forest gets enemies of its own. **Why
+copies.** The designer chose copies so the Forest fights as hard as it does today: each new kind takes every figure of the Orc it
+replaces, and what changes is who stands there, the damage they deal and what hurts them. Not every Orc has a copy — the Forest
+keeps two kinds of power 1 where it had five, and one mender that raises where it had three — so its cheapest fights and the
+Withered Warden's escort are thinner than they were. **Why nature.** The Forest's own kinds, the Bog Troll and the Withered Warden, already resist nature and are soft to
+fire; the seven take that signature, as the Frozen Plains' kinds wear frost and the Barrow's elite shadow. **Why the Rot Behemoth
+and the Grave Totem stay.** They are rot-and-root creatures, not Orcs, and they suit the Forest. **Why Shielding and Healing Wave
+keep their names.** The warband's support logic finds each by its name, so a renamed one would never be cast. **What it costs.** A
+run that does not draw the Scarlands — about one in four — meets no Orc, and the Forest fields twelve kinds where it fielded
+nineteen.
+
 ## Each new zone's own elite, and the Drowned Barrow's mender (Batch KG) — 2026-11-24
 
 **Why each zone's own elite.** After KF took the Orcs out of the Frozen Plains and the Drowned Barrow, the Orc Chief still led

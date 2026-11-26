@@ -251,7 +251,7 @@ const STATUS_INFO := {
 	"black_rot": ["Black Rot", "Rk", Color(0.30, 0.34, 0.22), "Takes %d%% of its own maximum health per\nstack at the start of each turn. It never\nruns out; a cleanse lifts it." % [int(round(BattleUnit.BLACK_ROT_PCT * 100))]],
 	"noxious_fumes": ["Noxious Fumes", "Fu", Color(0.56, 0.64, 0.30), "Single-target attacks are %d%%\nmore likely to miss." % [int(round(NOXIOUS_FUMES_MISS_PCT * 100))]],
 	"submerged": ["Submerged", "Su", Color(0.30, 0.50, 0.56), "Beneath the water: no blow, card or\nspell can pick it. It still acts."],
-	"shielded": ["Shielded", "Sh", Color(0.95, 0.65, 0.25), "Takes 25% less strike damage\n(a Shieldmaster's ward, or the\nHollow Crown's Regalia)."],
+	"shielded": ["Shielded", "Sh", Color(0.95, 0.65, 0.25), "Takes 25% less strike damage\n(a Shieldmaster's or a Sentinel's\nward, or the Hollow Crown's Regalia)."],
 	"wrath": ["Divine Wrath", "DW", Color(1.0, 0.85, 0.35), "+15% damage dealt and +15% speed."],
 	"umbral_sigil": ["Umbral Sigil", "US", Color(0.55, 0.30, 0.70), "Branded: half of every strike this\nunit takes echoes to its whole\nwarband."],
 	# BATCH CK §3 — THIS FALLBACK CARRIES NO MAGNITUDE ON PURPOSE, AND THAT IS

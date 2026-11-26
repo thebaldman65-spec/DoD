@@ -9,7 +9,8 @@
 #       renamed moves; each kind's moves stand in the original's order at its figures, each renamed move dealing the ruled type
 #       (frost, shadow; the Witch's one attack nature, the Shaman's own); the Maul's copies cool at 0 and cost the Chief's Rage
 #       (answer 1); the Witch holds one damaging move (answer 2); the resists are the ruled ones (answer 4), each with a weakness.
-#   §2  THE ROSTERS: the Orc Chief stands in the Forest's and the Scarlands' rosters alone; each new zone's roster holds one
+#   §2  THE ROSTERS: the Orc Chief stands in the Scarlands' roster alone (the Forest's and the Scarlands' from KG §1 until KH §1,
+#       the designer's word, moved the Orcs to the Scarlands); each new zone's roster holds one
 #       elite, its own; the Barrow's holds a mender, the Witch; and at every budget an elite node can roll, an elite theme composes
 #       in each new zone. What each zone never fields is printed.
 #   §3  THE KINDS IN A FIGHT, DRIVEN: a battle fields the three through `Enemies.config`; each unit carries its name, resists and
@@ -192,7 +193,9 @@ func _s2_rosters() -> void:
 	for z in _run.ZONE_ORDER:
 		if Enemies.kinds_for_roster(_roster_of(String(z))).has("chief"):
 			chief_in.append(String(z))
-	ok(chief_in == ["forest", "scarlands"], "§2: the Orc Chief stands in %s — since KG the Forest and the Scarlands alone" % str(chief_in))
+	# BATCH KH §1 — REPAIRED TO ITS INTENT: the arm held the Chief at home, in the old zones and in no new one; since KH his home
+	# is the Scarlands alone (the designer's *"lets move the orcs to scarlands"*), and `check_kh` §2 holds the Forest's own elite.
+	ok(chief_in == ["scarlands"], "§2: the Orc Chief stands in %s — since KH the Scarlands alone" % str(chief_in))
 	for z in ["frozen_plains", "drowned_barrow"]:
 		var ks: Array = Enemies.kinds_for_roster(_roster_of(z))
 		var elites: Array = ks.filter(func(k): return Enemies.roles(String(k)).has("elite"))

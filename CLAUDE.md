@@ -4920,7 +4920,8 @@ same breath as the removal.
   line above the door (`_rootbound_precut`), so what is floated and credited is what lands; and the unit's two damage doors
   (`BattleUnit._rootbound_cut`) cut whatever still reaches them whole. Break damage never. Alone, it takes the whole. The share is the designer's,
   held in its data (`data/enemies.json`'s `rootbound`), and no other kind carries it. Its Wild Growth tends the grove and its
-  escort's menders Raise a fallen body, which keeps it rooted, so the menders fall first. **The chip is a display chip**,
+  escort's menders Raise a fallen body — since KH §1 the Grave Totem alone of the Forest's, the Grove Tender holding the Orc
+  Shaman's kit — which keeps it rooted, so the menders fall first. **The chip is a display chip**,
   so no dispel answers the question; only the kill order does. The bot marks past it while another body stands (DV38).
 - **THE ASH-WROUGHT TYRANT AND THE ICEWROUGHT TITAN ARE TO BE REVISITED THE SAME WAY — RULED, NOT BUILT.**
   Each is given a strategy of its own by a later batch, and nothing here says either has one. **THE HOLLOW CROWN, THE END
@@ -4934,9 +4935,11 @@ same breath as the removal.
   WHO OWNS WHAT). A strategy is the question; how hard it presses is tuning.
 
 ## STANDING DESIGN RULE — A ZONE FIELDS ITS OWN KINDS (Batch KF §2, KF's reading of the designer's word)
-> **A zone written after the Forest of Old and the Scarlands fields its own kinds and takes no other zone's.** The designer,
-> after playing the Frozen Plains and the Drowned Barrow with the Orcs in them (24 November): *"enemies are not showing up in
-> there correct zones"*. The rule is KF's reading of those words; the words are the designer's.
+> **A zone written after the Forest of Old and the Scarlands fields its own kinds and takes no other zone's** — and since KH §1
+> every zone does, those two included. The designer, after playing the Frozen Plains and the Drowned Barrow with the Orcs in them
+> (24 November): *"enemies are not showing up in there correct zones"*; and after KG (25 November): *"lets move the orcs to
+> scarlands and lets come up with enemies for the forest of old"*. The rule is KF's reading of the first; its reach to the
+> Forest of Old and the Scarlands is KH's reading of the second (KH's reading 4), whose words are the designer's.
 
 - **WHAT IT RETIRED: JS's RULING 6**, under which every kind tagged for every old roster travelled to a new one, so ten Orc kinds,
   the Orc Chief and the Hollow Crown stood in the Frozen Plains' roster from JS and in the Drowned Barrow's from JW. KF took the
@@ -4944,27 +4947,35 @@ same breath as the removal.
   its own elite too, and the Barrow its own mender.
 - **ONE KIND STANDS IN EVERY ROSTER, NAMED, WHILE IT IS RULED**: the Hollow Crown, the end boss, whose tags no node composes.
   **The Orc Chief stood in every roster too until KG §1**, the game's one `elite` then, without whom no elite theme composed;
-  `check_kf` §2 reds on any other kind of an old zone standing in a new one.
+  `check_kf` §2 reds on any other kind of an old zone standing in a new one, and `check_kh` §2 on any kind in two zones' rosters.
 - **EACH NEW ZONE's ELITE IS ITS OWN, AND THE DROWNED BARROW's MENDER (KG §1, the designer's (a): *"Each zone's own"*).** The
   **Rimeclad Warlord** leads the Frozen Plains' elite nodes and the **Drowned Thane** the Barrow's, both written on the Orc
-  Chief's figures; the **Peat Witch** is the Barrow's mender, written on the Orc Shaman's. The Chief is the Forest's and the
-  Scarlands' elite alone. With a mender of its own the Barrow composes every theme its nodes roll (`check_kg` §2 prints what
+  Chief's figures; the **Peat Witch** is the Barrow's mender, written on the Orc Shaman's. The Chief is the Scarlands' elite
+  alone since KH §1 (the Forest's own, below). With a mender of its own the Barrow composes every theme its nodes roll (`check_kg` §2 prints what
   each zone never fields).
   · **A KIND WRITTEN ON ANOTHER's FIGURES KEEPS THEM, AND ITS ZONE DRESSES IT (KG §1: the designer's (a), each kind *written
-    on* its original's figures, and five answers).** Every figure of the original stands — its body, its bar, its moves in
+    on* its original's figures, and five answers; KH §1: the designer's answer 3, *Each copies its Orc*, "Same health, armor, speed, damage, Break
+    damage and cooldowns").** Every figure of the original stands — its body, its bar, its moves in
     their order, each move's damage, Break damage, delay, cost and cooldown — and only the name, the zone, the tint, the moves'
-    names, the damage type its renamed blows deal (the zone's: frost, shadow) and the resists (the zone's) are its own. **A
+    names, the damage type its renamed blows deal (the zone's: frost, shadow, nature) and the resists (the zone's) are its own. **A
     copy's figure the line would price otherwise is the designer's like the rest, and kept where the combat rules keep one**:
-    the Maul's copies uncooled by the designer's hand (`check_ji`'s `TUNED`), the Witch's Entrench at the Shaman's 2
-    (`HELD`, the one place `check_jk` §2 reads a spend's band). *Healing Wave* keeps its name, because
-    `_enemy_support_action` finds a heal by it; Rally and Entrench keep the names every kind's spends share. `check_kg` §1
-    holds each copy to its original key by key.
-- **THE FOREST OF OLD AND THE SCARLANDS SHARE THEIR ORCS, AND THAT IS THE DESIGNER's TO RULE**: both rosters were the Orcs'
-  before either new zone was written, and the Scarlands holds two kinds of its own beside them.
+    the Maul's copies uncooled by the designer's word — KG's two by its answer 1, the Huntmaster's by the designer's answer 3 at KH, which keeps
+    every cooldown its Orc's — in `check_ji`'s `TUNED` (the third's place there KH's reading 2), the Witch's and the Grove Tender's Entrench at
+    the Shaman's 2 and the Bristleback's Rally at the Wolfrider's 2 (`HELD`, the one place `check_jk` §2 reads a spend's band).
+    *Healing Wave* and *Shielding* keep their names, because `_enemy_support_action` finds each by it; Rally and Entrench keep
+    the names every kind's spends share. `check_kg` §1 and `check_kh` §1 hold each copy to its original key by key.
+- **THE ORCS STAND IN THE SCARLANDS, AND THE FOREST OF OLD FIELDS ITS OWN (KH §1, the designer's word and four answers).**
+  Every Orc kind, the Wolfrider and the Ash Hurler stand in the Scarlands' roster alone, and the Rot Behemoth and the Grave Totem
+  in the Forest's alone, so no two zones share a kind but the Hollow Crown. Beside the Bog Troll and the Withered Warden the
+  Forest fields seven kinds of its own, each written on the Orc it replaces (the sub-bullet above), every blow nature, each
+  resisting nature and soft to fire: the Thornling, the Bristleback, the Spore Lobber, the Heartwood Sentinel, the Blightcap,
+  the **Grove Tender**, a mender beside the Grave Totem, and the **Antlered Huntmaster**, its elite. **A run that draws no
+  Scarlands meets no Orc.**
 - **A ZONE WRITTEN FROM NOW ON IS SHOWN TO COMPOSE ON ITS OWN KINDS**: a roster with no kind for a role empties every theme whose
   minimum needs that role, so the batch shows that some theme of each node composes at every budget that node can roll —
   `check_kf` §2 reads the zones off `Run.ZONE_ORDER`, asks it of every one and prints the themes each never fields, and holds
-  every zone past the first two to kinds no other zone fields — or says which nodes fall to `compose`'s plain fallback, and why.
+  every zone past the first two to kinds no other zone fields, and `check_kh` §2 the first two to each other — or says which
+  nodes fall to `compose`'s plain fallback, and why.
 
 ## STANDING DESIGN RULE — THE PROTECTED CORE IS THE BASELINE (Batch EB §1)
 > **A protected core may be cheaper and faster than a comparable draft card. The core is the

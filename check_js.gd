@@ -46,7 +46,9 @@ const ADDED_SINCE := ["grave_husk", "mossback", "blight_speaker", "carrion_pack"
 	# BATCH JW §1 — AND THE DROWNED BARROW's THREE.
 	"rotfiend", "fen_lurker", "bone_shepherd",
 	# BATCH KG §1 — AND EACH NEW ZONE's OWN ELITE AND THE BARROW's MENDER, set aside as JW's three are.
-	"rimeclad_warlord", "drowned_thane", "peat_witch"]
+	"rimeclad_warlord", "drowned_thane", "peat_witch",
+	# BATCH KH §1 — AND THE FOREST OF OLD's OWN SEVEN, set aside as KG's three are.
+	"thornling", "bristleback", "spore_lobber", "heartwood_sentinel", "grove_tender", "blightcap", "antlered_huntmaster"]
 # THE SLOTS JS GAVE IT (1-based), replayed in §1, and the slot it never took: slot 2. Since JX it stands at every stage.
 const HOSTS := [1, 3]
 const NOT_HOST := 2
@@ -158,6 +160,11 @@ func _initialize() -> void:
 	for lk in Enemies._load():
 		live_zones[lk] = ((Enemies._load()[lk] as Dictionary).get("zones", []) as Array).duplicate()
 	Gate.rosters_before_jx(Enemies._load())
+	# BATCH KH §1 — AND THE KINDS ADDED SINCE STAND ASIDE FROM THE REPLAY, as `check_jr` §1's do: JS's world held none of them, and
+	# KH's seven stand in roster 1, where they would join JS's warbands. The live tags above bring them back.
+	for k0 in ADDED_SINCE:
+		if Enemies._load().has(k0):
+			(Enemies._load()[k0] as Dictionary)["zones"] = []
 	_s1_the_zone()
 	for lk in live_zones:
 		(Enemies._load()[lk] as Dictionary)["zones"] = live_zones[lk]
