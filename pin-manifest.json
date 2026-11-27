@@ -12315,7 +12315,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_jj.gd#567"
+   "g": "check_jj.gd#576"
   },
   {
    "s": "check_jj.gd",
@@ -12326,7 +12326,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_jj.gd#567"
+   "g": "check_jj.gd#576"
   },
   {
    "s": "check_jj.gd",
@@ -12337,7 +12337,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jj.gd#576",
+   "g": "check_jj.gd#585",
    "expr": "ANSWERED"
   },
   {
@@ -12349,7 +12349,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_jj.gd#587",
+   "g": "check_jj.gd#596",
    "expr": "MASTER_NEEDLE"
   },
   {
@@ -12361,7 +12361,7 @@
    "r": "runtime",
    "k": "composed",
    "how": "read",
-   "g": "check_jj.gd#574"
+   "g": "check_jj.gd#583"
   },
   {
    "s": "check_jj.gd",
@@ -12372,7 +12372,7 @@
    "r": "runtime",
    "k": "format",
    "how": "derived",
-   "g": "check_jj.gd#590"
+   "g": "check_jj.gd#599"
   },
   {
    "s": "check_jj.gd",
@@ -12383,7 +12383,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_jj.gd#589"
+   "g": "check_jj.gd#598"
   },
   {
    "s": "check_jj.gd",
@@ -12394,18 +12394,18 @@
    "r": "runtime",
    "k": "format",
    "how": "derived",
-   "g": "check_jj.gd#590"
+   "g": "check_jj.gd#599"
   },
   {
    "s": "check_jj.gd",
    "fn": "_s6_the_record",
    "h": "docs/master.html",
-   "n": "above the warband's plates",
+   "n": "beside the warband's plates",
    "p": "+",
-   "r": "code",
+   "r": "unresolved",
    "k": "literal",
    "how": "derived",
-   "g": "check_jj.gd#591"
+   "g": "check_jj.gd#600"
   },
   {
    "s": "check_jj.gd",
@@ -12416,7 +12416,7 @@
    "r": "runtime",
    "k": "format",
    "how": "derived",
-   "g": "check_jj.gd#590"
+   "g": "check_jj.gd#599"
   },
   {
    "s": "check_jj.gd",
@@ -12427,7 +12427,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_jj.gd#592"
+   "g": "check_jj.gd#601"
   },
   {
    "s": "check_jk.gd",

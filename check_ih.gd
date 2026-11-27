@@ -1230,21 +1230,17 @@ func _walk_field(s: Node) -> void:
 	_run.pending_modifier = ""
 	_run.pending_reward = {}
 	s.call("_draw_bargain_strip")
-	# BATCH JJ §2 — THE WARBAND's POOL, at its cap (its widest count), between the combat log's foot and the warband's stack.
+	# BATCH JJ §2 — THE WARBAND's POOL, at its cap (its widest count): since KI §1 its words on a row under the combat log's foot
+	# and its column down the warband's stack, so it is held from the log's foot to the screen's (`check_jj` §4 holds where).
 	if s.has_method("_draw_malice_strip"):
 		s.set("malice", int((s.get_script() as Script).get_script_constant_map().get("MALICE_CAP", 0)))
 		s.call("_draw_malice_strip")
 		await Gate.frames(self, 1)
 		var mstrip: Node = s.get("_malice_strip")
 		var lrect := (s.get("history_panel") as Control).get_global_rect()
-		var stack_top := 720.0
-		for me in enemies:
-			var mp: Variant = (me as BattleUnit).get("_plate_panel")
-			if mp != null and is_instance_valid(mp):
-				stack_top = minf(stack_top, (mp as Control).get_global_rect().position.y)
 		if mstrip != null:
 			_hold("malice strip", "the Malice strip at its cap", Rect2(Vector2(lrect.position.x, lrect.end.y),
-				Vector2(1280.0 - lrect.position.x, stack_top - lrect.end.y)), mstrip.get_children())
+				Vector2(1280.0 - lrect.position.x, 720.0 - lrect.end.y)), mstrip.get_children())
 	# 4 — THE INTENT LINE ABSENT, the row emptied.
 	for u3 in heroes + (s.get("companions") as Array) + enemies:
 		(u3 as BattleUnit).statuses = []

@@ -467,3 +467,20 @@ func _show_tree_tip(talent: Dictionary, worn: bool, center: Vector2) -> void:
 func _hide_tree_tip() -> void:
 	if _tree_tip != null:
 		_tree_tip.visible = false
+
+# BATCH KI §2 — ESCAPE LEAVES, AS THE SCREEN's OWN WAY OUT DOES (the designer's word: *"I want to be able to return to the
+# map screen from the trade, smith, ???, and character stats screen by pressing escape"*). One key, through the one door the
+# screen's leave button already uses, so nothing it saves or asks is skipped. An open overlay (the glossary, a kit's preview) takes the key first, as its own
+# close would.
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_action_pressed("ui_cancel") or event.is_echo():
+		return
+	get_viewport().set_input_as_handled()
+	for c in get_children():
+		if c is GlossaryPanel:
+			c.call("_close")
+			return
+		if c is Control and c.has_method("close_preview"):
+			c.call("close_preview")
+			return
+	_on_back()

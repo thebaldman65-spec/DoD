@@ -1443,9 +1443,12 @@ const ENEMY_LAYOUTS := {
 # Orc Chief, the Ash-Wrought Tyrant) — and a warband never grows mid-fight, so its stack is laid by
 # each plate's own height (`_stack_enemy_plates`) from 200, clear of the combat log above (to ~168),
 # with `ENEMY_PLATE_GAP` between: six at 74 end at 664, above the DEBUG button (678) they ran into at
-# 82 from 210. The width is the plate's own (`BattleUnit.PLATE_W`).
+# 82 from 210. The width is the plate's own (`BattleUnit.PLATE_W`). BATCH KI §1 — the warband's stack stands a column's
+# width in from the edge: the Malice column (`MALICE_BAR_W`, `MALICE_BAR_GAP`) runs down its right side.
 const HERO_PLATE_X := 8.0
-const ENEMY_PLATE_X := 1280.0 - 8.0 - BattleUnit.PLATE_W
+const MALICE_BAR_W := 22.0       # the Malice column, its frame included
+const MALICE_BAR_GAP := 4.0      # between the warband's plates and the column
+const ENEMY_PLATE_X := 1280.0 - 8.0 - MALICE_BAR_W - MALICE_BAR_GAP - BattleUnit.PLATE_W
 const PLATE_TOP := 170.0
 const PLATE_STEP := 90.0
 const ENEMY_PLATE_TOP := 200.0
@@ -2612,6 +2615,8 @@ func _stack_enemy_plates() -> void:
 	var y := ENEMY_PLATE_TOP
 	if y + total > PLATE_FLOOR:
 		y = maxf(176.0, PLATE_FLOOR - total)
+	# BATCH KI §1 — where the stack stands, top and foot, for the Malice column beside it.
+	_enemy_stack_span = Vector2(y, y + maxf(total, 0.0))
 	for e2 in enemies:
 		(e2 as BattleUnit).place_plate(Vector2(ENEMY_PLATE_X, y))
 		y += (e2 as BattleUnit).plate_height() + ENEMY_PLATE_GAP
@@ -9863,16 +9868,28 @@ func _warband_free_spend(u: BattleUnit, sp: Dictionary) -> void:
 
 # ══ BATCH JJ §2 — THE WARBAND's POOL ON SCREEN ════════════════════════════════════════════════════════════════════════
 #
-# **A pool the player cannot see is invisible difficulty.** Malice is the side's, not a body's, so it stands on no plate:
-# a strip of its own above the warband's stack, between the combat log's foot and the highest the stack is ever lifted
-# (`_stack_enemy_plates`'s 176), where nothing else is drawn — MALICE, its bar and its count. Its hover is the rule, every
-# figure read off its constant, and who in this warband spends it. A sim draws nothing.
-const MALICE_STRIP_POS := Vector2(ENEMY_PLATE_X, 161.0)
-const MALICE_COLOR := Color(0.86, 0.36, 0.42)
+# **A pool the player cannot see is invisible difficulty.** Malice is the side's, not a body's, so it stands on no plate.
+# BATCH KI §1 (the designer's word: *"make the malice bar much thicker and noticeable and make it run vertically along the
+# right side of the enemy namesplates"*) — it is a column of its own at the screen's right edge, beside the warband's stack
+# and as tall as it (never shorter than `MALICE_BAR_MIN_H`), its fill rising from the foot; MALICE and its count stand on one
+# row above the column, between the combat log's foot and the stack's top, where nothing else is drawn. The plates stand a
+# column's width in from the edge to make the room (`ENEMY_PLATE_X`). A change in the pool flashes the fill. Its hover is the
+# rule, every figure read off its constant, and who in this warband spends it. A sim draws nothing.
+const MALICE_BAR_X := 1280.0 - 8.0 - MALICE_BAR_W
+const MALICE_HEAD_Y := 161.0     # the row MALICE and its count stand on, under the combat log's foot
+const MALICE_HEAD_H := 17.0      # a font-12 line
+const MALICE_BAR_MIN_H := 160.0
+const MALICE_BAR_INSET := 3.0    # the frame's width either side of the track
+const MALICE_COLOR := Color(0.93, 0.22, 0.30)
+const MALICE_FRAME_COLOR := Color(0.62, 0.20, 0.26)
 var _malice_strip: Node2D = null
 var _malice_fill_rect: ColorRect = null
+var _malice_track: ColorRect = null
 var _malice_count: Label = null
 var _malice_hover: Control = null
+var _malice_head_hover: Control = null
+var _malice_drawn := -1
+var _enemy_stack_span := Vector2(ENEMY_PLATE_TOP, ENEMY_PLATE_TOP)  # the warband's stack, top and foot (`_stack_enemy_plates`)
 
 
 func _draw_malice_strip() -> void:
@@ -9881,41 +9898,78 @@ func _draw_malice_strip() -> void:
 	if _malice_strip != null and is_instance_valid(_malice_strip):
 		_malice_strip.queue_free()
 	_malice_strip = Node2D.new()
-	_malice_strip.position = MALICE_STRIP_POS
 	add_child(_malice_strip)
+	_malice_drawn = -1
+	var top := _enemy_stack_span.x
+	var h := maxf(_enemy_stack_span.y - _enemy_stack_span.x, MALICE_BAR_MIN_H)
+	var right := MALICE_BAR_X + MALICE_BAR_W
+	# THE ROW ABOVE: MALICE and its count, right-aligned to the column's edge. Parented, then sized (IH §6's three Godot facts).
 	var head := Label.new()
 	head.text = "MALICE"
-	head.add_theme_font_size_override("font_size", 9)
+	head.add_theme_font_size_override("font_size", 12)
 	head.add_theme_color_override("font_color", MALICE_COLOR)
+	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	head.add_theme_stylebox_override("normal", _malice_head_box())
 	head.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	# Parented, then sized (IH §6's three Godot facts): a font-9 line is 13 px.
-	BattleUnit._put(_malice_strip, head, Vector2(0, 0), Vector2(44, 13))
-	var track := ColorRect.new()
-	track.color = Color(0.16, 0.10, 0.12, 0.95)
-	track.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	BattleUnit._put(_malice_strip, track, Vector2(46, 4), Vector2(84, 6))
+	BattleUnit._put(_malice_strip, head, Vector2(right - 124, MALICE_HEAD_Y), Vector2(64, MALICE_HEAD_H))
+	_malice_count = Label.new()
+	_malice_count.add_theme_font_size_override("font_size", 12)
+	_malice_count.add_theme_color_override("font_color", Color(0.96, 0.90, 0.88))
+	_malice_count.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_malice_count.add_theme_stylebox_override("normal", _malice_head_box())
+	_malice_count.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	BattleUnit._put(_malice_strip, _malice_count, Vector2(right - 58, MALICE_HEAD_Y), Vector2(58, MALICE_HEAD_H))
+	# THE COLUMN: a frame, its track, and the fill rising from the foot.
+	var frame := ColorRect.new()
+	frame.color = MALICE_FRAME_COLOR
+	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	BattleUnit._put(_malice_strip, frame, Vector2(MALICE_BAR_X, top), Vector2(MALICE_BAR_W, h))
+	_malice_track = ColorRect.new()
+	_malice_track.color = Color(0.13, 0.07, 0.09, 0.97)
+	_malice_track.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	BattleUnit._put(_malice_strip, _malice_track, Vector2(MALICE_BAR_X + MALICE_BAR_INSET, top + MALICE_BAR_INSET),
+		Vector2(MALICE_BAR_W - 2 * MALICE_BAR_INSET, h - 2 * MALICE_BAR_INSET))
 	_malice_fill_rect = ColorRect.new()
 	_malice_fill_rect.color = MALICE_COLOR
 	_malice_fill_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	BattleUnit._put(_malice_strip, _malice_fill_rect, Vector2(46, 4), Vector2(0, 6))
-	_malice_count = Label.new()
-	_malice_count.add_theme_font_size_override("font_size", 9)
-	_malice_count.add_theme_color_override("font_color", Color(0.9, 0.84, 0.82))
-	_malice_count.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	BattleUnit._put(_malice_strip, _malice_count, Vector2(134, 0), Vector2(38, 13))
-	# The hover: a bare Control over the strip, so a pointer anywhere on it reads the rule.
+	BattleUnit._put(_malice_strip, _malice_fill_rect, _malice_track.position + Vector2(0, _malice_track.size.y),
+		Vector2(_malice_track.size.x, 0))
+	# The hover: two bare Controls, over the row and over the column, so a pointer anywhere on either reads the rule.
+	_malice_head_hover = Control.new()
+	_malice_head_hover.mouse_filter = Control.MOUSE_FILTER_STOP
+	BattleUnit._put(_malice_strip, _malice_head_hover, Vector2(right - 124, MALICE_HEAD_Y), Vector2(124, MALICE_HEAD_H))
 	_malice_hover = Control.new()
 	_malice_hover.mouse_filter = Control.MOUSE_FILTER_STOP
-	BattleUnit._put(_malice_strip, _malice_hover, Vector2(0, 0), Vector2(BattleUnit.PLATE_W, 13))
+	BattleUnit._put(_malice_strip, _malice_hover, Vector2(MALICE_BAR_X, top), Vector2(MALICE_BAR_W, h))
 	_refresh_malice_strip()
+
+
+# The row's words stand on a dark ground of their own, so the zone's sky never swallows them (the Scarlands' is red).
+func _malice_head_box() -> StyleBoxFlat:
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.07, 0.04, 0.06, 0.88)
+	sb.set_corner_radius_all(3)
+	sb.content_margin_left = 3
+	sb.content_margin_right = 3
+	return sb
 
 
 func _refresh_malice_strip() -> void:
 	if sim or _malice_strip == null or not is_instance_valid(_malice_strip):
 		return
-	_malice_fill_rect.size = Vector2(84.0 * clampf(float(malice) / MALICE_CAP, 0.0, 1.0), 6)
+	var inner := _malice_track.size.y
+	var fill_h := inner * clampf(float(malice) / MALICE_CAP, 0.0, 1.0)
+	_malice_fill_rect.position = _malice_track.position + Vector2(0, inner - fill_h)
+	_malice_fill_rect.size = Vector2(_malice_track.size.x, fill_h)
 	_malice_count.text = "%d/%d" % [malice, MALICE_CAP]
-	_malice_hover.tooltip_text = _malice_words()
+	var words := _malice_words()
+	_malice_hover.tooltip_text = words
+	_malice_head_hover.tooltip_text = words
+	# A CHANGE IN THE POOL FLASHES THE FILL, so a gain or a spend is seen as it happens.
+	if _malice_drawn >= 0 and malice != _malice_drawn and is_inside_tree():
+		_malice_fill_rect.modulate = Color(1.9, 1.9, 1.9)
+		create_tween().tween_property(_malice_fill_rect, "modulate", Color.WHITE, 0.4)
+	_malice_drawn = malice
 
 
 # THE RULE IN WORDS, every figure off its constant, hand-broken for a tooltip that does not wrap.

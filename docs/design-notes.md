@@ -4,6 +4,19 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## The Malice column, and Escape back to the map (Batch KI) — 2026-11-27
+
+**Why a column.** The designer asked for the bar to be much thicker and noticeable, running down the right side of the enemy
+nameplates. A six-pixel strip above the stack read as decoration; a column the height of the warband reads as the warband's own
+gauge, and its fill rising beside the bodies that spend it ties the two together. **Why the words have a dark ground.** The
+Scarlands' sky is red, and red words on it vanished in the pictures taken there. **Why it flashes.** A pool that moves only by a
+few pixels at a time is missed; the flash makes each gain and spend an event the eye catches.
+
+**Why Escape takes a choice on an event.** An event left unanswered opens again when the run resumes, so leaving one without an
+answer would only defer it. Every event but four has a choice that does nothing; Escape takes that one, so the key never costs
+the player anything they did not already decline. The four that have none have only one choice, which is what the key then
+takes, as there is nothing else to do there.
+
 ## The Orcs to the Scarlands, and the Forest of Old's own enemies (Batch KH) — 2026-11-25
 
 **Why.** KF and KG gave the two new zones enemies of their own and left the Forest of Old and the Scarlands sharing the Orcs, an

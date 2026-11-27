@@ -17,6 +17,57 @@ heading stands in both files. **Since JE §3 it also takes what `CLAUDE.md` clos
 
 ---
 
+## ARCHIVED AT KI — 2026-11-27, FROM `docs/state.md` AS AFTER KH LEFT IT (`b3cc2ad`)
+
+*The designer answered KH's three-part question in conversation on 26 November (*"Play it as built"*; After KH, `b3cc2ad`; `docs/reports/KI.md` §0), the last of KH's RULINGS OWED open: KH's RULINGS OWED, struck. Its item 5 still calls its three parts the designer's to read, as it stood; the struck head is the answer.*
+
+### ~~KH's RULINGS OWED~~ — **ALL ANSWERED: ITEM 0 BUILT AT KH §1; ITEMS 1–4, KH's READINGS, TAKEN; ITEM 5's THREE PARTS ANSWERED BY THE DESIGNER IN CONVERSATION, 26 NOVEMBER (*Play it as built*; recorded at After KH, `b3cc2ad`): EACH ITS OPTION (a), NOTHING NEW BUILT**
+
+*Its head as it stood: KG's CONTENT QUESTION, ANSWERED AND BUILT: THE ORCS TO THE SCARLANDS AND THE FOREST OF OLD's OWN SEVEN, THE DESIGNER's WORD AND FOUR ANSWERS; FOUR OF KH's OWN READINGS, TAKEN, NONE A FIGURE; THE THREE-PART QUESTION — THE ELITE FIGHTS, THE WARDEN's ESCORT, THE CHEAPEST FIGHTS — ANSWERED 26 NOV.: "PLAY IT AS BUILT"*
+
+Full working: `docs/reports/KH.md`, NEEDS A RULING.
+
+0. **KG's CONTENT QUESTION, ANSWERED (the designer's, 25 November, `RECORD_KH.md` in KH's work folder):** *"lets move the orcs
+   to scarlands and lets come up with enemies for the forest of old"*, and four questions put after it with their options, each
+   answered with its recommendation — the Orcs' four companions *"Behemoth, Totem stay"*, the Forest's new kinds *"These seven"*,
+   the figures *"Each copies its Orc"* ("Same health, armor, speed, damage, Break damage and cooldowns"), the damage type and
+   resists *"Nature, like the Forest"*. **Built at KH §1**: every Orc kind, the Wolfrider and the Ash Hurler in roster 2 (the
+   Scarlands) alone, the Rot Behemoth and the Grave Totem in roster 1 (the Forest) alone; and seven Forest kinds, each on the
+   Orc it replaces — the **Thornling** (the Whelp), the **Bristleback** (the Wolfrider), the **Spore Lobber** (the Archer), the
+   **Heartwood Sentinel** (the Shieldmaster), the **Grove Tender** (the Shaman; a mender beside the Grave Totem), the **Blightcap** (the
+   Hexer) and the **Antlered Huntmaster** (the Chief; the Forest's elite) — every damaging move renamed and nature, each
+   resisting nature 50% and soft to fire. **What stays the designer's**: item 5's three-part question, with its options; the two look-list rows left NOT YET (the turn bar under
+   Ambushed and Outpaced; the Drowned Barrow), and how the Forest plays (TO WATCH IN PLAY).
+1. **A COPY's ROLES ARE ITS ORC's (KH §1).** Answer 3 copies every number; a kind's `roles` are not a number but they decide
+   which fights it joins, so each copy keeps its Orc's — the Spore Lobber *sniper·hexer* as the Archer, the Blightcap
+   *hexer·sniper* as the Hexer, where the preview shown named one role each — and the Forest composes the themes it composed.
+   **The alternative**: the one role the preview named. **Reversing it**: two kinds' `roles`, and the themes the Forest composes.
+2. **WHERE THE DESIGNER's FIGURES FOR THE COPIES ARE KEPT (KH §1, as KG's reading 3).** The Huntmaster's Maul copy uncooled, the
+   line giving it 2, in `check_ji`'s `TUNED` beside KG's two; the Grove Tender's Entrench at the Shaman's 2 and the Bristleback's
+   Rally at the Wolfrider's 2 in `HELD` beside their originals', each with its `docs/reports/JO-held.tsv` row (`check_jo` §1).
+   **The alternative**: the Maul copy in `HELD`, as the Chief's own is. **Reversing it**: one key moved, one kept-table row.
+3. **THE TINTS ARE KH's (KH §1).** Briar green, tawny, pale fungus, dark bark, leaf green, sickly violet and forest green — the
+   names, the moves' names and what each does were shown to the designer (answer 2); the tints were not. **The alternative**: the
+   designer's. **Reversing it**: seven `tint` keys and the bestiary's seven rows.
+4. **NO TWO ZONES SHARE A KIND BUT THE HOLLOW CROWN (KH §1).** *Move the orcs to scarlands* and answer 1 leave every kind of the
+   two old zones in one of them (question 1 said so of the outcome: *Each enemy stands in one zone only*), so the zone rule KF wrote for the new zones holds for all four, and `check_kh` §2 reds on any
+   kind in two zones' rosters. **The alternative**: the old two held apart only by what KH moved. **Reversing it**: the arm.
+5. **FOR THE DESIGNER, NOT TAKEN — THREE THINGS KH's RECOMMENDED OPTIONS BUILT, WHICH THEIR TEXTS DID NOT SHOW, EACH WITH ITS
+   OPTIONS, THE RECOMMENDATION FIRST.** Question 3's option, which the designer took, said *"so the Forest fights as hard as it
+   does today"*, and question 2's *"One new enemy for each kind of fighter the Forest loses"*; neither text showed these. **(5a)
+   The Forest's elite fights read easier**: its Rage Company won 156 of 200 on KH's tree against 133 on HEAD's (78% against 66%,
+   about 2.6 standard errors; the designer's resists are not the cause — 153 of 200 with the Orcs' resists put back). (a) play
+   it as built and read it in play; (b) a Forest copy of the Orc Raider — 140 health, Sundering Strike — the Forest's cheap
+   skirmisher beside the Thornling, new content written with the designer; (c) the same and a copy of the Ash Hurler or the Orc
+   Brute, the brute the Forest lost. **(5b) The Withered Warden's escort raises through one kind**: the Forest's menders were
+   the Orc Totemist, the Orc Shaman, the Orc Ritual Chanter and the Grave Totem — three raising — and are the Grove Tender and
+   the Grave Totem. (a) play it as built and read it in play; (b) a Forest copy of the Orc Totemist, who raises and entrenches
+   (new content); (c) a Raise on the Grove Tender, as the Totemist's — a departure from answer 3, since the Shaman it copies
+   holds none. **(5c) The Forest's cheapest fights** field two kinds of power 1 where they fielded five. (a) play it as built;
+   (b) the Raider's copy of (5a)(b), which answers both. KH built none of them.
+
+---
+
 ## ARCHIVED AT KH — 2026-11-25, FROM `docs/state.md` AS KG LEFT IT (`af93e82`)
 
 *The designer answered KG's content question in conversation on 25 November (*"lets move the orcs to scarlands and lets come up with enemies for the forest of old"*, and four answers after it, `RECORD_KH.md` in KH's work folder; `docs/reports/KH.md` §0): KG's item 0's content question, struck in place and its text here, and the `CLAUDE.md` bullet the answer superseded, recorded rather than deleted. Every other line the answer touched stays in `docs/state.md`, re-worded in place.*

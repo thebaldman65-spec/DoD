@@ -2431,8 +2431,8 @@
   "check_jj": {
    "kind": "gate",
    "checks": [
-    68,
-    68
+    71,
+    71
    ],
    "checks_obs": 1,
    "fails": [
@@ -2440,7 +2440,7 @@
     0
    ],
    "fails_obs": 1,
-   "note": "**BATCH JJ: new, the warband's Malice: the fill at BL's doors and its cap, the heals it pays for and the selection that asks it, the strip, Communion's count, the Bellow's hand, the state's ceiling and the record.**"
+   "note": "**BATCH KI: 68 → 71.** §4 holds the pool where KI §1 put it — its words on a row clear of the log and the plates, its column right of every plate and the stack's height, its fill rising from the column's foot — where it held one span: three checks more; read 71 / 0 on KI's candidate tree.  |  **BATCH JJ: new, the warband's Malice: the fill at BL's doors and its cap, the heals it pays for and the selection that asks it, the strip, Communion's count, the Bellow's hand, the state's ceiling and the record.**"
   },
   "check_jk": {
    "kind": "gate",

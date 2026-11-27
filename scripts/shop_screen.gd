@@ -367,13 +367,7 @@ func _draw_screen() -> void:
 	leave.text = "Leave the Shop"
 	leave.custom_minimum_size = Vector2(220, 48)
 	leave.position = Vector2(530, 640)
-	leave.pressed.connect(func():
-		# Batch BK: the merchant is a map node now, so leaving is nearly always
-		# the map — but the bargain's bought merchant can still be pending, so
-		# the run is still asked rather than assumed.
-		var next := Run.next_after_scene()
-		Run.save_run()
-		get_tree().change_scene_to_file(next))
+	leave.pressed.connect(_leave)
 	add_child(leave)
 
 
@@ -575,3 +569,26 @@ func _sell_rune(sale_idx: int) -> void:
 	else:
 		Run.sell_bag_rune(int(rows_d[sale_idx]["at"]))
 	_draw_screen()
+
+# BATCH KI §2 — ESCAPE LEAVES, AS THE SCREEN's OWN WAY OUT DOES (the designer's word: *"I want to be able to return to the
+# map screen from the trade, smith, ???, and character stats screen by pressing escape"*). One key, through the one door the
+# screen's leave button already uses, so nothing it saves or asks is skipped. An open overlay (the kits' preview) takes the key first, as its own close
+# would.
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_action_pressed("ui_cancel") or event.is_echo():
+		return
+	get_viewport().set_input_as_handled()
+	for c in get_children():
+		if c is Control and c.has_method("close_preview"):
+			c.call("close_preview")
+			return
+	_leave()
+
+
+func _leave() -> void:
+	# Batch BK: the merchant is a map node now, so leaving is nearly always
+	# the map — but the bargain's bought merchant can still be pending, so
+	# the run is still asked rather than assumed.
+	var next := Run.next_after_scene()
+	Run.save_run()
+	get_tree().change_scene_to_file(next)

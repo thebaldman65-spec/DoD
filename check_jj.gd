@@ -14,8 +14,9 @@
 #        takes one it can (C05); the pool is asked at the selection's one door and by the
 #        heal's own payment, nowhere else (C06); a declared heal sets its price aside from the next healer; the healers heal
 #        whenever the pool allows and a body is hurt (C07).
-#   §4   THE BAR: the warband's pool stands on screen above its stack, clear of the log and the plates, its count and its
-#        words read off the constants (C08, R01).
+#   §4   THE BAR: the warband's pool stands on screen beside its stack — a column right of the plates, its fill rising
+#        from the foot, its words on a row clear of the log and the plates (KI §1) — its count and its words read off the
+#        constants (C08, R01).
 #   §5   COMMUNION's COUNT beside its crest chip, off the live party (C11); the Bellow's cooldown a hand-tune through
 #        `check_ji`'s `TUNED` (C12).
 #   §6   THE RECORD: the twelve rulings answered and archived, the pool's sentence and rule in the state and the master
@@ -647,27 +648,41 @@ func _s4_the_bar(s: Node) -> void:
 	_pool(s, 87)
 	s.call("_refresh_malice_strip")
 	await Gate.frames(self, 2)
+	# BATCH KI §1 — THE POOL IS A COLUMN BESIDE THE STACK (the designer's word: thicker, noticeable, running down the plates'
+	# right side): its words on a row between the combat log's foot and the stack's top, its column right of every plate and
+	# at least as tall as the stack, and its fill rising from the column's foot by the pool's share.
 	var texts: Array = []
 	var hover := ""
-	var top := INF
-	var bottom := -INF
+	var row_top := INF
+	var row_foot := -INF
 	for n in (strip as Node).find_children("*", "Control", true, false):
 		var c: Control = n
 		if c is Label:
 			texts.append(String((c as Label).text))
+			row_top = minf(row_top, c.get_global_rect().position.y)
+			row_foot = maxf(row_foot, c.get_global_rect().end.y)
 		if c.tooltip_text != "":
 			hover = c.tooltip_text
-		top = minf(top, c.get_global_rect().position.y)
-		bottom = maxf(bottom, c.get_global_rect().end.y)
-	print("    the strip reads %s; it spans y %.0f to %.0f" % [str(texts), top, bottom])
+	var col: Rect2 = (s.get("_malice_hover") as Control).get_global_rect()
+	var track: Rect2 = (s.get("_malice_track") as Control).get_global_rect()
+	var fill: Rect2 = (s.get("_malice_fill_rect") as Control).get_global_rect()
+	print("    the strip reads %s on a row at y %.0f to %.0f; its column %s, its fill %s" % [str(texts), row_top, row_foot, col, fill])
 	ok(texts.has(BAR_HEAD) and texts.has("%d/%d" % [87, cap]), "§4: the strip does not show the pool's name and its count (%s)" % str(texts))
 	var log_foot := (s.get("history_panel") as Control).get_global_rect().end.y
-	var stack_top := INF
+	var stack := Rect2()
+	var seen := false
 	for e in s.get("enemies"):
 		var p: Variant = (e as BattleUnit).get("_plate_panel")
 		if p != null and is_instance_valid(p):
-			stack_top = minf(stack_top, (p as Control).get_global_rect().position.y)
-	ok(top >= log_foot and bottom <= stack_top, "§4: the strip (y %.0f to %.0f) runs into the combat log (foot %.0f) or the warband's stack (top %.0f)" % [top, bottom, log_foot, stack_top])
+			var pr := (p as Control).get_global_rect()
+			stack = pr if not seen else stack.merge(pr)
+			seen = true
+	ok(seen and row_top >= log_foot and row_foot <= stack.position.y, "§4: the pool's row (y %.0f to %.0f) runs into the combat log (foot %.0f) or the warband's stack (top %.0f)" % [row_top, row_foot, log_foot, stack.position.y])
+	ok(col.position.x >= stack.end.x and col.end.x <= 1280.0, "§4: the pool's column (x %.0f to %.0f) does not stand right of the warband's plates (their edge %.0f)" % [col.position.x, col.end.x, stack.end.x])
+	ok(col.position.y <= stack.position.y + 0.5 and col.end.y >= stack.end.y - 0.5 and col.size.x >= 16.0,
+		"§4: the pool's column %s does not run the stack's height %s, or is thinner than 16 px" % [col, stack])
+	ok(absf(fill.end.y - track.end.y) < 0.6 and absf(fill.size.y - track.size.y * 87.0 / cap) < 0.6,
+		"§4: the pool's fill %s does not rise from its track's foot %s by the pool's share" % [fill, track])
 	# ITS WORDS READ THE CONSTANTS (R01): a re-tune moves the hover with it.
 	var step := _const_i(s, "MALICE_DAMAGE_STEP")
 	var kill := _const_i(s, "MALICE_PER_KILL")
@@ -785,7 +800,7 @@ func _s6_the_record() -> void:
 	var para := master.substr(at, master.find("</p>", at) - at) if at >= 0 else ""
 	ok(para.contains("a point for every %d points of damage" % step) and para.contains("%d when one of the warband falls" % kill) and para.contains("holds %d" % cap),
 		"§6: the master document's pool does not state its figures off the constants: '%s'" % para.left(200))
-	ok(para.contains("above the warband's plates"), "§6: the master document does not say where the pool is shown")
+	ok(para.contains("beside the warband's plates"), "§6: the master document does not say where the pool is shown")
 	ok(not master.contains("under 40% HP (friendly tanks"), "§6: the master document's enemy AI still waits for 40% to heal")
 	ok(_flat(_doc("res://docs/combat-rules.md")).contains("THE SELECTION ASKS THE POOL WHERE IT ASKS THE COOLDOWN"), "§6: the intent block does not say the selection asks the pool")
 	# THE LOOK-LIST names the strip and the count: drawn headless, never seen.

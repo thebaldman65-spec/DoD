@@ -7,6 +7,7 @@ extends Node2D
 const NAME_FONT := preload("res://assets/fonts/PirataOne-Regular.ttf")
 
 var _resolved := false
+var _outcome_shown := false
 
 
 func _ready() -> void:
@@ -113,6 +114,7 @@ func _show_outcome(outcome: String, lines: PackedStringArray) -> void:
 	for child in get_children():
 		child.queue_free()
 	_resolved = false
+	_outcome_shown = true
 	var bg := ColorRect.new()
 	bg.size = Vector2(1280, 720)
 	bg.color = Color(0.08, 0.06, 0.10)
@@ -145,8 +147,44 @@ func _show_outcome(outcome: String, lines: PackedStringArray) -> void:
 	# Batch BK: the event is a map node now, so leaving is nearly always the
 	# map — but the bargain's bought merchant can still be pending, so the run
 	# is still asked rather than assumed.
-	btn.pressed.connect(func():
-		var next := Run.next_after_scene()
-		Run.save_run()
-		get_tree().change_scene_to_file(next))
+	btn.pressed.connect(_leave)
 	vbox.add_child(btn)
+
+# BATCH KI §2 — ESCAPE LEAVES, AS THE SCREEN's OWN WAY OUT DOES (the designer's word: *"I want to be able to return to the
+# map screen from the trade, smith, ???, and character stats screen by pressing escape"*). One key, through the one door the
+# screen's leave button already uses, so nothing it saves or asks is skipped. On the outcome it is Continue. On the choice it takes the walk-away — the choice
+# that does nothing, through `_choose` as its button would — and leaves; an event with no walk-away and one choice takes that
+# one, as there is nothing else to do there; an event with no walk-away and several choices waits for one.
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_action_pressed("ui_cancel") or event.is_echo():
+		return
+	get_viewport().set_input_as_handled()
+	if _outcome_shown:
+		_leave()
+		return
+	var choice := _walk_away()
+	if choice.is_empty() or _resolved:
+		return
+	_choose(choice)
+	_leave()
+
+
+# The choice Escape takes on the choice page: the first that does nothing and is open, or the only one.
+func _walk_away() -> Dictionary:
+	var choices: Array = Events.config(Run.pending_event).get("choices", [])
+	for c in choices:
+		if (c as Dictionary).get("effects", []).is_empty() \
+				and Events.failed_reason(Run, (c as Dictionary).get("requires", {})) == "":
+			return c
+	if choices.size() == 1 and Events.failed_reason(Run, (choices[0] as Dictionary).get("requires", {})) == "":
+		return choices[0]
+	return {}
+
+
+func _leave() -> void:
+	# Batch BK: the event is a map node now, so leaving is nearly always the
+	# map — but the bargain's bought merchant can still be pending, so the run
+	# is still asked rather than assumed.
+	var next := Run.next_after_scene()
+	Run.save_run()
+	get_tree().change_scene_to_file(next)

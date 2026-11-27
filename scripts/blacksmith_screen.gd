@@ -179,3 +179,11 @@ func _buy(i: int) -> void:
 func _leave() -> void:
 	Run.save_run()
 	get_tree().change_scene_to_file(Run.next_after_scene())
+# BATCH KI §2 — ESCAPE LEAVES, AS THE SCREEN's OWN WAY OUT DOES (the designer's word: *"I want to be able to return to the
+# map screen from the trade, smith, ???, and character stats screen by pressing escape"*). One key, through the one door the
+# screen's leave button already uses, so nothing it saves or asks is skipped.
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_action_pressed("ui_cancel") or event.is_echo():
+		return
+	get_viewport().set_input_as_handled()
+	_leave()

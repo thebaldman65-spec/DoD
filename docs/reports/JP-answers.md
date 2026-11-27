@@ -28,7 +28,7 @@ and reds on a door that does not exist or a row that quotes nothing. A line numb
 | a declared spend is bought at the body's turn, asking the list, the cost and the cooldown, never the pool | `scripts/battle.gd` | `_warband_free_spend` | `if not _intent_ability_usable(u, ab):` |
 | what the pool did, read by the instruments and by three warband heals' log lines | `scripts/battle.gd` | `—` | `var malice_ledger := {"generated": 0, "banked": 0, "wasted": 0, "spent": 0}` |
 | a heal's log line reads the ledger around its own call | `scripts/battle.gd` | `_resolve_special` | `growth_spent = int(malice_ledger["spent"]) - growth_spent` |
-| the strip redraws on every change, a rise or a fall | `scripts/battle.gd` | `_refresh_malice_strip` | `_malice_fill_rect.size = Vector2(84.0 * clampf(float(malice) / MALICE_CAP, 0.0, 1.0), 6)` |
+| the strip redraws on every change, a rise or a fall | `scripts/battle.gd` | `_refresh_malice_strip` | `_malice_fill_rect.size = Vector2(_malice_track.size.x, fill_h)` |
 | the strip's count | `scripts/battle.gd` | `_refresh_malice_strip` | `_malice_count.text = "%d/%d" % [malice, MALICE_CAP]` |
 | a field a hero's blow carries, read on every hit and costing no turn | `scripts/battle.gd` | `_resolve` | `if ab.delay_push > 0.0:` |
 | the hit's status line, both sides' blows alike | `scripts/battle.gd` | `_resolve` | `if not result.died and not ab.applies_status.is_empty() \` |
