@@ -1163,6 +1163,9 @@ const FLANK_PCT := 0.5                        # a Flank move: more to a hero ano
 const FLANK_MOVES := ["Harrying Bite", "Cinder Flank", "Gang Gore", "Pack Rend"]  # the Flank moves, by name (the support half's way)
 const MARK_PCT := 0.25                        # Doomed (Carrion Mark): more from every blow of the warband on the hero
 const BRAND_PCT := 0.06                       # Branded (Rot Brand): of the hero's maximum health, for each ability it uses
+# The afflictions that bind their bearer's own turns: a status's clock ticks at its bearer's turn start, before it acts, so each
+# binds one turn fewer than it is laid for, and the intent hover says the turns it binds, as the card does (KJ, KK).
+const BEARER_TURN_STATUSES := ["silenced", "branded"]
 const BODYGUARD_TURNS := 2                    # Shield Guard, Rootguard, Bog Guard: the turns it guards
 const BRACE_TAKEN := 0.5                      # Frozen Stance, Moss Shell: the share of a blow a Hunkered body takes
 const BRACE_STRIKE_FRAC := 0.5                # ... and the share of its basic attack it strikes back with
@@ -8397,10 +8400,11 @@ func _intent_hover_text(u: BattleUnit) -> String:
 		var st_line := "Applies %s" % (String(STATUS_INFO[sid][0]) if STATUS_INFO.has(sid)
 			else sid.capitalize())
 		var st_turns := int(ab.applies_status.get("turns", 0))
-		# BATCH KJ — a Silence binds its bearer's next turn (laid for two: a clock ticks before its bearer acts), and its line
-		# says so, as its chip and its description do — never "for 2 turns" beside "next turn".
-		if sid == "silenced":
-			st_line += " on that hero's next turn"
+		# BATCH KJ, KK — a Silence and a Brand bind their bearer's own turns, one fewer than they are laid for (a clock ticks
+		# before its bearer acts), and the line says the turns bound, as the card does — never the laid count beside it.
+		if BEARER_TURN_STATUSES.has(sid) and st_turns > 1:
+			var bound := st_turns - 1
+			st_line += " on that hero's next turn" if bound == 1 else " on that hero's next %d turns" % bound
 		elif st_turns > 0:
 			st_line += " for %d turn%s" % [st_turns, "" if st_turns == 1 else "s"]
 		if ab.status_chance < 1.0:

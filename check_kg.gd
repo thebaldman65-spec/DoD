@@ -8,7 +8,8 @@
 #       figure, and the Peat Witch every key of the Orc Shaman at hers, but for the name, the zones, the tint, the resists and the
 #       renamed moves; each kind's moves stand in the original's order at its figures, each renamed move dealing the ruled type
 #       (frost, shadow; the Witch's one attack nature, the Shaman's own); the Maul's copies cool as the Chief's and cost his Rage
-#       (answer 1) — since KJ the Maul's place holds War Cry, the Chief's on all four elites, unrenamed and physical, cooling 3 at
+#       (answer 1) — since KJ the Maul's place holds War Cry, the Chief's on all four elites, unrenamed (in the zone's type since KK, as the
+#       Maul it took the place of: KJ's item 10), cooling 3 at
 #       the Maul's Rage (the designer's F1 and answer 6); the Witch holds one damaging move (answer 2); the resists are the ruled
 #       ones (answer 4), each with a weakness.
 #   §2  THE ROSTERS: the Orc Chief stands in the Scarlands' roster alone (the Forest's and the Scarlands' from KG §1 until KH §1,
@@ -172,7 +173,8 @@ func _s1_kinds() -> void:
 			var pn := String(p["display_name"])
 			var want_name := String((spec["moves"] as Dictionary).get(pn, pn))
 			ok(String(a["display_name"]) == want_name, "§1: %s's move %d is %s, want %s" % [kind, i, a["display_name"], want_name])
-			var typed := (spec["moves"] as Dictionary).has(pn) and String(spec["type"]) != ""
+			# BATCH KK — the Maul's place, War Cry, deals the zone's type as a renamed blow does (KJ's item 10: its Maul's type).
+			var typed := ((spec["moves"] as Dictionary).has(pn) or String(MAUL.get(kind, "")) == pn) and String(spec["type"]) != ""
 			var want_type := String(spec["type"]) if typed else String(p.get("dmg_type", ""))
 			ok(String(a.get("dmg_type", "")) == want_type, "§1: %s's %s deals %s, want %s" % [kind, a["display_name"], a.get("dmg_type", "physical"), want_type if want_type != "" else "physical"])
 			var moved: Array = []
@@ -326,9 +328,8 @@ func _s3_fight() -> void:
 				continue
 			var t := a.dmg_type
 			var want_t := String(KINDS[kind]["type"]) if String(KINDS[kind]["type"]) != "" else "nature"
-			# BATCH KJ — War Cry is the Chief's on all four elites: a physical blow, as his (the designer's answer 6).
-			if MAUL.has(kind) and a.display_name == String(MAUL[kind]):
-				want_t = "physical"
+			# BATCH KJ, KK — War Cry is the Chief's on all four elites, and since KK it deals the zone's type, as the Maul it took
+			# the place of (KJ's item 10, answered): the kind's type, as every other blow here.
 			ok(t == want_t, "§3: %s's %s fields as %s, ruled %s" % [kind, a.display_name, t, want_t])
 			var plain := await _blow(s, u, a, hero, t, 0.0)
 			var held := await _blow(s, u, a, hero, t, 0.9)

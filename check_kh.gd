@@ -11,8 +11,8 @@
 #       armor, speed, damage, Break damage and cooldowns"); the resists are nature 50% and fire −25% (answer 4); the
 #       Huntmaster's Maul copy cools and costs as the Chief's (at 0 until KJ). Since KJ (the designer's picks) each kit is KJ's cut: the
 #       Bristleback's Flank move, the Blightcap's hex (its own status and words) and the Sentinel's guard are each the kind's
-#       own in its pattern's slot, and the Maul's place holds War Cry, the Chief's on all four elites — unrenamed, physical,
-#       cooling and costing as his.
+#       own in its pattern's slot, and the Maul's place holds War Cry, the Chief's on all four elites — unrenamed, in the kind's
+#       nature since KK (as the blow it took the place of: KJ's item 10), cooling and costing as his.
 #   §2  THE ROSTERS: the fourteen kinds that leave stand in the Scarlands' roster alone; the Rot Behemoth and the Grave Totem in
 #       the Forest's alone (answer 1); no two zones' rosters share a kind but the Hollow Crown; the Forest's roster holds one
 #       elite, its own, and a mender of its own; the Scarlands' elite is the Orc Chief; and at every budget an elite node can
@@ -189,14 +189,15 @@ func _s1_kinds() -> void:
 			var pn := String(p["display_name"])
 			var hits := int(p.get("damage", 0)) > 0
 			# BATCH KJ — THE KITS AS KJ CUT THEM (`KJ_MOVES`, `KJ_AS_THE_CHIEF`): a move KJ gave the kind in its pattern's slot is
-			# named as KJ named it, renamed as KH's are when it strikes; War Cry, the Chief's on all four elites, keeps his name and type.
+			# named as KJ named it, renamed as KH's are when it strikes; War Cry, the Chief's on all four elites, keeps his name, and
+			# since KK deals the kind's type, as the blow it took the place of (KJ's item 10).
 			var kj_names: Dictionary = KJ_MOVES.get(kind, {})
 			var as_chief := KJ_AS_THE_CHIEF.has(pn)
 			var renamed := (spec["moves"] as Dictionary).has(pn) or (hits and kj_names.has(pn))
 			ok((hits and not as_chief) == renamed, "§1: %s's %s — every damaging move is renamed, and only those" % [kind, pn])
 			var want_name := String(kj_names.get(pn, (spec["moves"] as Dictionary).get(pn, pn)))
 			ok(String(a["display_name"]) == want_name, "§1: %s's move %d is %s, want %s" % [kind, i, a["display_name"], want_name])
-			var want_type := TYPE if (hits and not as_chief) else String(p.get("dmg_type", ""))
+			var want_type := TYPE if hits and (not as_chief or String(MAUL.get(kind, "")) == pn) else String(p.get("dmg_type", ""))
 			ok(String(a.get("dmg_type", "")) == want_type, "§1: %s's %s deals %s, want %s" % [kind, a["display_name"], a.get("dmg_type", "physical"), want_type if want_type != "" else "physical"])
 			var moved: Array = []
 			for key in p:
@@ -357,8 +358,9 @@ func _s3_fight() -> void:
 						"§3: %s's %s fields cooling %d at %d Rage" % [kind, a.display_name, a.cooldown, a.cost])
 				if a.damage <= 0 or a.special != "":
 					continue
-				# BATCH KJ — War Cry is the Chief's on all four elites: a physical blow, as his (the designer's answer 6).
-				var want_t := "physical" if KJ_AS_THE_CHIEF.has(a.display_name) else TYPE
+				# BATCH KJ, KK — War Cry is the Chief's on all four elites, and since KK deals the kind's type, as the blow it took
+				# the place of (KJ's item 10, answered).
+				var want_t := TYPE
 				ok(a.dmg_type == want_t, "§3: %s's %s fields as %s, ruled %s" % [kind, a.display_name, a.dmg_type, want_t])
 				var plain := await _blow(s, u, a, hero, a.dmg_type, 0.0)
 				var held := await _blow(s, u, a, hero, a.dmg_type, 0.9)

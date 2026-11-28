@@ -4,6 +4,12 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## War Cry in each elite's own type, and a Brand's three turns (Batch KK) — 2026-11-27
+
+**Why War Cry took the type of the blow it replaced.** KG gave the Frozen Plains' and the Drowned Barrow's new elites the Orc Chief's figures in their zone's type, frost and shadow, and KH gave the Forest of Old's Huntmaster its figures in nature. KJ put War Cry in each Maul's place untyped, which left three elites with one physical blow among their zone's typed ones. The designer's answer to KJ's question kept KG's and KH's rulings: War Cry is the blow it replaced, in its type. The Chief's Maul was physical, so its War Cry is.
+
+**Why a Brand is laid for one turn more than its card says.** A status's clock ticks at the start of its bearer's turn, before it acts, so a Brand laid for 3 cost a hero two turns while its card said three. The designer kept the card's words: Rot Brand is laid for 4 and the hero pays on three. The card's figure can no longer be read off the data, which holds the laid count, so it is typed and a gate holds it to the laid count and to a Brand ticked as a turn start ticks it; and the intent hover says the turns a Brand binds, as it already said a Silence's, so the card and the intent hover say one thing. The chip on a Branded hero still counts its clock, one more than the turns left to pay, until the hero's turn begins, as a Silence's has since KJ (found and not fixed at KK).
+
 ## Enemy tiers, moves to play around, and a combo for every recipe (Batch KJ) — 2026-11-27
 
 **Why the tier is the cost the builder already spent.** The designer asked that a tier set an enemy's power and its count of

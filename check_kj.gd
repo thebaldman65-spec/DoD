@@ -9,7 +9,8 @@
 #       the Orc Totemist and the Rotfiend at 2; a tier-N kind carries N moves; a tier-1 kind carries no Malice spend, a tier-3
 #       kind and an elite exactly one, Raise only on the Ritual Chanter and the Grave Totem beside the bosses' own; each
 #       tier's health stands in its band; five tier-1 basics carry their signature effect at the ruled chance; every new move
-#       carries the figures the designer ruled; the four elites carry one War Cry.
+#       carries the figures the designer ruled; the four elites carry one War Cry, each in the type of the blow it took the
+#       place of (KJ's item 10, answered at KK).
 #   §2  THE MOVES, DRIVEN IN A FIGHT: a Flank move lands harder on a hero another body struck since that hero's last turn and
 #       not otherwise, and a companion's span closes with its master's turn; a guard takes the first blow aimed at another body in a turn, and not the second, and a Break ends it
 #       (a Broken body guards nothing); a hex move telegraphs Afflict; a Silenced hero may use
@@ -17,7 +18,9 @@
 #       takes more from the warband; a Singled Out hero draws every blow, below a taunt; a Hunkered body takes the ruled share
 #       and strikes back at a melee hitter and not at a ranged one, nor at a spell, and at an area blow that strikes it beside
 #       its target; Frost Fury fires once, under its share of health, and not again after its Fury is lifted; a single-target
-#       wind-up lands on the hero it was raised at.
+#       wind-up lands on the hero it was raised at; Rot Brand's card states one turn fewer than Branded is laid for, a
+#       Brand ticked as a turn start ticks it binds as many of its bearer's turns as the card states and a Silence one, the
+#       turn's clock ticking before its action, and the Brand's hover says them (KJ's item 11, answered at KK).
 #   §3  THE TWELVE COMBOS: each recipe's fight carries its combo, and each combo's arm does what its words say (a Broken
 #       tank guards no elite).
 #   §4  THE RECORD: the master document names every tier's count, each new move and each combo; the state no longer marks
@@ -66,6 +69,10 @@ const NEW_MOVES := {
 }
 const ELITES := ["chief", "antlered_huntmaster", "rimeclad_warlord", "drowned_thane"]
 const WAR_CRY := {"damage": 34, "pressure": 56, "cooldown": 3, "status": "singled_out", "turns": 2}
+# KK — each War Cry deals the type of the blow it took the place of at KJ (the designer's answer to KJ's item 10, *"Its
+# Maul's type"*), read off the warband KJ kept; a blow with no type key is physical.
+const WAR_CRY_REPLACED := {"chief": "Chieftain's Maul", "antlered_huntmaster": "Antler Rend",
+	"rimeclad_warlord": "Avalanche Maul", "drowned_thane": "Barrow Maul"}
 
 var _g := Gate.new()
 var _run: Node = null
@@ -123,6 +130,14 @@ func _fresh_meta() -> void:
 	Relics.loaded = false
 	Relics.unlocked = []
 	Relics.load_data()
+
+
+# The type of the blow a War Cry took the place of, off the kept warband; "" when the kept copy holds no such blow.
+func _replaced_type(before: Dictionary, kind: String) -> String:
+	for a in ((before.get(kind, {}) as Dictionary).get("abilities", []) as Array):
+		if a is Dictionary and String(a.get("display_name", "")) == String(WAR_CRY_REPLACED.get(kind, "")):
+			return String(a.get("dmg_type", "physical"))
+	return ""
 
 
 func _move(kind: String, name: String) -> Dictionary:
@@ -200,14 +215,20 @@ func _s1_data() -> void:
 				bad_move.append("%s %s lays no %s" % [kind, mv, want["status"]])
 	ok(bad_move.is_empty(), "§1: a new move is not as the designer ruled it: %s" % [bad_move])
 	var bad_wc: Array = []
+	var before := Gate.warband_before_kj()
+	var wc_types: Array = []
 	for kind in ELITES:
 		var wc := _move(kind, "War Cry")
 		var st2: Dictionary = wc.get("applies_status", {})
+		var want_type := _replaced_type(before, kind)
+		var got_type := String(wc.get("dmg_type", "physical"))
+		wc_types.append("%s %s" % [kind, got_type])
 		if wc.is_empty() or int(wc.get("damage", 0)) != int(WAR_CRY["damage"]) or int(wc.get("pressure", 0)) != int(WAR_CRY["pressure"]) \
 				or int(wc.get("cooldown", 0)) != int(WAR_CRY["cooldown"]) or String(st2.get("id", "")) != String(WAR_CRY["status"]) \
-				or int(st2.get("turns", 0)) != int(WAR_CRY["turns"]) or wc.has("dmg_type"):
-			bad_wc.append(kind)
-	ok(bad_wc.is_empty(), "§1: an elite's War Cry is not the one ruled (F1, answer 6): %s" % [bad_wc])
+				or int(st2.get("turns", 0)) != int(WAR_CRY["turns"]) or want_type == "" or got_type != want_type:
+			bad_wc.append("%s (%s, the blow it took the place of %s)" % [kind, got_type, want_type if want_type != "" else "none kept"])
+	print("    War Cry, each in the type of the blow it took the place of: %s" % ", ".join(PackedStringArray(wc_types)))
+	ok(bad_wc.is_empty(), "§1: an elite's War Cry is not the one ruled (F1, answer 6; KJ's item 10, its Maul's type): %s" % [bad_wc])
 	# THE SELF-CAST's TAG: an enemy self-cast is tagged `"ally"`, its own side, and there is no `"self"` — `Enemies.config` maps
 	# `"ally"` and nothing else, so any other value loads as an attack on a hero, silently. KJ wrote its guards, its braces and
 	# Frost Fury as self-casts, so every move's target in the data is read here.
@@ -384,6 +405,53 @@ func _s2_moves() -> void:
 		print("    Branded: the basic left %d of %d; %s: %s" % [after_basic, h.max_hp, hero_ab.display_name, str(said.contains(want))])
 		ok(after_basic == h.max_hp and said.contains(want), "§2: a Branded hero did not pay its share for an ability (%s), or paid for the basic" % want)
 	h.remove_status("branded")
+	# A BRAND's TURNS (KJ's item 11, answered at KK): Rot Brand is laid for one turn more than its card states, because a
+	# status's clock ticks at its bearer's turn start, before it acts. The card's figure is typed, so it is held here to the
+	# laid count and to a driven Brand, and the hover says the turns bound, as the card does.
+	var blight := _body(s, "blightcap")
+	var rot: Ability = s.call("_find_ability", blight, "Rot Brand")
+	var laid := int(rot.applies_status.get("turns", 0)) if rot != null else 0
+	var stated := -1
+	var turns_rx := RegEx.new()
+	turns_rx.compile("for (\\d+) turns")
+	var turns_m: RegExMatch = null
+	if rot != null:
+		turns_m = turns_rx.search(rot.description)
+	if turns_m != null:
+		stated = int(turns_m.get_string(1))
+	ok(stated > 0 and stated == laid - 1,
+		"§2: Rot Brand's card states %d turns and Branded is laid for %d — a Brand binds one turn fewer than it is laid for" % [stated, laid])
+	# Ticked as a turn start ticks it: a unit's statuses tick at its turn start, before it acts (held here in `_run_battle`'s
+	# source, the tick ahead of the hero's action), so the turns it acts Branded are the turns it pays.
+	var rb_body := bsrc.substr(rb_at, rb_end - rb_at)
+	var tick_at := rb_body.find("\n\t\tu.tick_statuses()\n\t\tu.tick_cooldowns()\n")
+	var act_at := rb_body.find("await _player_turn(u)")
+	var ticks_first := tick_at >= 0 and act_at > tick_at
+	var paid := 0
+	s.call("_apply_status", h, "branded", laid, 0, 0, blight)
+	for _t in range(laid + 2):
+		h.tick_statuses()
+		if h.has_status("branded"):
+			paid += 1
+	var choke: Ability = s.call("_find_ability", hexer, "Choking Hex")
+	var hushed := 0
+	s.call("_apply_status", h, "silenced", int(choke.applies_status.get("turns", 0)) if choke != null else 0, 0, 0, hexer)
+	for _t in range(4):
+		h.tick_statuses()
+		if h.has_status("silenced"):
+			hushed += 1
+	print("    Rot Brand: laid %d, its card %d, a hero acts Branded on %d turns; Choking Hex: a hero acts Silenced on %d" % [
+		laid, stated, paid, hushed])
+	ok(paid == stated and hushed == 1 and ticks_first,
+		("§2: a Brand laid as Rot Brand lays it bound %d of its bearer's turns where its card states %d (a Silence %d, its card one)"
+		+ " — and the turn's clock ticks before its action: %s") % [paid, stated, hushed, str(ticks_first)])
+	# The hover: the turns a Brand binds, as the card states them.
+	blight.intent = {"ability": rot, "target": h, "turns": 1, "support": false, "message": "", "logs": [],
+		"category": s.call("_intent_category", blight, rot)}
+	var rot_hover := String(s.call("_intent_hover_text", blight))
+	var rot_line := "Applies Branded on that hero's next %d turns" % stated
+	ok(Array(rot_hover.split("\n")).has(rot_line),
+		"§2: Rot Brand's hover does not say the turns its card states (`%s`): %s" % [rot_line, rot_hover.replace("\n", " | ")])
 	# Doomed: the warband's blows land harder on the hero.
 	var undoomed := float(s.call("_kj_out_mult", hexer, h, hexer.abilities[0]))
 	s.call("_apply_status", h, "doomed", 2, 0, 0, hexer)

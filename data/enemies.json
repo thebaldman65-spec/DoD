@@ -1021,9 +1021,9 @@
     "anim": "attack02",
     "applies_status": {
      "id": "branded",
-     "turns": 3
+     "turns": 4
     },
-    "description": "Brands one hero for {=@applies_status.turns} turns: each\nability that hero uses costs it\n{=Battle.BRAND_PCT*100}% of its maximum health.",
+    "description": "Brands one hero for 3 turns: each\nability that hero uses costs it\n{=Battle.BRAND_PCT*100}% of its maximum health.",
     "dmg_type": "nature"
    }
   ]
@@ -1084,6 +1084,7 @@
     "pressure": 56,
     "delay": 4.0,
     "anim": "attack02",
+    "dmg_type": "nature",
     "applies_status": {
      "id": "singled_out",
      "turns": 2
@@ -1893,6 +1894,7 @@
     "pressure": 56,
     "delay": 4.0,
     "anim": "attack02",
+    "dmg_type": "frost",
     "applies_status": {
      "id": "singled_out",
      "turns": 2
@@ -2333,6 +2335,7 @@
     "pressure": 56,
     "delay": 4.0,
     "anim": "attack02",
+    "dmg_type": "shadow",
     "applies_status": {
      "id": "singled_out",
      "turns": 2

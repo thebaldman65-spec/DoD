@@ -2739,8 +2739,8 @@
   "check_kj": {
    "kind": "gate",
    "checks": [
-    62,
-    62
+    65,
+    65
    ],
    "checks_obs": 1,
    "fails": [
@@ -2748,7 +2748,7 @@
     0
    ],
    "fails_obs": 1,
-   "note": "**BATCH KJ: NEW.** The designer's enemy rework (tiers, kits cut to their tier, moves to play around, a combo for every recipe; the four answers at KI, the 44 picks and seven figures at KJ): §1 a kind's tier is its power, its kit its tier's count, its spends its tier's, its health in its band, the five bites and every new move at the ruled figures, one War Cry on the elites, every move's target absent or ally (S2-046, re-read HELD at KJ); §2 the moves driven in fights — Flank, the guard, Silenced, Branded, Doomed, Singled Out below a taunt, the brace and its strike back, Frost Fury, a single-target wind-up; §3 each recipe's fight carries its combo and each does what its words say; §4 the master document names the new moves and the combos, the state the enemy half built; §5 check_ht's function window, repaired at KJ §1 (IT's STANDING row); §6 the player's files."
+   "note": "**BATCH KK: 62 → 65.** §2 holds a Brand's turns, the designer's answer to KJ's item 11 (laid for 4, three turns paid): Rot Brand's card states one turn fewer than Branded is laid for; a Brand ticked as a turn start ticks it binds as many of its bearer's turns as the card states, and a Silence one, the turn's clock ticking before its action; the Brand's hover says them. §1's War Cry check holds each War Cry to the type of the blow it took the place of (item 10), the same check. **BATCH KJ: NEW.** The designer's enemy rework (tiers, kits cut to their tier, moves to play around, a combo for every recipe; the four answers at KI, the 44 picks and seven figures at KJ): §1 a kind's tier is its power, its kit its tier's count, its spends its tier's, its health in its band, the five bites and every new move at the ruled figures, one War Cry on the elites, every move's target absent or ally (S2-046, re-read HELD at KJ); §2 the moves driven in fights — Flank, the guard, Silenced, Branded, Doomed, Singled Out below a taunt, the brace and its strike back, Frost Fury, a single-target wind-up; §3 each recipe's fight carries its combo and each does what its words say; §4 the master document names the new moves and the combos, the state the enemy half built; §5 check_ht's function window, repaired at KJ §1 (IT's STANDING row); §6 the player's files."
   }
  }
 }

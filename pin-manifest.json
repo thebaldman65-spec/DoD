@@ -2,18 +2,18 @@
  "note": "Every literal a suite pins into a file, with the file it lives in. DERIVED by build_pin_manifest.py; ENFORCED by check_ed.gd every battery. Do not hand-edit: re-run the generator.",
  "generated_by": "build_pin_manifest.py",
  "counts": {
-  "total": 2466,
-  "source": 1485,
+  "total": 2468,
+  "source": 1487,
   "other": 367,
   "document": 614
  },
  "floor": {
-  "pins": 2466
+  "pins": 2468
  },
  "falls": [],
  "source_residency": {
   "narrow": 49,
-  "code": 918,
+  "code": 920,
   "absent": 336,
   "runtime": 115,
   "unresolved": 6,
@@ -13868,7 +13868,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_kg.gd#256",
+   "g": "check_kg.gd#254",
    "expr": "ZONE_BLOCK"
   },
   {
@@ -13880,7 +13880,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_kg.gd#257"
+   "g": "check_kg.gd#255"
   },
   {
    "s": "check_kg.gd",
@@ -13891,7 +13891,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_kg.gd#260"
+   "g": "check_kg.gd#258"
   },
   {
    "s": "check_kg.gd",
@@ -13902,7 +13902,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_kg.gd#260"
+   "g": "check_kg.gd#258"
   },
   {
    "s": "check_kg.gd",
@@ -13913,7 +13913,7 @@
    "r": "code",
    "k": "loop-list",
    "how": "derived",
-   "g": "check_kg.gd#260"
+   "g": "check_kg.gd#258"
   },
   {
    "s": "check_kh.gd",
@@ -13975,12 +13975,23 @@
    "s": "check_kj.gd",
    "fn": "_s2_moves",
    "h": "scripts/battle.gd",
+   "n": "\n\t\tu.tick_statuses()\n\t\tu.tick_cooldowns()\n",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_kj.gd#300"
+  },
+  {
+   "s": "check_kj.gd",
+   "fn": "_s2_moves",
+   "h": "scripts/battle.gd",
    "n": "\nfunc ",
    "p": "+",
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_kj.gd#222"
+   "g": "check_kj.gd#234"
   },
   {
    "s": "check_kj.gd",
@@ -13991,7 +14002,18 @@
    "r": "code",
    "k": "literal",
    "how": "slice",
-   "g": "check_kj.gd#223"
+   "g": "check_kj.gd#235"
+  },
+  {
+   "s": "check_kj.gd",
+   "fn": "_s2_moves",
+   "h": "scripts/battle.gd",
+   "n": "await _player_turn(u)",
+   "p": "+",
+   "r": "code",
+   "k": "literal",
+   "how": "derived",
+   "g": "check_kj.gd#301"
   },
   {
    "s": "check_kj.gd",
@@ -14002,7 +14024,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_kj.gd#221"
+   "g": "check_kj.gd#233"
   },
   {
    "s": "check_kj.gd",
@@ -14013,7 +14035,7 @@
    "r": "runtime",
    "k": "non-literal",
    "how": "read",
-   "g": "check_kj.gd#514",
+   "g": "check_kj.gd#561",
    "expr": "String"
   },
   {
@@ -14025,7 +14047,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_kj.gd#522"
+   "g": "check_kj.gd#569"
   },
   {
    "s": "check_kj.gd",
@@ -14036,7 +14058,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_kj.gd#534"
+   "g": "check_kj.gd#581"
   },
   {
    "s": "check_kj.gd",
@@ -14047,7 +14069,7 @@
    "r": "absent",
    "k": "literal",
    "how": "read",
-   "g": "check_kj.gd#534"
+   "g": "check_kj.gd#581"
   },
   {
    "s": "check_kj.gd",
@@ -14058,7 +14080,7 @@
    "r": "code",
    "k": "literal",
    "how": "read",
-   "g": "check_kj.gd#521"
+   "g": "check_kj.gd#568"
   },
   {
    "s": "test_batch_ah.gd",
