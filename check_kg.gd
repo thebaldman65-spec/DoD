@@ -7,15 +7,18 @@
 #   §1  THE KINDS, WRITTEN ON THEIR ORIGINALS: the Rimeclad Warlord and the Drowned Thane carry every key of the Orc Chief at his
 #       figure, and the Peat Witch every key of the Orc Shaman at hers, but for the name, the zones, the tint, the resists and the
 #       renamed moves; each kind's moves stand in the original's order at its figures, each renamed move dealing the ruled type
-#       (frost, shadow; the Witch's one attack nature, the Shaman's own); the Maul's copies cool at 0 and cost the Chief's Rage
-#       (answer 1); the Witch holds one damaging move (answer 2); the resists are the ruled ones (answer 4), each with a weakness.
+#       (frost, shadow; the Witch's one attack nature, the Shaman's own); the Maul's copies cool as the Chief's and cost his Rage
+#       (answer 1) — since KJ the Maul's place holds War Cry, the Chief's on all four elites, unrenamed and physical, cooling 3 at
+#       the Maul's Rage (the designer's F1 and answer 6); the Witch holds one damaging move (answer 2); the resists are the ruled
+#       ones (answer 4), each with a weakness.
 #   §2  THE ROSTERS: the Orc Chief stands in the Scarlands' roster alone (the Forest's and the Scarlands' from KG §1 until KH §1,
 #       the designer's word, moved the Orcs to the Scarlands); each new zone's roster holds one
 #       elite, its own; the Barrow's holds a mender, the Witch; and at every budget an elite node can roll, an elite theme composes
 #       in each new zone. What each zone never fields is printed.
 #   §3  THE KINDS IN A FIGHT, DRIVEN: a battle fields the three through `Enemies.config`; each unit carries its name, resists and
-#       kit as §1 reads them off the data, the Maul's copy uncooled; and each damaging move, struck on a hero under the same dice,
-#       takes far less off a hero who resists its ruled type than off one who does not — the type reaches the blow's door; and
+#       kit as §1 reads them off the data, the Maul's place at the Chief's War Cry (since KJ); and each damaging move, struck on a
+#       hero under the same dice, takes far less off a hero who resists its ruled type than off one who does not — the type
+#       reaches the blow's door; and
 #       (§3b) the Witch, a hurt ally beside her and a pool that can pay, chooses her Healing Wave on it — the move the support
 #       code reads by its name.
 #   §4  THE RECORD: `CLAUDE.md`'s zone block names each zone's own elite and the Barrow's mender.
@@ -48,7 +51,10 @@ const KINDS := {
 		"moves": {"Chain Lightning": "Marshlight Chain"},
 		"type": "", "resists": "pattern"},
 }
-const MAUL := {"rimeclad_warlord": "Avalanche Maul", "drowned_thane": "Barrow Maul"}
+# BATCH KJ — THE MAUL's PLACE HOLDS WAR CRY ON ALL FOUR ELITES (the designer's F1 and answer 6, RECORD_KJ): one move, the Chief's —
+# a physical blow, cooling 3, at the Maul's Rage — so the Warlord's and the Thane's are neither renamed nor typed, and each cools
+# as the Chief's does (answer 1's rule). KG's Maul names above stand for the move KJ replaced; no kit holds them.
+const MAUL := {"rimeclad_warlord": "War Cry", "drowned_thane": "War Cry"}
 # The keys a kind may carry apart from its pattern's figure.
 const OWN_KEYS := ["unit_name", "zones", "tint", "resists", "abilities"]
 
@@ -119,6 +125,14 @@ func _want_resists(kind: String) -> Dictionary:
 	return (_data[KINDS[kind]["pattern"]] as Dictionary)["resists"] if typeof(w) == TYPE_STRING else w
 
 
+# BATCH KJ — THE CHIEF's MOVE OF A NAME, off the data: the copy a kind holds of it cools and costs as his does.
+func _chief_move(name: String) -> Dictionary:
+	for a in ((_data.get("chief", {}) as Dictionary).get("abilities", []) as Array):
+		if String((a as Dictionary).get("display_name", "")) == name:
+			return a
+	return {}
+
+
 # ── §1 — THE KINDS ───────────────────────────────────────────────────────────
 
 func _s1_kinds() -> void:
@@ -177,8 +191,13 @@ func _s1_kinds() -> void:
 			for a in ka:
 				if String(a["display_name"]) == String(MAUL[kind]):
 					maul = a
-			ok(not maul.is_empty() and int(maul.get("cooldown", 0)) == 0 and int(maul.get("cost", 0)) > 0,
-				"§1: %s's %s cools %s — the designer's answer 1 is no cooldown, as the Chief's" % [kind, MAUL[kind], str(maul.get("cooldown", "?"))])
+			# BATCH KJ — REPAIRED TO ITS INTENT: answer 1 is *as the Chief's*, and since KJ the Chief's is War Cry, cooling 3 at the
+			# Maul's Rage (answer 6), where his Maul cooled at 0.
+			var chief_m := _chief_move(String(MAUL[kind]))
+			ok(not maul.is_empty() and not chief_m.is_empty() and int(maul.get("cooldown", 0)) == int(chief_m.get("cooldown", -1))
+					and int(maul.get("cooldown", 0)) > 0 and int(maul.get("cost", 0)) == int(chief_m.get("cost", -1)) and int(maul.get("cost", 0)) > 0,
+				"§1: %s's %s cools %s at %s Rage — the designer's answer 1 is as the Chief's, and his War Cry cools %s at %s since KJ" % [
+					kind, MAUL[kind], str(maul.get("cooldown", "?")), str(maul.get("cost", "?")), str(chief_m.get("cooldown", "?")), str(chief_m.get("cost", "?"))])
 	var w: Array = (_data.get("peat_witch", {}) as Dictionary).get("abilities", [])
 	var hitters: Array = w.filter(func(a): return int(a.get("damage", 0)) > 0)
 	ok(hitters.size() == 1, "§1: the Peat Witch holds %d damaging moves — the designer's answer 2 is one, as the Shaman's" % hitters.size())
@@ -300,11 +319,16 @@ func _s3_fight() -> void:
 		for ab in u.abilities:
 			var a := ab as Ability
 			if MAUL.has(kind) and a.display_name == String(MAUL[kind]):
-				ok(a.cooldown == 0 and a.cost == 20, "§3: %s's %s fields cooling %d at %d Rage" % [kind, a.display_name, a.cooldown, a.cost])
+				# BATCH KJ — War Cry fields at the Chief's cooldown and the Maul's 20 Rage (answer 6), where the Maul fielded uncooled.
+				ok(a.cooldown == int(_chief_move(a.display_name).get("cooldown", -1)) and a.cooldown > 0 and a.cost == 20,
+					"§3: %s's %s fields cooling %d at %d Rage" % [kind, a.display_name, a.cooldown, a.cost])
 			if a.damage <= 0 or a.special != "":
 				continue
 			var t := a.dmg_type
 			var want_t := String(KINDS[kind]["type"]) if String(KINDS[kind]["type"]) != "" else "nature"
+			# BATCH KJ — War Cry is the Chief's on all four elites: a physical blow, as his (the designer's answer 6).
+			if MAUL.has(kind) and a.display_name == String(MAUL[kind]):
+				want_t = "physical"
 			ok(t == want_t, "§3: %s's %s fields as %s, ruled %s" % [kind, a.display_name, t, want_t])
 			var plain := await _blow(s, u, a, hero, t, 0.0)
 			var held := await _blow(s, u, a, hero, t, 0.9)

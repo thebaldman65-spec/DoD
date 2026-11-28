@@ -1560,9 +1560,9 @@ as a live decision.
   `"self"`.** `Ability.Target` is `{ENEMY, ALLY}` and `Enemies.config` maps the literal string
   `"ally"` and nothing else, so **`"target": "self"` is silently unmapped and falls through to
   `Target.ENEMY`** — a boss authored that way wards a hero. **Every self-cast in the game is
-  tagged `"ally"`**: the Bog Troll's Regenerate, the Ritual Chanter's Cleansing Rite, the Grave
-  Totem's Dark Vigil, the Hollow Crown's Regalia, the Fen Lurker's Submerge, and the warband's Malice spends — Rally, Entrench
-  and Raise.
+  tagged `"ally"`**: the Hollow Crown's Regalia, the Fen Lurker's Submerge, the guards (Shield Guard, Rootguard and
+  Bog Guard) and the braces (Frozen Stance and Moss Shell), the Rimehorn's Frost Fury, a slot that is never cast, and the warband's
+  Malice spends — Rally, Entrench and Raise.
   **The unit a support cast lands on is chosen in `_enemy_support_action`, and a spend's in `_warband_spend`, which
   `_declare_intent` asks (JL §1) — not in the data** — re-point a cast there, never in the JSON.
 - **A PAYLOAD SHARED BY TWO ABILITIES MUST LOG `ab.display_name`, NEVER A LITERAL NAME.** The
@@ -2545,7 +2545,9 @@ the block left out, spend what they were paid.
   FC's shape; the build was right, and the difference is not drift. **The survivor stands alone with what it had left,
   CONFIRMED (HT §1.3).**
   · **AN ENEMY MENDER'S RITE READS `chilled`, SO IT THAWS THE CHILL INSIDE (HT §1.4, ruled: HS §2d applied, not a
-    carve-out).** Its candidates are a cleanse's, and one that carries a chill is ranked and thawed by its chill through
+    carve-out).** **No kind of the warband carries the rite since KJ**, whose kits took the Ritual Chanter's Cleansing Rite (the
+    designer's picks); its arm (`cleanse_allies`, in `_resolve_special`) stands, and this rule binds it the day a kind carries it
+    again. Its candidates are a cleanse's, and one that carries a chill is ranked and thawed by its chill through
     the chill door (`battle._rite_chill`, `set_chilled_stacks`): one stack off and the Rupture stands; at the last stack
     the chill goes as a bare one's does and the Burn stands alone. **A Rupture is never lifted by it**: taking one whole
     would overturn Batch V for precisely the targets a player spent two turns assembling — one enemy ability deleting the
@@ -4959,10 +4961,10 @@ same breath as the removal.
     their order, each move's damage, Break damage, delay, cost and cooldown — and only the name, the zone, the tint, the moves'
     names, the damage type its renamed blows deal (the zone's: frost, shadow, nature) and the resists (the zone's) are its own. **A
     copy's figure the line would price otherwise is the designer's like the rest, and kept where the combat rules keep one**:
-    the Maul's copies uncooled by the designer's word — KG's two by its answer 1, the Huntmaster's by the designer's answer 3 at KH, which keeps
-    every cooldown its Orc's — in `check_ji`'s `TUNED` (the third's place there KH's reading 2), the Witch's and the Grove Tender's Entrench at
-    the Shaman's 2 and the Bristleback's Rally at the Wolfrider's 2 (`HELD`, the one place `check_jk` §2 reads a spend's band).
-    *Healing Wave* and *Shielding* keep their names, because `_enemy_support_action` finds each by it; Rally and Entrench keep
+    the Maul's copies were uncooled by the designer's word (KG's answer 1, KH's answer 3), kept in `check_ji`'s `TUNED` as a record of the
+    warband before KJ; **since KJ every copy is cut to its tier as its original is, and the elites' War Cry, in each Maul's place, cools at
+    the designer's figure** (`check_ji`'s `KJ_RULED`), so the Witch and the Grove Tender hold no Entrench and the Bristleback no Rally.
+    *Healing Wave* keeps its name, because `_enemy_support_action` finds it by it; Rally and Entrench keep
     the names every kind's spends share. `check_kg` §1 and `check_kh` §1 hold each copy to its original key by key.
 - **THE ORCS STAND IN THE SCARLANDS, AND THE FOREST OF OLD FIELDS ITS OWN (KH §1, the designer's word and four answers).**
   Every Orc kind, the Wolfrider and the Ash Hurler stand in the Scarlands' roster alone, and the Rot Behemoth and the Grave Totem

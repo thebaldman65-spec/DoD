@@ -1,0 +1,2872 @@
+{
+ "raider": {
+  "unit_name": "Orc Raider",
+  "power": 1,
+  "roles": [
+   "skirmisher"
+  ],
+  "zones": [
+   2
+  ],
+  "enemy_role": "damage",
+  "max_hp": 140,
+  "attack": 100,
+  "armor": 0.15,
+  "speed": 90.0,
+  "stability": 100,
+  "constitution": 100,
+  "tint": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "resists": {
+   "physical": 0.1
+  },
+  "abilities": [
+   {
+    "display_name": "Slash",
+    "damage": 34,
+    "pressure": 26,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Sundering Strike",
+    "cooldown": 2,
+    "damage": 53,
+    "pressure": 22,
+    "delay": 2.5,
+    "anim": "attack02",
+    "applies_status": {
+     "id": "sunder",
+     "turns": 2
+    },
+    "status_chance": 0.6
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "whelp": {
+  "unit_name": "Orc Whelp",
+  "power": 1,
+  "roles": [
+   "skirmisher"
+  ],
+  "zones": [
+   2
+  ],
+  "enemy_role": "damage",
+  "max_hp": 90,
+  "attack": 100,
+  "armor": 0.05,
+  "speed": 115.0,
+  "stability": 100,
+  "constitution": 70,
+  "tint": [
+   0.85,
+   1.0,
+   0.85
+  ],
+  "sprite_scale": 2.9,
+  "resists": {
+   "nature": -0.25,
+   "shadow": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Frenzied Nip",
+    "damage": 26,
+    "pressure": 16,
+    "delay": 1.5,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Reckless Lunge",
+    "cooldown": 2,
+    "damage": 38,
+    "pressure": 20,
+    "delay": 2.5,
+    "anim": "attack02"
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "slinger": {
+  "unit_name": "Orc Slinger",
+  "power": 1,
+  "roles": [
+   "sniper"
+  ],
+  "zones": [
+   2
+  ],
+  "enemy_role": "damage",
+  "max_hp": 100,
+  "attack": 100,
+  "armor": 0.08,
+  "speed": 100.0,
+  "stability": 100,
+  "constitution": 80,
+  "is_ranged": true,
+  "tint": [
+   0.92,
+   0.82,
+   0.55
+  ],
+  "resists": {
+   "frost": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Stone Sling",
+    "damage": 24,
+    "pressure": 20,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Skull Crack",
+    "cooldown": 2,
+    "damage": 34,
+    "pressure": 38,
+    "delay": 2.5,
+    "anim": "attack02"
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "totemist": {
+  "unit_name": "Orc Totemist",
+  "power": 1,
+  "roles": [
+   "mender"
+  ],
+  "zones": [
+   2
+  ],
+  "enemy_role": "support",
+  "max_hp": 90,
+  "attack": 50,
+  "armor": 0.02,
+  "speed": 95.0,
+  "stability": 100,
+  "constitution": 75,
+  "is_ranged": true,
+  "tint": [
+   0.55,
+   0.9,
+   0.9
+  ],
+  "resists": {
+   "nature": 0.25,
+   "shadow": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Totem Jab",
+    "damage": 30,
+    "pressure": 12,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Healing Wave",
+    "cooldown": 3,
+    "special": "healing_wave",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Mends the most wounded of its warband\nfor 25% of their max HP, paid in\nMalice (tanks and supports first)."
+   },
+   {
+    "display_name": "Raise",
+    "cooldown": 4,
+    "special": "malice_raise",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Stands a fallen body of its warband back\nup at {=Battle.MALICE_RAISE_PCT*100}% of its maximum health, for\nthat health in Malice (once a body, a fight)."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 4,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   }
+  ]
+ },
+ "archer": {
+  "unit_name": "Orc Archer",
+  "power": 1,
+  "roles": [
+   "sniper",
+   "hexer"
+  ],
+  "zones": [
+   2
+  ],
+  "enemy_role": "damage",
+  "max_hp": 110,
+  "attack": 100,
+  "armor": 0.1,
+  "speed": 100.0,
+  "stability": 100,
+  "constitution": 85,
+  "is_ranged": true,
+  "tint": [
+   1.0,
+   0.35,
+   0.35
+  ],
+  "resists": {
+   "physical": 0.05,
+   "frost": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Arrow Shot",
+    "damage": 21,
+    "pressure": 16,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Poison Arrow",
+    "cooldown": 2,
+    "dmg_type": "nature",
+    "damage": 29,
+    "pressure": 14,
+    "delay": 2.5,
+    "anim": "attack02",
+    "applies_status": {
+     "id": "poison",
+     "turns": 3
+    },
+    "status_chance": 0.7
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 4,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   },
+   {
+    "display_name": "Gall",
+    "cooldown": 2,
+    "damage": 10,
+    "delay": 2.5,
+    "anim": "attack02",
+    "aoe": true,
+    "applies_status": {
+     "id": "gall",
+     "turns": 3
+    },
+    "description": "Every hero receives {=Unit.GALL_HEAL_CUT*100}% less healing."
+   }
+  ]
+ },
+ "shieldmaster": {
+  "unit_name": "Orc Shieldmaster",
+  "power": 2,
+  "roles": [
+   "bulwark"
+  ],
+  "zones": [
+   2
+  ],
+  "enemy_role": "tank",
+  "max_hp": 150,
+  "attack": 75,
+  "armor": 0.25,
+  "speed": 85.0,
+  "stability": 100,
+  "constitution": 120,
+  "block_chance": 0.05,
+  "tint": [
+   1.0,
+   0.62,
+   0.2
+  ],
+  "resists": {
+   "physical": 0.15,
+   "arcane": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Strike",
+    "damage": 37,
+    "pressure": 20,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Shielding",
+    "special": "enemy_shield",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Wards one of its warband: 25% less strike damage taken for 3 turns."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 4,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   }
+  ]
+ },
+ "shaman": {
+  "unit_name": "Orc Shaman",
+  "power": 2,
+  "roles": [
+   "mender"
+  ],
+  "zones": [
+   2
+  ],
+  "enemy_role": "support",
+  "max_hp": 110,
+  "attack": 50,
+  "armor": 0.01,
+  "speed": 100.0,
+  "stability": 100,
+  "constitution": 80,
+  "is_ranged": true,
+  "tint": [
+   0.4,
+   0.55,
+   1.0
+  ],
+  "resists": {
+   "fire": 0.25,
+   "frost": 0.25,
+   "nature": 0.5,
+   "shadow": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Chain Lightning",
+    "damage": 30,
+    "pressure": 15,
+    "delay": 3.0,
+    "anim": "attack02",
+    "dmg_type": "nature",
+    "aoe": true
+   },
+   {
+    "display_name": "Healing Wave",
+    "special": "healing_wave",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Mends the most wounded of its warband\nfor 25% of their max HP, paid in\nMalice (tanks and supports first)."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 2,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   }
+  ]
+ },
+ "hexer": {
+  "unit_name": "Orc Hexer",
+  "power": 2,
+  "roles": [
+   "hexer",
+   "sniper"
+  ],
+  "zones": [
+   2
+  ],
+  "enemy_role": "support",
+  "max_hp": 120,
+  "attack": 50,
+  "armor": 0.05,
+  "speed": 95.0,
+  "stability": 100,
+  "constitution": 90,
+  "is_ranged": true,
+  "tint": [
+   0.75,
+   0.45,
+   0.95
+  ],
+  "resists": {
+   "shadow": 0.5,
+   "holy": -0.25,
+   "nature": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Hex Bolt",
+    "damage": 44,
+    "pressure": 14,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "shadow"
+   },
+   {
+    "display_name": "Withering Hex",
+    "cooldown": 2,
+    "damage": 69,
+    "pressure": 10,
+    "delay": 2.5,
+    "anim": "attack02",
+    "dmg_type": "shadow",
+    "applies_status": {
+     "id": "exposed",
+     "turns": 2
+    },
+    "status_chance": 0.7
+   },
+   {
+    "display_name": "Bone Rattle",
+    "cooldown": 2,
+    "damage": 52,
+    "pressure": 34,
+    "delay": 3.0,
+    "anim": "attack02",
+    "dmg_type": "shadow",
+    "applies_status": {
+     "id": "sap",
+     "turns": 3
+    },
+    "description": "One hero gains {=Unit.SAP_CUT*100}% less Rage or Mana."
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 4,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "wolfrider": {
+  "unit_name": "Wolfrider",
+  "power": 2,
+  "roles": [
+   "skirmisher"
+  ],
+  "zones": [
+   2
+  ],
+  "enemy_role": "damage",
+  "max_hp": 130,
+  "attack": 100,
+  "armor": 0.12,
+  "speed": 125.0,
+  "stability": 100,
+  "constitution": 95,
+  "tint": [
+   0.7,
+   0.7,
+   0.78
+  ],
+  "sprite_scale": 3.5,
+  "resists": {
+   "physical": 0.05,
+   "nature": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Lunging Bite",
+    "damage": 36,
+    "pressure": 20,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Ride-by Slash",
+    "cooldown": 2,
+    "damage": 55,
+    "pressure": 16,
+    "delay": 2.0,
+    "anim": "attack02",
+    "applies_status": {
+     "id": "cripple",
+     "turns": 2
+    },
+    "status_chance": 0.5
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 2,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "ashblade": {
+  "unit_name": "Ashblade",
+  "power": 2,
+  "roles": [
+   "skirmisher"
+  ],
+  "zones": [
+   2
+  ],
+  "enemy_role": "damage",
+  "max_hp": 135,
+  "attack": 100,
+  "armor": 0.15,
+  "speed": 105.0,
+  "stability": 100,
+  "constitution": 95,
+  "tint": [
+   1.0,
+   0.45,
+   0.2
+  ],
+  "resists": {
+   "fire": 0.5,
+   "frost": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Cinder Slash",
+    "damage": 32,
+    "pressure": 20,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "fire"
+   },
+   {
+    "display_name": "Flame Lick",
+    "cooldown": 2,
+    "damage": 44,
+    "pressure": 12,
+    "delay": 2.5,
+    "anim": "attack02",
+    "dmg_type": "fire",
+    "applies_status": {
+     "id": "burn",
+     "turns": 2
+    },
+    "status_chance": 0.6
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "brute": {
+  "unit_name": "Orc Brute",
+  "power": 3,
+  "roles": [
+   "brute"
+  ],
+  "zones": [
+   2
+  ],
+  "enemy_role": "damage",
+  "max_hp": 260,
+  "attack": 100,
+  "armor": 0.2,
+  "speed": 75.0,
+  "stability": 100,
+  "constitution": 125,
+  "tint": [
+   0.82,
+   0.56,
+   0.4
+  ],
+  "sprite_scale": 3.7,
+  "resists": {
+   "physical": 0.1,
+   "shadow": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Smash",
+    "damage": 40,
+    "pressure": 32,
+    "delay": 2.5,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Overhead Crush",
+    "cooldown": 2,
+    "damage": 56,
+    "pressure": 50,
+    "delay": 3.5,
+    "anim": "attack02"
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 2,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "bog_troll": {
+  "unit_name": "Bog Troll",
+  "power": 3,
+  "roles": [
+   "brute",
+   "bulwark"
+  ],
+  "zones": [
+   1
+  ],
+  "enemy_role": "tank",
+  "max_hp": 300,
+  "attack": 75,
+  "armor": 0.15,
+  "speed": 70.0,
+  "stability": 100,
+  "constitution": 130,
+  "tint": [
+   0.45,
+   0.78,
+   0.5
+  ],
+  "sprite_scale": 3.8,
+  "resists": {
+   "nature": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Claw",
+    "damage": 40,
+    "pressure": 24,
+    "delay": 2.5,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Swampy Grasp",
+    "cooldown": 2,
+    "damage": 64,
+    "pressure": 18,
+    "delay": 3.0,
+    "anim": "attack02",
+    "dmg_type": "nature",
+    "applies_status": {
+     "id": "slow",
+     "turns": 2
+    },
+    "status_chance": 0.7
+   },
+   {
+    "display_name": "Regenerate",
+    "cooldown": 3,
+    "special": "healing_wave",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Knits its own rubbery flesh back\ntogether: heals 25% of max health."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 4,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   }
+  ]
+ },
+ "behemoth": {
+  "unit_name": "Rot Behemoth",
+  "power": 3,
+  "roles": [
+   "brute",
+   "hexer"
+  ],
+  "zones": [
+   1
+  ],
+  "enemy_role": "damage",
+  "max_hp": 280,
+  "attack": 100,
+  "armor": 0.18,
+  "speed": 65.0,
+  "stability": 100,
+  "constitution": 135,
+  "tint": [
+   0.62,
+   0.5,
+   0.45
+  ],
+  "sprite_scale": 4.0,
+  "resists": {
+   "nature": 0.5,
+   "shadow": 0.25,
+   "holy": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Rotting Fist",
+    "damage": 38,
+    "pressure": 28,
+    "delay": 2.5,
+    "anim": "attack01",
+    "dmg_type": "nature",
+    "applies_status": {
+     "id": "poison",
+     "turns": 3
+    },
+    "status_chance": 0.5
+   },
+   {
+    "display_name": "Wretched Bellow",
+    "cooldown": 3,
+    "damage": 15,
+    "pressure": 22,
+    "delay": 3.5,
+    "anim": "attack02",
+    "dmg_type": "nature",
+    "aoe": true,
+    "applies_status": {
+     "id": "fester",
+     "turns": 3
+    },
+    "description": "Every hero takes {=Battle.DOT_STATUSES.fester}% of the applier's Attack\nper stack at the start of each turn, and\ngains a stack and its full clock each\nturn, until cleansed."
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 2,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "chief": {
+  "unit_name": "Orc Chief",
+  "power": 4,
+  "roles": [
+   "elite"
+  ],
+  "zones": [
+   2
+  ],
+  "enemy_role": "damage",
+  "max_hp": 250,
+  "attack": 100,
+  "armor": 0.2,
+  "speed": 80.0,
+  "stability": 100,
+  "constitution": 130,
+  "resource_name": "Rage",
+  "resource": 0,
+  "max_resource": 100,
+  "tint": [
+   1.0,
+   0.75,
+   0.7
+  ],
+  "sprite_scale": 3.9,
+  "resists": {
+   "physical": 0.15,
+   "arcane": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Strike",
+    "damage": 28,
+    "pressure": 26,
+    "resource_gain": 15,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Heavy Strike",
+    "cooldown": 2,
+    "cost": 30,
+    "damage": 54,
+    "pressure": 40,
+    "delay": 4.0,
+    "anim": "attack02"
+   },
+   {
+    "display_name": "Chieftain's Maul",
+    "cost": 20,
+    "damage": 34,
+    "pressure": 56,
+    "delay": 4.0,
+    "anim": "attack02"
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "withered_warden": {
+  "unit_name": "Withered Warden",
+  "power": 7,
+  "roles": [
+   "boss"
+  ],
+  "zones": [
+   1
+  ],
+  "enemy_role": "tank",
+  "max_hp": 500,
+  "attack": 100,
+  "armor": 0.35,
+  "speed": 80.0,
+  "stability": 100,
+  "constitution": 150,
+  "is_boss": true,
+  "rootbound": 0.5,
+  "tint": [
+   0.7,
+   1.0,
+   0.7
+  ],
+  "sprite_scale": 4.4,
+  "resists": {
+   "nature": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Timber Slam",
+    "damage": 60,
+    "pressure": 30,
+    "delay": 3.0,
+    "anim": "attack01",
+    "dmg_type": "nature",
+    "applies_status": {
+     "id": "dazed",
+     "turns": 3
+    }
+   },
+   {
+    "display_name": "Roots of Wrath",
+    "cooldown": 3,
+    "damage": 25,
+    "pressure": 20,
+    "delay": 3.5,
+    "anim": "attack02",
+    "dmg_type": "nature",
+    "aoe": true,
+    "applies_status": {
+     "id": "poison",
+     "turns": 3
+    }
+   },
+   {
+    "display_name": "Wild Growth",
+    "special": "wild_growth",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Heals one of its warband for 20% of their max health."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 2,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   }
+  ]
+ },
+ "thornling": {
+  "unit_name": "Thornling",
+  "power": 1,
+  "roles": [
+   "skirmisher"
+  ],
+  "zones": [
+   1
+  ],
+  "enemy_role": "damage",
+  "max_hp": 90,
+  "attack": 100,
+  "armor": 0.05,
+  "speed": 115.0,
+  "stability": 100,
+  "constitution": 70,
+  "tint": [
+   0.62,
+   0.8,
+   0.45
+  ],
+  "sprite_scale": 2.9,
+  "resists": {
+   "nature": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Thorn Prick",
+    "damage": 26,
+    "pressure": 16,
+    "delay": 1.5,
+    "anim": "attack01",
+    "dmg_type": "nature"
+   },
+   {
+    "display_name": "Bramble Lunge",
+    "cooldown": 2,
+    "damage": 38,
+    "pressure": 20,
+    "delay": 2.5,
+    "anim": "attack02",
+    "dmg_type": "nature"
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "bristleback": {
+  "unit_name": "Bristleback",
+  "power": 2,
+  "roles": [
+   "skirmisher"
+  ],
+  "zones": [
+   1
+  ],
+  "enemy_role": "damage",
+  "max_hp": 130,
+  "attack": 100,
+  "armor": 0.12,
+  "speed": 125.0,
+  "stability": 100,
+  "constitution": 95,
+  "tint": [
+   0.8,
+   0.62,
+   0.42
+  ],
+  "sprite_scale": 3.5,
+  "resists": {
+   "nature": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Tusk Gore",
+    "damage": 36,
+    "pressure": 20,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "nature"
+   },
+   {
+    "display_name": "Trampling Rush",
+    "cooldown": 2,
+    "damage": 55,
+    "pressure": 16,
+    "delay": 2.0,
+    "anim": "attack02",
+    "applies_status": {
+     "id": "cripple",
+     "turns": 2
+    },
+    "status_chance": 0.5,
+    "dmg_type": "nature"
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 2,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "spore_lobber": {
+  "unit_name": "Spore Lobber",
+  "power": 1,
+  "roles": [
+   "sniper",
+   "hexer"
+  ],
+  "zones": [
+   1
+  ],
+  "enemy_role": "damage",
+  "max_hp": 110,
+  "attack": 100,
+  "armor": 0.1,
+  "speed": 100.0,
+  "stability": 100,
+  "constitution": 85,
+  "is_ranged": true,
+  "tint": [
+   0.88,
+   0.8,
+   0.58
+  ],
+  "resists": {
+   "nature": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Spore Pod",
+    "damage": 21,
+    "pressure": 16,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "nature"
+   },
+   {
+    "display_name": "Choking Spores",
+    "cooldown": 2,
+    "dmg_type": "nature",
+    "damage": 29,
+    "pressure": 14,
+    "delay": 2.5,
+    "anim": "attack02",
+    "applies_status": {
+     "id": "poison",
+     "turns": 3
+    },
+    "status_chance": 0.7
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 4,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   },
+   {
+    "display_name": "Sour Cloud",
+    "cooldown": 2,
+    "damage": 10,
+    "delay": 2.5,
+    "anim": "attack02",
+    "aoe": true,
+    "applies_status": {
+     "id": "gall",
+     "turns": 3
+    },
+    "description": "Every hero receives {=Unit.GALL_HEAL_CUT*100}% less healing.",
+    "dmg_type": "nature"
+   }
+  ]
+ },
+ "heartwood_sentinel": {
+  "unit_name": "Heartwood Sentinel",
+  "power": 2,
+  "roles": [
+   "bulwark"
+  ],
+  "zones": [
+   1
+  ],
+  "enemy_role": "tank",
+  "max_hp": 150,
+  "attack": 75,
+  "armor": 0.25,
+  "speed": 85.0,
+  "stability": 100,
+  "constitution": 120,
+  "block_chance": 0.05,
+  "tint": [
+   0.55,
+   0.42,
+   0.28
+  ],
+  "resists": {
+   "nature": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Bough Strike",
+    "damage": 37,
+    "pressure": 20,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "nature"
+   },
+   {
+    "display_name": "Shielding",
+    "special": "enemy_shield",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Wards one of its warband: 25% less strike damage taken for 3 turns."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 4,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   }
+  ]
+ },
+ "grove_tender": {
+  "unit_name": "Grove Tender",
+  "power": 2,
+  "roles": [
+   "mender"
+  ],
+  "zones": [
+   1
+  ],
+  "enemy_role": "support",
+  "max_hp": 110,
+  "attack": 50,
+  "armor": 0.01,
+  "speed": 100.0,
+  "stability": 100,
+  "constitution": 80,
+  "is_ranged": true,
+  "tint": [
+   0.55,
+   0.95,
+   0.62
+  ],
+  "resists": {
+   "nature": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Stinging Pollen",
+    "damage": 30,
+    "pressure": 15,
+    "delay": 3.0,
+    "anim": "attack02",
+    "dmg_type": "nature",
+    "aoe": true
+   },
+   {
+    "display_name": "Healing Wave",
+    "special": "healing_wave",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Mends the most wounded of its warband\nfor 25% of their max HP, paid in\nMalice (tanks and supports first)."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 2,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   }
+  ]
+ },
+ "blightcap": {
+  "unit_name": "Blightcap",
+  "power": 2,
+  "roles": [
+   "hexer",
+   "sniper"
+  ],
+  "zones": [
+   1
+  ],
+  "enemy_role": "support",
+  "max_hp": 120,
+  "attack": 50,
+  "armor": 0.05,
+  "speed": 95.0,
+  "stability": 100,
+  "constitution": 90,
+  "is_ranged": true,
+  "tint": [
+   0.72,
+   0.55,
+   0.78
+  ],
+  "resists": {
+   "nature": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Rot Bolt",
+    "damage": 44,
+    "pressure": 14,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "nature"
+   },
+   {
+    "display_name": "Wilting Curse",
+    "cooldown": 2,
+    "damage": 69,
+    "pressure": 10,
+    "delay": 2.5,
+    "anim": "attack02",
+    "dmg_type": "nature",
+    "applies_status": {
+     "id": "exposed",
+     "turns": 2
+    },
+    "status_chance": 0.7
+   },
+   {
+    "display_name": "Spore Choke",
+    "cooldown": 2,
+    "damage": 52,
+    "pressure": 34,
+    "delay": 3.0,
+    "anim": "attack02",
+    "dmg_type": "nature",
+    "applies_status": {
+     "id": "sap",
+     "turns": 3
+    },
+    "description": "One hero gains {=Unit.SAP_CUT*100}% less Rage or Mana."
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 4,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "antlered_huntmaster": {
+  "unit_name": "Antlered Huntmaster",
+  "power": 4,
+  "roles": [
+   "elite"
+  ],
+  "zones": [
+   1
+  ],
+  "enemy_role": "damage",
+  "max_hp": 250,
+  "attack": 100,
+  "armor": 0.2,
+  "speed": 80.0,
+  "stability": 100,
+  "constitution": 130,
+  "resource_name": "Rage",
+  "resource": 0,
+  "max_resource": 100,
+  "tint": [
+   0.42,
+   0.62,
+   0.38
+  ],
+  "sprite_scale": 3.9,
+  "resists": {
+   "nature": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Spear Thrust",
+    "damage": 28,
+    "pressure": 26,
+    "resource_gain": 15,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "nature"
+   },
+   {
+    "display_name": "Goring Charge",
+    "cooldown": 2,
+    "cost": 30,
+    "damage": 54,
+    "pressure": 40,
+    "delay": 4.0,
+    "anim": "attack02",
+    "dmg_type": "nature"
+   },
+   {
+    "display_name": "Antler Rend",
+    "cost": 20,
+    "damage": 34,
+    "pressure": 56,
+    "delay": 4.0,
+    "anim": "attack02",
+    "dmg_type": "nature"
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "ash_tyrant": {
+  "unit_name": "Ash-Wrought Tyrant",
+  "power": 7,
+  "roles": [
+   "boss"
+  ],
+  "zones": [
+   2
+  ],
+  "enemy_role": "damage",
+  "max_hp": 370,
+  "attack": 100,
+  "armor": 0.22,
+  "speed": 85.0,
+  "stability": 100,
+  "constitution": 160,
+  "is_boss": true,
+  "resource_name": "Rage",
+  "resource": 20,
+  "max_resource": 100,
+  "tint": [
+   1.0,
+   0.55,
+   0.35
+  ],
+  "sprite_scale": 4.4,
+  "resists": {
+   "fire": 0.5,
+   "physical": 0.1,
+   "frost": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Cinder Cleave",
+    "dmg_type": "fire",
+    "damage": 30,
+    "pressure": 24,
+    "resource_gain": 15,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Immolating Wave",
+    "cooldown": 4,
+    "dmg_type": "fire",
+    "cost": 30,
+    "damage": 18,
+    "pressure": 14,
+    "delay": 3.5,
+    "anim": "attack02",
+    "aoe": true,
+    "applies_status": {
+     "id": "burn",
+     "turns": 2
+    },
+    "status_chance": 0.8
+   },
+   {
+    "display_name": "Tyrant's Verdict",
+    "cooldown": 2,
+    "dmg_type": "fire",
+    "cost": 20,
+    "damage": 44,
+    "pressure": 40,
+    "delay": 4.0,
+    "anim": "attack02",
+    "applies_status": {
+     "id": "sunder",
+     "turns": 2
+    },
+    "status_chance": 0.7
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "chanter": {
+  "unit_name": "Orc Ritual Chanter",
+  "power": 2,
+  "roles": [
+   "mender"
+  ],
+  "zones": [
+   2
+  ],
+  "enemy_role": "support",
+  "max_hp": 105,
+  "attack": 50,
+  "armor": 0.03,
+  "speed": 105.0,
+  "stability": 100,
+  "constitution": 80,
+  "is_ranged": true,
+  "tint": [
+   0.95,
+   0.9,
+   0.55
+  ],
+  "resists": {
+   "holy": 0.25,
+   "shadow": -0.25,
+   "physical": -0.15
+  },
+  "abilities": [
+   {
+    "display_name": "Warding Chant",
+    "damage": 22,
+    "pressure": 14,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Cleansing Rite",
+    "special": "cleanse_allies",
+    "delay": 3.0,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Strips one harmful effect from each of\nits warband (the longest-lasting one;\nChilled thaws one stack at a time)."
+   },
+   {
+    "display_name": "Raise",
+    "cooldown": 4,
+    "special": "malice_raise",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Stands a fallen body of its warband back\nup at {=Battle.MALICE_RAISE_PCT*100}% of its maximum health, for\nthat health in Malice (once a body, a fight)."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 4,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   }
+  ]
+ },
+ "hurler": {
+  "unit_name": "Ash Hurler",
+  "power": 3,
+  "roles": [
+   "brute",
+   "sniper"
+  ],
+  "zones": [
+   2
+  ],
+  "enemy_role": "damage",
+  "max_hp": 190,
+  "attack": 100,
+  "armor": 0.12,
+  "speed": 60.0,
+  "stability": 100,
+  "constitution": 90,
+  "is_ranged": true,
+  "tint": [
+   0.8,
+   0.35,
+   0.25
+  ],
+  "sprite_scale": 3.7,
+  "resists": {
+   "fire": 0.5,
+   "physical": 0.1,
+   "frost": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Ember Lob",
+    "damage": 30,
+    "pressure": 18,
+    "delay": 2.5,
+    "anim": "attack01",
+    "dmg_type": "fire"
+   },
+   {
+    "display_name": "Siege Stone",
+    "cooldown": 4,
+    "special": "windup",
+    "damage": 70,
+    "pressure": 45,
+    "delay": 4.0,
+    "anim": "attack02",
+    "aoe": true,
+    "description": "Hoists a burning stone. It lands next\nturn: heavy damage to every ally.\nBreak, Freeze, or Stun the Hurler\nto cancel the throw."
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "bloodcaller": {
+  "unit_name": "Orc Bloodcaller",
+  "power": 2,
+  "roles": [
+   "hexer"
+  ],
+  "zones": [
+   2
+  ],
+  "enemy_role": "damage",
+  "max_hp": 125,
+  "attack": 100,
+  "armor": 0.08,
+  "speed": 100.0,
+  "stability": 100,
+  "constitution": 85,
+  "tint": [
+   0.7,
+   0.15,
+   0.25
+  ],
+  "resists": {
+   "shadow": 0.25,
+   "holy": -0.25,
+   "nature": -0.15
+  },
+  "abilities": [
+   {
+    "display_name": "Ragged Cut",
+    "damage": 30,
+    "pressure": 20,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Blood Tribute",
+    "cooldown": 2,
+    "special": "blood_tribute",
+    "damage": 44,
+    "pressure": 24,
+    "delay": 2.5,
+    "anim": "attack02",
+    "dmg_type": "shadow",
+    "description": "Grows stronger for every one of its\nwarband fallen this battle."
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "grave_totem": {
+  "unit_name": "Grave Totem",
+  "power": 2,
+  "roles": [
+   "mender",
+   "hexer"
+  ],
+  "zones": [
+   1
+  ],
+  "enemy_role": "support",
+  "max_hp": 80,
+  "attack": 50,
+  "armor": 0.0,
+  "speed": 130.0,
+  "stability": 100,
+  "constitution": 60,
+  "is_ranged": true,
+  "tint": [
+   0.45,
+   0.4,
+   0.5
+  ],
+  "sprite_scale": 3.0,
+  "resists": {
+   "shadow": 0.5,
+   "physical": 0.35,
+   "fire": -0.5,
+   "holy": -0.5
+  },
+  "abilities": [
+   {
+    "display_name": "Grasping Roots",
+    "damage": 18,
+    "pressure": 20,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "nature",
+    "applies_status": {
+     "id": "cripple",
+     "turns": 2
+    },
+    "status_chance": 0.6
+   },
+   {
+    "display_name": "Dark Vigil",
+    "cooldown": 4,
+    "special": "totem_pulse",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband regains 6% of\ntheir maximum health."
+   },
+   {
+    "display_name": "Raise",
+    "cooldown": 4,
+    "special": "malice_raise",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Stands a fallen body of its warband back\nup at {=Battle.MALICE_RAISE_PCT*100}% of its maximum health, for\nthat health in Malice (once a body, a fight)."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 4,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   },
+   {
+    "display_name": "Mire",
+    "cooldown": 2,
+    "damage": 45,
+    "delay": 2.5,
+    "anim": "attack02",
+    "applies_status": {
+     "id": "mire",
+     "turns": 3
+    },
+    "description": "One hero acts {=Unit.MIRE_SLOW*100}% slower; turns\narrive later."
+   }
+  ]
+ },
+ "hollow_crown": {
+  "unit_name": "The Hollow Crown",
+  "power": 9,
+  "roles": [
+   "boss"
+  ],
+  "zones": [
+   1,
+   2,
+   4,
+   6
+  ],
+  "enemy_role": "damage",
+  "max_hp": 620,
+  "attack": 115,
+  "armor": 0.3,
+  "speed": 90.0,
+  "stability": 100,
+  "constitution": 170,
+  "is_boss": true,
+  "tint": [
+   0.72,
+   0.68,
+   0.95
+  ],
+  "sprite_scale": 4.6,
+  "resists": {
+   "shadow": 0.5,
+   "arcane": 0.25,
+   "physical": 0.1,
+   "holy": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Crown of Thorns",
+    "damage": 46,
+    "pressure": 30,
+    "delay": 2.5,
+    "anim": "attack01",
+    "dmg_type": "shadow"
+   },
+   {
+    "display_name": "Hollow Wail",
+    "cooldown": 2,
+    "damage": 20,
+    "pressure": 22,
+    "delay": 3.5,
+    "anim": "attack02",
+    "dmg_type": "shadow",
+    "aoe": true,
+    "applies_status": {
+     "id": "dazed",
+     "turns": 2
+    },
+    "status_chance": 0.7
+   },
+   {
+    "display_name": "Regalia",
+    "special": "enemy_shield",
+    "delay": 3.0,
+    "anim": "attack03",
+    "target": "ally",
+    "description": "The Crown wards itself: 25% less strike damage taken for 3 turns."
+   },
+   {
+    "display_name": "Sundering Decree",
+    "rung": 2,
+    "damage": 34,
+    "pressure": 48,
+    "delay": 3.5,
+    "anim": "attack02",
+    "dmg_type": "physical",
+    "applies_status": {
+     "id": "sunder",
+     "turns": 3
+    },
+    "status_chance": 0.8
+   },
+   {
+    "display_name": "The Long Dark",
+    "cooldown": 4,
+    "rung": 3,
+    "damage": 30,
+    "pressure": 26,
+    "delay": 4.0,
+    "anim": "attack02",
+    "dmg_type": "shadow",
+    "aoe": true,
+    "applies_status": {
+     "id": "poison",
+     "turns": 4
+    },
+    "status_chance": 0.9
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 3,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   }
+  ]
+ },
+ "frostbitten_thrall": {
+  "unit_name": "Frostbitten Thrall",
+  "power": 1,
+  "roles": [
+   "skirmisher"
+  ],
+  "zones": [
+   4
+  ],
+  "enemy_role": "damage",
+  "max_hp": 95,
+  "attack": 100,
+  "armor": 0.07,
+  "speed": 100.0,
+  "stability": 100,
+  "constitution": 75,
+  "tint": [
+   0.72,
+   0.86,
+   1.0
+  ],
+  "sprite_scale": 2.9,
+  "resists": {
+   "frost": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Numb Claws",
+    "damage": 33,
+    "pressure": 12,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Hobbling Bite",
+    "cooldown": 2,
+    "damage": 46,
+    "pressure": 18,
+    "delay": 2.5,
+    "anim": "attack02",
+    "applies_status": {
+     "id": "slow",
+     "turns": 2
+    },
+    "status_chance": 0.7
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "icebound_bulwark": {
+  "unit_name": "Icebound Bulwark",
+  "power": 2,
+  "roles": [
+   "bulwark"
+  ],
+  "zones": [
+   4
+  ],
+  "enemy_role": "tank",
+  "max_hp": 190,
+  "attack": 75,
+  "armor": 0.4,
+  "speed": 65.0,
+  "stability": 100,
+  "constitution": 130,
+  "block_chance": 0.05,
+  "tint": [
+   0.6,
+   0.78,
+   0.95
+  ],
+  "resists": {
+   "frost": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Ice-Shod Bash",
+    "damage": 38,
+    "pressure": 26,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Glacier Press",
+    "cooldown": 2,
+    "damage": 38,
+    "pressure": 70,
+    "delay": 3.0,
+    "anim": "attack02"
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 3,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   }
+  ]
+ },
+ "hailcaster": {
+  "unit_name": "Hailcaster",
+  "power": 1,
+  "roles": [
+   "sniper"
+  ],
+  "zones": [
+   4
+  ],
+  "enemy_role": "damage",
+  "max_hp": 85,
+  "attack": 100,
+  "armor": 0.1,
+  "speed": 92.0,
+  "stability": 100,
+  "constitution": 75,
+  "is_ranged": true,
+  "tint": [
+   0.82,
+   0.9,
+   1.0
+  ],
+  "resists": {
+   "frost": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Hailstone",
+    "damage": 24,
+    "pressure": 18,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "frost"
+   },
+   {
+    "display_name": "Hailstorm",
+    "cooldown": 2,
+    "damage": 8,
+    "pressure": 8,
+    "delay": 3.0,
+    "anim": "attack02",
+    "dmg_type": "frost",
+    "aoe": true,
+    "applies_status": {
+     "id": "dazed",
+     "turns": 2
+    }
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "rimehorn": {
+  "unit_name": "Rimehorn",
+  "power": 3,
+  "roles": [
+   "brute"
+  ],
+  "zones": [
+   4
+  ],
+  "enemy_role": "damage",
+  "max_hp": 300,
+  "attack": 100,
+  "armor": 0.24,
+  "speed": 68.0,
+  "stability": 100,
+  "constitution": 135,
+  "tint": [
+   0.66,
+   0.8,
+   0.9
+  ],
+  "sprite_scale": 3.9,
+  "resists": {
+   "frost": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Gore",
+    "damage": 42,
+    "pressure": 30,
+    "delay": 2.5,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Trampling Charge",
+    "cooldown": 2,
+    "damage": 52,
+    "pressure": 64,
+    "delay": 3.5,
+    "anim": "attack02"
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 2,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "hoarfrost_warden": {
+  "unit_name": "Sleetveil Matron",
+  "power": 2,
+  "roles": [
+   "mender"
+  ],
+  "zones": [
+   4
+  ],
+  "enemy_role": "support",
+  "max_hp": 130,
+  "attack": 50,
+  "armor": 0.08,
+  "speed": 90.0,
+  "stability": 100,
+  "constitution": 85,
+  "is_ranged": true,
+  "tint": [
+   0.9,
+   0.95,
+   1.0
+  ],
+  "resists": {
+   "frost": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Chill Touch",
+    "damage": 32,
+    "pressure": 12,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "frost"
+   },
+   {
+    "display_name": "Healing Wave",
+    "cooldown": 2,
+    "special": "healing_wave",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Mends the most wounded of its warband\nfor 25% of their max HP, paid in\nMalice (tanks and supports first)."
+   },
+   {
+    "display_name": "Raise",
+    "cooldown": 3,
+    "special": "malice_raise",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Stands a fallen body of its warband back\nup at {=Battle.MALICE_RAISE_PCT*100}% of its maximum health, for\nthat health in Malice (once a body, a fight)."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 4,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   }
+  ]
+ },
+ "stillwrought": {
+  "unit_name": "The Stillwrought",
+  "power": 2,
+  "roles": [
+   "hexer"
+  ],
+  "zones": [
+   4
+  ],
+  "enemy_role": "support",
+  "max_hp": 120,
+  "attack": 50,
+  "armor": 0.1,
+  "speed": 88.0,
+  "stability": 100,
+  "constitution": 90,
+  "is_ranged": true,
+  "tint": [
+   0.55,
+   0.6,
+   0.85
+  ],
+  "resists": {
+   "frost": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Stillbolt",
+    "damage": 46,
+    "pressure": 14,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "frost"
+   },
+   {
+    "display_name": "Leaching Stillness",
+    "cooldown": 2,
+    "damage": 58,
+    "pressure": 30,
+    "delay": 3.0,
+    "anim": "attack02",
+    "dmg_type": "shadow",
+    "applies_status": {
+     "id": "sap",
+     "turns": 3
+    },
+    "description": "One hero gains {=Unit.SAP_CUT*100}% less Rage or Mana."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 4,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   }
+  ]
+ },
+ "icewrought_titan": {
+  "unit_name": "Icewrought Titan",
+  "power": 7,
+  "roles": [
+   "boss"
+  ],
+  "zones": [
+   4
+  ],
+  "enemy_role": "tank",
+  "max_hp": 460,
+  "attack": 100,
+  "armor": 0.32,
+  "speed": 75.0,
+  "stability": 100,
+  "constitution": 155,
+  "is_boss": true,
+  "tint": [
+   0.62,
+   0.82,
+   1.0
+  ],
+  "sprite_scale": 4.4,
+  "resists": {
+   "frost": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Glacier Fist",
+    "damage": 44,
+    "pressure": 24,
+    "delay": 3.0,
+    "anim": "attack01",
+    "dmg_type": "frost"
+   },
+   {
+    "display_name": "Entomb",
+    "cooldown": 2,
+    "damage": 60,
+    "pressure": 40,
+    "delay": 3.5,
+    "anim": "attack02",
+    "dmg_type": "frost",
+    "applies_status": {
+     "id": "frozen",
+     "turns": 1
+    },
+    "description": "Freezes one hero solid: a turn lost."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 3,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   }
+  ]
+ },
+ "rimeclad_warlord": {
+  "unit_name": "Rimeclad Warlord",
+  "power": 4,
+  "roles": [
+   "elite"
+  ],
+  "zones": [
+   4
+  ],
+  "enemy_role": "damage",
+  "max_hp": 250,
+  "attack": 100,
+  "armor": 0.2,
+  "speed": 80.0,
+  "stability": 100,
+  "constitution": 130,
+  "resource_name": "Rage",
+  "resource": 0,
+  "max_resource": 100,
+  "tint": [
+   0.5,
+   0.7,
+   0.95
+  ],
+  "sprite_scale": 3.9,
+  "resists": {
+   "frost": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Frostbrand Cut",
+    "damage": 28,
+    "pressure": 26,
+    "resource_gain": 15,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "frost"
+   },
+   {
+    "display_name": "Glacial Hew",
+    "cooldown": 2,
+    "cost": 30,
+    "damage": 54,
+    "pressure": 40,
+    "delay": 4.0,
+    "anim": "attack02",
+    "dmg_type": "frost"
+   },
+   {
+    "display_name": "Avalanche Maul",
+    "cost": 20,
+    "damage": 34,
+    "pressure": 56,
+    "delay": 4.0,
+    "anim": "attack02",
+    "dmg_type": "frost"
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "grave_husk": {
+  "unit_name": "Grave Husk",
+  "power": 1,
+  "roles": [
+   "skirmisher"
+  ],
+  "zones": [
+   6
+  ],
+  "enemy_role": "damage",
+  "max_hp": 90,
+  "attack": 100,
+  "armor": 0.05,
+  "speed": 115.0,
+  "stability": 100,
+  "constitution": 70,
+  "tint": [
+   0.78,
+   0.76,
+   0.66
+  ],
+  "sprite_scale": 2.9,
+  "resists": {
+   "nature": -0.25,
+   "shadow": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Rattling Swipe",
+    "damage": 26,
+    "pressure": 16,
+    "delay": 1.5,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Shambling Lurch",
+    "cooldown": 2,
+    "damage": 38,
+    "pressure": 20,
+    "delay": 2.5,
+    "anim": "attack02"
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "mossback": {
+  "unit_name": "Mossback",
+  "power": 3,
+  "roles": [
+   "brute",
+   "bulwark"
+  ],
+  "zones": [
+   6
+  ],
+  "enemy_role": "tank",
+  "max_hp": 300,
+  "attack": 75,
+  "armor": 0.15,
+  "speed": 70.0,
+  "stability": 100,
+  "constitution": 130,
+  "tint": [
+   0.52,
+   0.66,
+   0.38
+  ],
+  "sprite_scale": 3.8,
+  "resists": {
+   "nature": 0.5,
+   "fire": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Bark Ram",
+    "damage": 40,
+    "pressure": 24,
+    "delay": 2.5,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Silt Smother",
+    "cooldown": 2,
+    "damage": 64,
+    "pressure": 18,
+    "delay": 3.0,
+    "anim": "attack02",
+    "dmg_type": "nature",
+    "applies_status": {
+     "id": "slow",
+     "turns": 2
+    },
+    "status_chance": 0.7
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 3,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   }
+  ]
+ },
+ "blight_speaker": {
+  "unit_name": "Blight-Speaker",
+  "power": 2,
+  "roles": [
+   "hexer",
+   "sniper"
+  ],
+  "zones": [
+   6
+  ],
+  "enemy_role": "support",
+  "max_hp": 120,
+  "attack": 50,
+  "armor": 0.05,
+  "speed": 95.0,
+  "stability": 100,
+  "constitution": 90,
+  "is_ranged": true,
+  "tint": [
+   0.74,
+   0.78,
+   0.36
+  ],
+  "resists": {
+   "shadow": 0.5,
+   "holy": -0.25,
+   "nature": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Sour Whisper",
+    "damage": 44,
+    "pressure": 14,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "shadow"
+   },
+   {
+    "display_name": "Canker Litany",
+    "cooldown": 2,
+    "damage": 43,
+    "pressure": 34,
+    "delay": 3.0,
+    "anim": "attack02",
+    "dmg_type": "shadow",
+    "applies_status": {
+     "id": "fester",
+     "turns": 3
+    },
+    "description": "One hero takes {=Battle.DOT_STATUSES.fester}% of the applier's Attack\nper stack at the start of each turn, and\ngains a stack and its full clock each\nturn, until cleansed."
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 4,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "carrion_pack": {
+  "unit_name": "Carrion Pack",
+  "power": 2,
+  "roles": [
+   "skirmisher"
+  ],
+  "zones": [
+   6
+  ],
+  "enemy_role": "damage",
+  "max_hp": 130,
+  "attack": 100,
+  "armor": 0.12,
+  "speed": 125.0,
+  "stability": 100,
+  "constitution": 95,
+  "tint": [
+   0.5,
+   0.42,
+   0.36
+  ],
+  "sprite_scale": 3.5,
+  "resists": {
+   "physical": 0.05,
+   "nature": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Snapping Jaws",
+    "damage": 36,
+    "pressure": 20,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Worrying Bites",
+    "cooldown": 2,
+    "damage": 55,
+    "pressure": 16,
+    "delay": 2.0,
+    "anim": "attack02",
+    "applies_status": {
+     "id": "cripple",
+     "turns": 2
+    },
+    "status_chance": 0.5
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "rotfiend": {
+  "unit_name": "Rotfiend",
+  "power": 1,
+  "roles": [
+   "skirmisher"
+  ],
+  "zones": [
+   6
+  ],
+  "enemy_role": "damage",
+  "max_hp": 90,
+  "attack": 100,
+  "armor": 0.05,
+  "speed": 115.0,
+  "stability": 100,
+  "constitution": 70,
+  "tint": [
+   0.46,
+   0.56,
+   0.36
+  ],
+  "sprite_scale": 2.9,
+  "resists": {
+   "nature": -0.25,
+   "shadow": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Sodden Claw",
+    "damage": 26,
+    "pressure": 16,
+    "delay": 1.5,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Corpse Explosion",
+    "cooldown": 2,
+    "special": "corpse_explosion",
+    "damage": 5,
+    "pressure": 20,
+    "delay": 2.5,
+    "anim": "attack02",
+    "aoe": true,
+    "applies_status": {
+     "id": "black_rot",
+     "turns": -1
+    },
+    "description": "The Rotfiend bursts and dies: every\nhero is struck and takes a stack of\nBlack Rot, and one neighbour heals\n{=Battle.CORPSE_EXPLOSION_HEAL_PCT*100}% of that neighbour's maximum\nhealth, paid in Malice. Only while the\nRotfiend is at {=Battle.CORPSE_EXPLOSION_AT*100}% of its health or less."
+   },
+   {
+    "display_name": "Rake",
+    "damage": 13,
+    "pressure": 8,
+    "delay": 1.5,
+    "anim": "attack02",
+    "applies_status": {
+     "id": "black_rot",
+     "turns": -1
+    },
+    "description": "Lays a stack of Black Rot on one hero."
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "fen_lurker": {
+  "unit_name": "Fen Lurker",
+  "power": 3,
+  "roles": [
+   "brute"
+  ],
+  "zones": [
+   6
+  ],
+  "enemy_role": "damage",
+  "max_hp": 260,
+  "attack": 100,
+  "armor": 0.2,
+  "speed": 75.0,
+  "stability": 100,
+  "constitution": 125,
+  "tint": [
+   0.4,
+   0.56,
+   0.54
+  ],
+  "sprite_scale": 3.7,
+  "resists": {
+   "physical": 0.1,
+   "shadow": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Swipe",
+    "damage": 40,
+    "pressure": 32,
+    "delay": 2.5,
+    "anim": "attack01",
+    "choose_two": true,
+    "description": "Strikes two heroes."
+   },
+   {
+    "display_name": "Lacerate",
+    "cooldown": 2,
+    "damage": 55,
+    "pressure": 50,
+    "delay": 3.5,
+    "anim": "attack02",
+    "bleed_build": 20,
+    "description": "Opens a wound: {=@bleed_build} Bleed on one hero."
+   },
+   {
+    "display_name": "Submerge",
+    "special": "submerge",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Sinks beneath the water: no blow, card or\nspell can pick it for {=Battle.SUBMERGE_TURNS} turns, and it\nstill acts. Once a fight, on a turn it\nstands under {=Battle.SUBMERGE_AT*100}% of its health while\nanother of its warband can be picked."
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 2,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "bone_shepherd": {
+  "unit_name": "Bone Shepherd",
+  "power": 7,
+  "roles": [
+   "boss"
+  ],
+  "zones": [
+   6
+  ],
+  "enemy_role": "damage",
+  "max_hp": 370,
+  "attack": 100,
+  "armor": 0.22,
+  "speed": 85.0,
+  "stability": 100,
+  "constitution": 160,
+  "is_boss": true,
+  "tint": [
+   0.84,
+   0.82,
+   0.68
+  ],
+  "sprite_scale": 4.4,
+  "resists": {
+   "holy": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Bone Smash",
+    "damage": 30,
+    "pressure": 24,
+    "delay": 2.0,
+    "anim": "attack01"
+   },
+   {
+    "display_name": "Soul Leech",
+    "cooldown": 2,
+    "dmg_type": "shadow",
+    "damage": 46,
+    "pressure": 24,
+    "delay": 2.0,
+    "anim": "attack02",
+    "lifesteal": 0.5,
+    "description": "Heals the Bone Shepherd {=@lifesteal*100}% of the damage\nit deals, paid from the warband's Malice."
+   },
+   {
+    "display_name": "Noxious Fumes",
+    "cooldown": 2,
+    "dmg_type": "nature",
+    "damage": 9,
+    "pressure": 14,
+    "delay": 3.5,
+    "anim": "attack02",
+    "aoe": true,
+    "applies_status": {
+     "id": "noxious_fumes",
+     "turns": 3
+    },
+    "description": "Every hero it strikes misses\n{=Battle.NOXIOUS_FUMES_MISS_PCT*100}% more of the time for {=@applies_status.turns}\nturns, added to its chance to miss."
+   },
+   {
+    "display_name": "Call the Drowned",
+    "cooldown": 4,
+    "special": "malice_raise",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Stands a fallen body of its warband back\nup at {=Battle.MALICE_RAISE_PCT*100}% of its maximum health, for\nthat health in Malice (once a body, a fight)."
+   }
+  ]
+ },
+ "drowned_thane": {
+  "unit_name": "Drowned Thane",
+  "power": 4,
+  "roles": [
+   "elite"
+  ],
+  "zones": [
+   6
+  ],
+  "enemy_role": "damage",
+  "max_hp": 250,
+  "attack": 100,
+  "armor": 0.2,
+  "speed": 80.0,
+  "stability": 100,
+  "constitution": 130,
+  "resource_name": "Rage",
+  "resource": 0,
+  "max_resource": 100,
+  "tint": [
+   0.6,
+   0.7,
+   0.58
+  ],
+  "sprite_scale": 3.9,
+  "resists": {
+   "shadow": 0.5,
+   "holy": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Drowned Blade",
+    "damage": 28,
+    "pressure": 26,
+    "resource_gain": 15,
+    "delay": 2.0,
+    "anim": "attack01",
+    "dmg_type": "shadow"
+   },
+   {
+    "display_name": "Sunken Cleave",
+    "cooldown": 2,
+    "cost": 30,
+    "damage": 54,
+    "pressure": 40,
+    "delay": 4.0,
+    "anim": "attack02",
+    "dmg_type": "shadow"
+   },
+   {
+    "display_name": "Barrow Maul",
+    "cost": 20,
+    "damage": 34,
+    "pressure": 56,
+    "delay": 4.0,
+    "anim": "attack02",
+    "dmg_type": "shadow"
+   },
+   {
+    "display_name": "Rally",
+    "cooldown": 3,
+    "special": "malice_rally",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+   }
+  ]
+ },
+ "peat_witch": {
+  "unit_name": "Peat Witch",
+  "power": 2,
+  "roles": [
+   "mender"
+  ],
+  "zones": [
+   6
+  ],
+  "enemy_role": "support",
+  "max_hp": 110,
+  "attack": 50,
+  "armor": 0.01,
+  "speed": 100.0,
+  "stability": 100,
+  "constitution": 80,
+  "is_ranged": true,
+  "tint": [
+   0.6,
+   0.48,
+   0.58
+  ],
+  "resists": {
+   "fire": 0.25,
+   "frost": 0.25,
+   "nature": 0.5,
+   "shadow": -0.25
+  },
+  "abilities": [
+   {
+    "display_name": "Marshlight Chain",
+    "damage": 30,
+    "pressure": 15,
+    "delay": 3.0,
+    "anim": "attack02",
+    "dmg_type": "nature",
+    "aoe": true
+   },
+   {
+    "display_name": "Healing Wave",
+    "special": "healing_wave",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Mends the most wounded of its warband\nfor 25% of their max HP, paid in\nMalice (tanks and supports first)."
+   },
+   {
+    "display_name": "Entrench",
+    "cooldown": 2,
+    "special": "malice_entrench",
+    "delay": 2.5,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+   }
+  ]
+ }
+}

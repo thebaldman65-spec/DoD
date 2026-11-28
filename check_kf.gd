@@ -42,6 +42,9 @@ const MAY_TRAVEL := ["hollow_crown"]
 const ZONE_BLOCK := "## STANDING DESIGN RULE — A ZONE FIELDS ITS OWN KINDS"
 const CHIP_WORDS := "A CHIP ON THE HERO SIDE SAYS WHICH WAY IT CUTS"
 const CUTS := "res://docs/reports/KF-cuts.tsv"
+# BATCH KJ — the census classes the rework's seven statuses by its own rows' meanings: the four hexes the warband lays on a hero
+# (Silenced, Branded, Doomed, Singled Out) are debuffs in DEBUFF_IDS; the three a body of the warband wears (Guarding, Hunkered,
+# Fury) are an enemy's own boons, on a plate that is unframed.
 # The three the registry names that STATUS_INFO does not, each drawn on a plate by its own writer (Broken, the Bleed meter's chip,
 # Melt Armor's display chip): the census classes them too, beside every id a line lays by its literal (§1's walk).
 const OUTSIDE_INFO := ["broken", "bleed", "melted"]

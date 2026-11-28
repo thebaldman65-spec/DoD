@@ -160,7 +160,12 @@ const SRC_FLOOR := 107
 # passing its caster as the source, DI's rule, so `with_src` moves with it.
 # **BATCH JW MOVED IT 224 -> 225, AND SAYS WHY. Net +1, one arrival.** The Fen Lurker's Submerge (JW §3) lays `submerged` on
 # itself in `_submerge`, passing itself as the source, DI's rule, so `with_src` moves with it.
-const CALL_SITES := 225
+# **BATCH KJ MOVED IT 225 -> 229, AND SAYS WHY. Net +4, four arrivals.** A guard's `guarding` and a brace's `hunkered`, each laid
+# by the body on itself in `_resolve_special`, and Frost Fury's `fury`, laid by the body on itself at the damage door, pass that
+# body as the source, DI's rule, so `with_src` moves with them. Alpha's `dazed`, laid on the rest of the warband when its last
+# brute falls (`_kj_alpha_falls`), passes none: its source is ambiguous — the brute that fell or the hero who felled it — and
+# DI's rule is to report that, never to pick (`docs/reports/KJ.md`, FOUND AT KJ). `SRC_FLOOR` is a ratchet and did not move.
+const CALL_SITES := 229
 
 # Four plain afflictions: all in `DEBUFF_IDS`, none sticky, none on the boss
 # immunity list, so `_harvest_yield` counts all four and `purge_debuffs` takes

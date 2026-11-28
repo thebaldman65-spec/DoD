@@ -13,7 +13,8 @@
 #   §3   THE ROTFIEND AND THE FEN LURKER, DRIVEN: Rake lays a stack of Black Rot; Corpse Explosion is withheld above half health,
 #        strikes every hero with a stack, kills the Rotfiend through the death door (a kill's Malice) and heals a neighbour paid
 #        by Malice; Swipe strikes two heroes, never a stale pick of the warband's; Lacerate opens 20 Bleed; Black Rot stacks,
-#        never runs out, ticks its share of maximum health and is cleansable
+#        never runs out, ticks its share of maximum health and is cleansable. Since KJ each kit is held as KJ ruled it (the
+#        designer's tier picks), and Rake and Lacerate, which left their kits, are driven as JW left them (the kept warband)
 #   §4   A BODY NO PICK MAY REACH: every site of the battle that reads the warband is in the census of record, classified;
 #        the door refuses a single blow onto a submerged body; an area and a scatter pass it by; Submerge is once a fight,
 #        under half, while another body can be picked; the last pickable body falls and the submerged surface
@@ -58,6 +59,9 @@ const STATE := "res://docs/state.md"
 const ARCHIVE := "res://DoD-archive/state-archive.md"
 const CLAUDE := "res://CLAUDE.md"
 const CENSUS := "res://docs/reports/JW-picks.tsv"
+# BATCH KJ — the census classes the rework's three sites by its own classes: the guard that takes a blow (`_kj_guard_for`) a pick
+# on the door; the warband standing (`_kj_standing`) a pick too, as the Vigil's is, for The Rite heals and Alpha Dazes through it;
+# and Compounding Curse's names (`_kj_debuff_count`) a read, no body chosen.
 # The files whose sites §4 derives — the battle and every script the census found reading the warband's bodies.
 const PICK_FILES := ["scripts/battle.gd", "scripts/run_sim.gd"]
 const PICK_CLASSES := ["P", "C", "S", "R", "SELF"]
@@ -277,6 +281,28 @@ func _ab(u: BattleUnit, name: String) -> Ability:
 	return null
 
 
+func _kit(u: BattleUnit) -> Array:
+	return u.abilities.map(func(a): return (a as Ability).display_name)
+
+
+# BATCH KJ — A MOVE AS JW LEFT IT, built by `Enemies.config` off the kept warband (`Gate.warband_before_kj()`, KI's data byte for
+# byte): the kind's kit in the warband's own table is the kept one for the one call, and the live one is put back after it. Null
+# when the kept warband holds no such move.
+func _kept_move(kind: String, name: String) -> Ability:
+	var kd: Dictionary = Enemies._load().get(kind, {})
+	var before: Dictionary = Gate.warband_before_kj().get(kind, {})
+	if kd.is_empty() or before.is_empty():
+		return null
+	var live_kit: Array = kd["abilities"]
+	kd["abilities"] = before["abilities"]
+	var cfg := Enemies.config(kind)
+	kd["abilities"] = live_kit
+	for a in cfg.get("abilities", []):
+		if (a as Ability).display_name == name:
+			return a
+	return null
+
+
 func _done(s: Node) -> void:
 	s.queue_free()
 	await Gate.frames(self, 2)
@@ -352,9 +378,13 @@ func _s3_the_kinds() -> void:
 	var foes := _foes(s)
 	var rf: BattleUnit = foes[1]
 	_as_kind(rf, "rotfiend")
-	var rake := _ab(rf, "Rake")
+	# BATCH KJ — THE KIT AS KJ RULED IT, AND RAKE AS JW LEFT IT: KJ made the Rotfiend a tier-2 kind of two moves, Sodden Claw and
+	# Corpse Explosion (the designer's picks, A1 and D), and Rake left its kit; no kit carries it since. Black Rot's stack, which
+	# Rake drove, stands — Corpse Explosion lays it — so Rake is driven as JW left it, off the kept warband (`_kept_move`).
+	var rake := _kept_move("rotfiend", "Rake")
 	var boom := _ab(rf, "Corpse Explosion")
-	ok(rake != null and boom != null and _ab(rf, "Sodden Claw") != null, "§3: the Rotfiend's kit is not Sodden Claw, Rake and Corpse Explosion")
+	ok(rake != null and boom != null and _kit(rf) == ["Sodden Claw", "Corpse Explosion"],
+		"§3: the Rotfiend's kit is not Sodden Claw and Corpse Explosion, as KJ ruled it, or JW's Rake is not kept (%s)" % str(_kit(rf)))
 	var h: BattleUnit = _heroes(s)[1]
 	if rake != null:
 		await s._resolve(rf, rake, h, "good")
@@ -407,8 +437,11 @@ func _s3_the_kinds() -> void:
 	var fl: BattleUnit = foes[0]
 	_as_kind(fl, "fen_lurker")
 	var swipe := _ab(fl, "Swipe")
-	var lac := _ab(fl, "Lacerate")
-	ok(swipe != null and lac != null and _ab(fl, "Submerge") != null, "§3: the Fen Lurker's kit is not Swipe, Lacerate and Submerge")
+	# BATCH KJ — KJ cut the Fen Lurker to its tier's three, Swipe, Submerge and Rally (the designer's E pick), and Lacerate left its
+	# kit; an enemy blow's Bleed stands in the code, so Lacerate is driven as JW left it, off the kept warband.
+	var lac := _kept_move("fen_lurker", "Lacerate")
+	ok(swipe != null and lac != null and _kit(fl) == ["Swipe", "Submerge", "Rally"],
+		"§3: the Fen Lurker's kit is not Swipe, Submerge and Rally, as KJ ruled it, or JW's Lacerate is not kept (%s)" % str(_kit(fl)))
 	if swipe != null:
 		ok(swipe.choose_two and s._cheapest_attack(fl) == swipe, "§3: Swipe is not the Fen Lurker's two-hero basic")
 		# A STALE PICK OF THE WARBAND's in the battle var: the second body still comes from the heroes' side.

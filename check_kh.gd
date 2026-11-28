@@ -9,16 +9,20 @@
 #       too, KH's reading 1), but for the name, the zones (the Forest's roster alone), the tint and the resists; each kind's moves stand in its pattern's order at their
 #       figures, every damaging move renamed and dealing nature and every other move keeping its name (answer 3: "Same health,
 #       armor, speed, damage, Break damage and cooldowns"); the resists are nature 50% and fire −25% (answer 4); the
-#       Huntmaster's Maul copy cools at 0 and costs the Chief's Rage.
+#       Huntmaster's Maul copy cools and costs as the Chief's (at 0 until KJ). Since KJ (the designer's picks) each kit is KJ's cut: the
+#       Bristleback's Flank move, the Blightcap's hex (its own status and words) and the Sentinel's guard are each the kind's
+#       own in its pattern's slot, and the Maul's place holds War Cry, the Chief's on all four elites — unrenamed, physical,
+#       cooling and costing as his.
 #   §2  THE ROSTERS: the fourteen kinds that leave stand in the Scarlands' roster alone; the Rot Behemoth and the Grave Totem in
 #       the Forest's alone (answer 1); no two zones' rosters share a kind but the Hollow Crown; the Forest's roster holds one
 #       elite, its own, and a mender of its own; the Scarlands' elite is the Orc Chief; and at every budget an elite node can
 #       roll, an elite theme composes in each of the two. What each zone never fields is printed.
 #   §3  THE SEVEN IN A FIGHT, DRIVEN: two battles field the seven through `Enemies.config`; each unit carries its name, resists
-#       and kit as §1 reads them off the data, the Maul's copy uncooled; and each damaging move, struck on a hero under the
-#       same dice, takes far less off a hero who resists nature than off one who does not — the type reaches the blow's door;
-#       and (§3b) the two support casts the support code finds by name: the Heartwood Sentinel, no ally shielded, chooses its
-#       Shielding, and the Grove Tender, a hurt ally beside it and a pool that can pay, chooses its Healing Wave on it.
+#       and kit as §1 reads them off the data, the Maul's place at the Chief's War Cry (since KJ); and each damaging move, struck
+#       on a hero under the same dice, takes far less off a hero who resists its type than off one who does not — the type
+#       reaches the blow's door; and (§3b) the two support casts the support code finds: the Heartwood Sentinel, guarding none,
+#       chooses its Rootguard on itself (since KJ, found by its payload), and the Grove Tender, a hurt ally beside it and a pool
+#       that can pay, chooses its Healing Wave on it.
 #   §4  THE RECORD: `CLAUDE.md`'s zone block names the Forest's own elite and mender and says the Orcs stand in the Scarlands.
 #   §5  The player's files are as this gate found them.
 #
@@ -60,7 +64,17 @@ const KINDS := {
 	"antlered_huntmaster": {"pattern": "chief", "name": "Antlered Huntmaster",
 		"moves": {"Strike": "Spear Thrust", "Heavy Strike": "Goring Charge", "Chieftain's Maul": "Antler Rend"}},
 }
-const MAUL := {"antlered_huntmaster": "Antler Rend"}
+# BATCH KJ — THE KITS AS KJ CUT THEM (the designer's picks, RECORD_KJ): each kind's moves are its tier's count, and where KJ gave a
+# kind a move of its own it holds it in its pattern's slot — the Bristleback's Flank move Gang Gore where the Wolfrider's is
+# Harrying Bite, the Blightcap's hex Rot Brand (a Brand, its own status and words) where the Hexer's is Choking Hex (a Silence),
+# the Sentinel's guard Rootguard where the Shieldmaster's is Shield Guard; and War Cry is one move on all four elites (F1, answer
+# 6), the Chief's: neither renamed nor typed, cooling and costing as his. KH's names above stand; a row of theirs for a move KJ
+# cut names no move of the pattern now, and is read by nothing.
+const KJ_MOVES := {"bristleback": {"Harrying Bite": "Gang Gore"}, "blightcap": {"Choking Hex": "Rot Brand"},
+	"heartwood_sentinel": {"Shield Guard": "Rootguard"}}
+const KJ_DEPARTS := {"Rot Brand": ["applies_status", "description"]}
+const KJ_AS_THE_CHIEF := ["War Cry"]
+const MAUL := {"antlered_huntmaster": "War Cry"}
 # Answer 1: what leaves the Forest for the Scarlands, and what stays.
 const TO_SCARLANDS := ["raider", "whelp", "slinger", "totemist", "archer", "shieldmaster", "shaman", "hexer", "wolfrider",
 	"brute", "chief", "chanter", "hurler", "bloodcaller"]
@@ -129,6 +143,14 @@ func _roster_of(zone: String) -> int:
 	return int((_run.ZONE_DEFS[zone] as Dictionary)["roster"])
 
 
+# BATCH KJ — THE CHIEF's MOVE OF A NAME, off the data: the copy a kind holds of it cools and costs as his does.
+func _chief_move(name: String) -> Dictionary:
+	for a in ((_data.get("chief", {}) as Dictionary).get("abilities", []) as Array):
+		if String((a as Dictionary).get("display_name", "")) == name:
+			return a
+	return {}
+
+
 # ── §1 — THE KINDS ───────────────────────────────────────────────────────────
 
 func _s1_kinds() -> void:
@@ -166,14 +188,19 @@ func _s1_kinds() -> void:
 			var p: Dictionary = pa[i]
 			var pn := String(p["display_name"])
 			var hits := int(p.get("damage", 0)) > 0
-			ok(hits == (spec["moves"] as Dictionary).has(pn), "§1: %s's %s — every damaging move is renamed, and only those" % [kind, pn])
-			var want_name := String((spec["moves"] as Dictionary).get(pn, pn))
+			# BATCH KJ — THE KITS AS KJ CUT THEM (`KJ_MOVES`, `KJ_AS_THE_CHIEF`): a move KJ gave the kind in its pattern's slot is
+			# named as KJ named it, renamed as KH's are when it strikes; War Cry, the Chief's on all four elites, keeps his name and type.
+			var kj_names: Dictionary = KJ_MOVES.get(kind, {})
+			var as_chief := KJ_AS_THE_CHIEF.has(pn)
+			var renamed := (spec["moves"] as Dictionary).has(pn) or (hits and kj_names.has(pn))
+			ok((hits and not as_chief) == renamed, "§1: %s's %s — every damaging move is renamed, and only those" % [kind, pn])
+			var want_name := String(kj_names.get(pn, (spec["moves"] as Dictionary).get(pn, pn)))
 			ok(String(a["display_name"]) == want_name, "§1: %s's move %d is %s, want %s" % [kind, i, a["display_name"], want_name])
-			var want_type := TYPE if hits else String(p.get("dmg_type", ""))
+			var want_type := TYPE if (hits and not as_chief) else String(p.get("dmg_type", ""))
 			ok(String(a.get("dmg_type", "")) == want_type, "§1: %s's %s deals %s, want %s" % [kind, a["display_name"], a.get("dmg_type", "physical"), want_type if want_type != "" else "physical"])
 			var moved: Array = []
 			for key in p:
-				if key in ["display_name", "dmg_type"]:
+				if key in ["display_name", "dmg_type"] or (KJ_DEPARTS.get(want_name, []) as Array).has(key):
 					continue
 				if not a.has(key) or str(a[key]) != str(p[key]):
 					moved.append(key)
@@ -187,8 +214,13 @@ func _s1_kinds() -> void:
 			for a in ka:
 				if String(a["display_name"]) == String(MAUL[kind]):
 					maul = a
-			ok(not maul.is_empty() and int(maul.get("cooldown", 0)) == 0 and int(maul.get("cost", 0)) > 0,
-				"§1: %s's %s cools %s — the Chief's Maul cools at 0, and answer 3 keeps its cooldowns" % [kind, MAUL[kind], str(maul.get("cooldown", "?"))])
+			# BATCH KJ — REPAIRED TO ITS INTENT: the copy cools as the Chief's does (answer 3 keeps its cooldowns), and since KJ the
+			# Chief's is War Cry, cooling 3 at the Maul's Rage (the designer's F1 and answer 6), where his Maul cooled at 0.
+			var chief_m := _chief_move(String(MAUL[kind]))
+			ok(not maul.is_empty() and not chief_m.is_empty() and int(maul.get("cooldown", 0)) == int(chief_m.get("cooldown", -1))
+					and int(maul.get("cooldown", 0)) > 0 and int(maul.get("cost", 0)) == int(chief_m.get("cost", -1)) and int(maul.get("cost", 0)) > 0,
+				"§1: %s's %s cools %s at %s Rage — the Chief's War Cry cools %s at %s since KJ, and answer 3 keeps its cooldowns" % [
+					kind, MAUL[kind], str(maul.get("cooldown", "?")), str(maul.get("cost", "?")), str(chief_m.get("cooldown", "?")), str(chief_m.get("cost", "?"))])
 	print("    CHECKED %d moves of %d kinds against their patterns" % [checked, KINDS.size()])
 
 
@@ -320,26 +352,34 @@ func _s3_fight() -> void:
 			for ab in u.abilities:
 				var a := ab as Ability
 				if MAUL.has(kind) and a.display_name == String(MAUL[kind]):
-					ok(a.cooldown == 0 and a.cost == 20, "§3: %s's %s fields cooling %d at %d Rage" % [kind, a.display_name, a.cooldown, a.cost])
+					# BATCH KJ — War Cry fields at the Chief's cooldown and the Maul's 20 Rage (answer 6), where the Maul fielded uncooled.
+					ok(a.cooldown == int(_chief_move(a.display_name).get("cooldown", -1)) and a.cooldown > 0 and a.cost == 20,
+						"§3: %s's %s fields cooling %d at %d Rage" % [kind, a.display_name, a.cooldown, a.cost])
 				if a.damage <= 0 or a.special != "":
 					continue
-				ok(a.dmg_type == TYPE, "§3: %s's %s fields as %s, ruled %s" % [kind, a.display_name, a.dmg_type, TYPE])
+				# BATCH KJ — War Cry is the Chief's on all four elites: a physical blow, as his (the designer's answer 6).
+				var want_t := "physical" if KJ_AS_THE_CHIEF.has(a.display_name) else TYPE
+				ok(a.dmg_type == want_t, "§3: %s's %s fields as %s, ruled %s" % [kind, a.display_name, a.dmg_type, want_t])
 				var plain := await _blow(s, u, a, hero, a.dmg_type, 0.0)
 				var held := await _blow(s, u, a, hero, a.dmg_type, 0.9)
 				print("    %-19s %-16s %-6s: %3d off a hero who does not resist it, %3d off one who resists it 90%%" % [kind, a.display_name, a.dmg_type, plain, held])
 				ok(plain > 0 and held * 4 < plain, "§3: %s's %s took %d plain and %d resisted — the type does not reach the blow" % [kind, a.display_name, plain, held])
 				blows += 1
 		# §3b — THE TWO SUPPORT CASTS THE SUPPORT CODE FINDS BY NAME (`_enemy_support_action`), the reason each keeps its name.
+		# BATCH KJ — RE-ASKED OF WHAT THE SENTINEL CHOOSES TODAY: Shielding left its kit at KJ for Rootguard (the designer's pick),
+		# which the support code finds by its payload, `bodyguard`, the spends' way; guarding none, its warband standing to be
+		# guarded, the Sentinel stands guard over it — Rootguard, cast on itself.
 		if by.has("heartwood_sentinel"):
 			for u2 in foes:
 				(u2 as BattleUnit).hp = (u2 as BattleUnit).max_hp
-				(u2 as BattleUnit).remove_status("shielded")
+				(u2 as BattleUnit).remove_status("guarding")
 			(by["thornling"] as BattleUnit).hp = 20
 			var act: Array = s.call("_enemy_support_action", by["heartwood_sentinel"])
 			var picked := "nothing" if act.is_empty() else "%s on %s" % [(act[0] as Ability).display_name, (act[1] as BattleUnit).unit_name]
-			print("    the Sentinel, no ally shielded and a Thornling at 20 health: %s" % picked)
-			ok(not act.is_empty() and (act[0] as Ability).display_name == "Shielding" and act[1] == by["thornling"],
-				"§3b: the Heartwood Sentinel with no ally shielded chose %s — want its Shielding on the lowest" % picked)
+			print("    the Sentinel, guarding none and a Thornling at 20 health: %s" % picked)
+			ok(not act.is_empty() and (act[0] as Ability).display_name == "Rootguard" and (act[0] as Ability).special == "bodyguard"
+					and act[1] == by["heartwood_sentinel"],
+				"§3b: the Heartwood Sentinel guarding none chose %s — want its Rootguard, on itself" % picked)
 		if by.has("grove_tender") and by.has("blightcap"):
 			for u2 in foes:
 				(u2 as BattleUnit).hp = (u2 as BattleUnit).max_hp
@@ -352,7 +392,9 @@ func _s3_fight() -> void:
 			ok(not act2.is_empty() and (act2[0] as Ability).display_name == "Healing Wave" and act2[1] == cap,
 				"§3b: the Grove Tender with a hurt ally and a full pool chose %s — want its Healing Wave on the Blightcap" % picked2)
 	ok(fielded == 7, "§3: %d of the seven fielded" % fielded)
-	ok(blows == 15, "§3: %d blows driven — want the seven's fifteen damaging moves" % blows)
+	# BATCH KJ — ELEVEN SINCE KJ CUT THE KITS TO THEIR TIERS (the designer's picks): the Thornling's and the Spore Lobber's one, the
+	# Bristleback's and the Blightcap's two, the Sentinel's and the Tender's one, the Huntmaster's three.
+	ok(blows == 11, "§3: %d blows driven — want the seven's eleven damaging moves, as KJ cut the kits" % blows)
 	print("    CHECKED %d blows, each twice under the same dice" % blows)
 
 

@@ -166,11 +166,11 @@ inside it breaks that promise.
   with the enemy as source — **and a hex that reaches every hero (`aoe`, the data's reach key; Gall since JM §0) on every hero
   standing**, each through that one door, a hero who carries it taking its clock back. Each is an affliction in `DEBUFF_IDS`, and each is read at one door: Gall in `heal_amount`, Sap at the
   bar's own setter, Mire at `effective_speed()`, Fester in `_dot_pass`.
-· **A HEX RIDES A BLOW: NO WARBAND MOVE LAYS A STATUS ON A HERO UNLESS IT DEALS DAMAGE (JO §2, the designer's).** Each of the four is a
-  damaging move's own `applies_status`: Sap on the Orc Hexer's Bone Rattle and Fester on the Rot Behemoth's Wretched Bellow, each
-  folded onto a damaging move of its carrier's that laid nothing (and since JS Sap on the Stillwrought's Leaching Stillness, authored
-  with it), and Gall and Mire on their own moves, given the damage that clears
-  JI's line. So each is an attack `_choose_enemy_action` picks among the moves that deal damage, aimed as a blow is, through the
+· **A HEX RIDES A BLOW: NO WARBAND MOVE LAYS A STATUS ON A HERO UNLESS IT DEALS DAMAGE (JO §2, the designer's).** A hex is a
+  damaging move's own `applies_status`: Fester on the Rot Behemoth's Wretched Bellow, folded onto a damaging move of its carrier's
+  that laid nothing; since KJ no move lays Gall, Sap or Mire, and each move that lays KJ's Silenced, Branded, Doomed or Singled Out
+  deals its blow's damage as it lays it (the designer's answers 3 and 6).
+  So each is an attack `_choose_enemy_action` picks among the moves that deal damage, aimed as a blow is, through the
   draws and the evasions, and a single blow rolls its miss in the strike loop as the warband's other status blows do (an area blow rolls none, as every area blow); on a hit it lays its
   status through the door at the move's `status_chance`, on every body an area blow strikes, a companion among them. No move is a
   hex that deals nothing, and nothing aims or lays one past the strike loop. Each is an affliction in `DEBUFF_IDS`, read at one

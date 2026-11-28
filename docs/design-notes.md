@@ -4,6 +4,24 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## Enemy tiers, moves to play around, and a combo for every recipe (Batch KJ) — 2026-11-27
+
+**Why the tier is the cost the builder already spent.** The designer asked that a tier set an enemy's power and its count of
+moves. The fight builder already spends a budget on each kind's power, 1 to 3 for the ordinary kinds, so a tier that is that number
+keeps one field and one answer: a tier-2 kind is a kind that costs two, carries two moves and stands in the second health band.
+Two kinds moved up because the count would otherwise have taken what they are: a healer at tier 1 cannot heal, and the Rotfiend's
+burst is the Rotfiend.
+
+**Why the combos ride the recipe, not the kind.** A fight is a recipe filled from its zone's kinds, so a combo written on a kind
+fires in every recipe that drafts it; written on the recipe it fires where the recipe's roles make it make sense, and a recipe
+filled with an odd mix simply misses it. The combo's name stands beside MALICE so the player can see which question this fight is
+asking. **Why The Rite heals free.** The designer's words are "every enemy heals to full"; paying it from the pool would make it
+mostly a no-op late in a fight, which is not the threat the count on screen promises.
+
+**Why the new moves' cooldowns are the designer's and not the line's.** JI's line prices a move's wait by how hard it hits against
+its own basic. Most new moves hit no harder than the basic: what they buy is the mechanic, so the line would let them fire every turn.
+The designer set each one's wait directly; the line still prices every other move but the four JO held at the data's figure (`check_ji`'s `HELD`).
+
 ## The Malice column, and Escape back to the map (Batch KI) — 2026-11-27
 
 **Why a column.** The designer asked for the bar to be much thicker and noticeable, running down the right side of the enemy

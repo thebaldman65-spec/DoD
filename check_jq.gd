@@ -14,8 +14,8 @@
 #   §4   THE COUNT's FIGHTS: one fight a warband kind with the warband's attacks on, on autoplay, through the fixture's door, the
 #        three answers' cards seated, every fight's log printed and its counts beside how many fights it was taken over; and the
 #        kept count taken over the fights where the warband attacks, every row saying how many (C18).
-#   §5   WHAT IS DELIBERATELY NOT DONE: no drain in the strike loop and no field on `Ability` (C16); no dial pulled (C17); the deck
-#        closed at twenty-five (C19).
+#   §5   WHAT IS DELIBERATELY NOT DONE: no drain in the strike loop and no field on `Ability` (C16); no dial pulled (C17), on the
+#        warband as KJ found it (its kept copy: KJ's rework is the designer's picks); the deck closed at twenty-five (C19).
 #   §6   the player's files, as this gate found them.
 #   Every needle is the rule's own words, never the batch code beside them — but for the three blocks' headings §0 reads, which are
 #   named for their batches. Every new member is asked for before it is read, so HEAD's code reds here (H01) rather than throwing.
@@ -269,8 +269,10 @@ func _s0_the_record() -> void:
 
 
 # THE WARBAND's DATA WITH A LATER BATCH's APPEARANCE TAGS PUT BACK (`MOVED_SINCE`).
+# BATCH KJ — READ OFF THE WARBAND AS KJ FOUND IT (`Gate.warband_before_kj()`): KJ re-cut every kit by the designer's picks, so the
+# digest asks its question of the kept copy, as a later batch's kinds are set aside by ADDED_SINCE.
 func _warband_as_landed() -> Dictionary:
-	var d: Dictionary = Enemies._load().duplicate(true)
+	var d: Dictionary = Gate.warband_before_kj().duplicate(true)
 	# BATCH JX §1 — THE ROSTER TAGS AS THEY STOOD BEFORE THE STAGES, put back first (JX folded roster 3 into 1 and 5 into 4): this gate digests the warband its batch left.
 	Gate.rosters_before_jx(d)
 	for kind in MOVED_SINCE:
@@ -410,14 +412,15 @@ func _s1_the_raise() -> void:
 	var fs := _foes(s)
 	var raiser: BattleUnit = fs[0]
 	var body: BattleUnit = fs[1]
-	var cfg := Enemies.config("totemist")
+	# BATCH KJ — THE RITUAL CHANTER RAISES: the designer's picks left the Totemist its heal and no Raise.
+	var cfg := Enemies.config("chanter")
 	raiser.abilities = cfg["abilities"]
 	raiser.cooldowns = {}
 	var raise: Ability = null
 	for a in raiser.abilities:
 		if String((a as Ability).special) == "malice_raise":
 			raise = a
-	ok(raise != null, "§1: the premise — the Totemist holds a Raise")
+	ok(raise != null, "§1: the premise — the Ritual Chanter holds a Raise")
 	if raise == null:
 		return
 	_mark(s, body, hs[2])

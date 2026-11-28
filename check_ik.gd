@@ -15,7 +15,8 @@
 #        and no other card's Perfect moves; the class basics stay Perfectless.
 #   §4   THE TWO NAMES: Iron Will and Undying Rage on the node, the chip, the log and master.html, each node's
 #        description opening its words, and the old labels gone.
-#   §5   A STRIKE, NAMED ONCE: the glossary's entry, the eight texts and the ward's chip saying it through the door
+#   §5   A STRIKE, NAMED ONCE: the glossary's entry, the seven texts (Shielding's left every kit at KJ, its slot retired onto
+#        that fact) and the ward's chip saying it through the door
 #        each surface reads, and the asymmetries they now name read off the fight — Profligate's price on a Killing
 #        Frost it pays nothing, a ward that lessens a hero's strike and no companion's blow.
 #   §6   CAIRNMOSS POULTICE IS DRAWN AGAIN (JD), AND THE BOMB's LINE: back at the boss's unlock, an event's grant,
@@ -804,7 +805,10 @@ func _s5_strike() -> void:
 		"rune clarity": String(Runes.config("clarity").get("desc", "")),
 		"rune profligate": String(Runes.config("profligate").get("desc", "")),
 	}
-	for kind in [["shieldmaster", "Shielding"], ["hollow_crown", "Regalia"]]:
+	# BATCH KJ — SHIELDING LEFT EVERY KIT (the Shieldmaster and the Heartwood Sentinel guard instead, the designer's picks), and
+	# its text with it: the Crown's Regalia is the one ward a kind carries, so seven texts say *strike damage*. Shielding's slot is
+	# retired onto the fact that took it, asserted below beside the count: no kind's kit carries a move of that name.
+	for kind in [["hollow_crown", "Regalia"]]:
 		for eab in Enemies.config(String(kind[0]))["abilities"]:
 			if (eab as Ability).display_name == String(kind[1]):
 				texts["enemy %s" % kind[1]] = (eab as Ability).description
@@ -812,7 +816,15 @@ func _s5_strike() -> void:
 	var chip_at := bsrc.find("\"shielded\": [\"Shielded\"")
 	texts["chip shielded"] = bsrc.substr(chip_at, bsrc.find("\n", chip_at) - chip_at) if chip_at >= 0 else ""
 	# RE-POINTED AT IZ §5: Tinderbox left the deck (no reach on the party that deals fire), so eight texts say *strike damage*.
-	ok(texts.size() == 8, "§5b: %d of the eight texts read" % texts.size())
+	# RE-POINTED AT KJ: Shielding's left with the move, so seven; and the move is in no kit.
+	ok(texts.size() == 7, "§5b: %d of the seven texts read" % texts.size())
+	var shielding_in: Array = []
+	for sk in Enemies.kinds():
+		for sab in Enemies.config(String(sk))["abilities"]:
+			if (sab as Ability).display_name == "Shielding" and not shielding_in.has(String(sk)):
+				shielding_in.append(String(sk))
+	ok(shielding_in.is_empty(),
+		"§5b: %s carry Shielding again — its ward's text is an eighth that says *strike damage*, and this section reads it" % str(shielding_in))
 	for k in texts:
 		ok(String(texts[k]).contains("strike damage"), "§5b: %s does not say strike damage ('%s')" % [k, texts[k]])
 		ok(not String(texts[k]).contains("{="), "§5b: %s carries a raw token" % k)

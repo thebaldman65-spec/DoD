@@ -9,7 +9,7 @@
    2
   ],
   "enemy_role": "damage",
-  "max_hp": 140,
+  "max_hp": 110,
   "attack": 100,
   "armor": 0.15,
   "speed": 90.0,
@@ -29,29 +29,12 @@
     "damage": 34,
     "pressure": 26,
     "delay": 2.0,
-    "anim": "attack01"
-   },
-   {
-    "display_name": "Sundering Strike",
-    "cooldown": 2,
-    "damage": 53,
-    "pressure": 22,
-    "delay": 2.5,
-    "anim": "attack02",
+    "anim": "attack01",
     "applies_status": {
      "id": "sunder",
      "turns": 2
     },
-    "status_chance": 0.6
-   },
-   {
-    "display_name": "Rally",
-    "cooldown": 3,
-    "special": "malice_rally",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+    "status_chance": 0.3
    }
   ]
  },
@@ -88,23 +71,6 @@
     "pressure": 16,
     "delay": 1.5,
     "anim": "attack01"
-   },
-   {
-    "display_name": "Reckless Lunge",
-    "cooldown": 2,
-    "damage": 38,
-    "pressure": 20,
-    "delay": 2.5,
-    "anim": "attack02"
-   },
-   {
-    "display_name": "Rally",
-    "cooldown": 3,
-    "special": "malice_rally",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
    }
   ]
  },
@@ -140,29 +106,12 @@
     "pressure": 20,
     "delay": 2.0,
     "anim": "attack01"
-   },
-   {
-    "display_name": "Skull Crack",
-    "cooldown": 2,
-    "damage": 34,
-    "pressure": 38,
-    "delay": 2.5,
-    "anim": "attack02"
-   },
-   {
-    "display_name": "Rally",
-    "cooldown": 3,
-    "special": "malice_rally",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
    }
   ]
  },
  "totemist": {
   "unit_name": "Orc Totemist",
-  "power": 1,
+  "power": 2,
   "roles": [
    "mender"
   ],
@@ -170,7 +119,7 @@
    2
   ],
   "enemy_role": "support",
-  "max_hp": 90,
+  "max_hp": 110,
   "attack": 50,
   "armor": 0.02,
   "speed": 95.0,
@@ -202,24 +151,6 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Mends the most wounded of its warband\nfor 25% of their max HP, paid in\nMalice (tanks and supports first)."
-   },
-   {
-    "display_name": "Raise",
-    "cooldown": 4,
-    "special": "malice_raise",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Stands a fallen body of its warband back\nup at {=Battle.MALICE_RAISE_PCT*100}% of its maximum health, for\nthat health in Malice (once a body, a fight)."
-   },
-   {
-    "display_name": "Entrench",
-    "cooldown": 4,
-    "special": "malice_entrench",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
    }
   ]
  },
@@ -256,43 +187,12 @@
     "damage": 21,
     "pressure": 16,
     "delay": 2.0,
-    "anim": "attack01"
-   },
-   {
-    "display_name": "Poison Arrow",
-    "cooldown": 2,
-    "dmg_type": "nature",
-    "damage": 29,
-    "pressure": 14,
-    "delay": 2.5,
-    "anim": "attack02",
+    "anim": "attack01",
     "applies_status": {
      "id": "poison",
      "turns": 3
     },
-    "status_chance": 0.7
-   },
-   {
-    "display_name": "Rally",
-    "cooldown": 4,
-    "special": "malice_rally",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
-   },
-   {
-    "display_name": "Gall",
-    "cooldown": 2,
-    "damage": 10,
-    "delay": 2.5,
-    "anim": "attack02",
-    "aoe": true,
-    "applies_status": {
-     "id": "gall",
-     "turns": 3
-    },
-    "description": "Every hero receives {=Unit.GALL_HEAL_CUT*100}% less healing."
+    "status_chance": 0.3
    }
   ]
  },
@@ -331,21 +231,13 @@
     "anim": "attack01"
    },
    {
-    "display_name": "Shielding",
-    "special": "enemy_shield",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Wards one of its warband: 25% less strike damage taken for 3 turns."
-   },
-   {
-    "display_name": "Entrench",
+    "display_name": "Shield Guard",
     "cooldown": 4,
-    "special": "malice_entrench",
+    "special": "bodyguard",
     "delay": 2.5,
     "anim": "attack02",
     "target": "ally",
-    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+    "description": "Guards its warband for {=Battle.BODYGUARD_TURNS} turns: the first\nblow each turn aimed at another of its\nwarband lands on the guard instead.\nA Break or a Dispel ends it."
    }
   ]
  },
@@ -394,15 +286,6 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Mends the most wounded of its warband\nfor 25% of their max HP, paid in\nMalice (tanks and supports first)."
-   },
-   {
-    "display_name": "Entrench",
-    "cooldown": 2,
-    "special": "malice_entrench",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
    }
   ]
  },
@@ -444,41 +327,18 @@
     "dmg_type": "shadow"
    },
    {
-    "display_name": "Withering Hex",
-    "cooldown": 2,
-    "damage": 69,
-    "pressure": 10,
+    "display_name": "Choking Hex",
+    "cooldown": 3,
+    "damage": 44,
+    "pressure": 14,
     "delay": 2.5,
     "anim": "attack02",
-    "dmg_type": "shadow",
     "applies_status": {
-     "id": "exposed",
+     "id": "silenced",
      "turns": 2
     },
-    "status_chance": 0.7
-   },
-   {
-    "display_name": "Bone Rattle",
-    "cooldown": 2,
-    "damage": 52,
-    "pressure": 34,
-    "delay": 3.0,
-    "anim": "attack02",
-    "dmg_type": "shadow",
-    "applies_status": {
-     "id": "sap",
-     "turns": 3
-    },
-    "description": "One hero gains {=Unit.SAP_CUT*100}% less Rage or Mana."
-   },
-   {
-    "display_name": "Rally",
-    "cooldown": 4,
-    "special": "malice_rally",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+    "description": "Silences one hero: on that hero's next\nturn, only its basic attack.",
+    "dmg_type": "shadow"
    }
   ]
  },
@@ -517,26 +377,13 @@
     "anim": "attack01"
    },
    {
-    "display_name": "Ride-by Slash",
+    "display_name": "Harrying Bite",
     "cooldown": 2,
-    "damage": 55,
-    "pressure": 16,
+    "damage": 36,
+    "pressure": 20,
     "delay": 2.0,
     "anim": "attack02",
-    "applies_status": {
-     "id": "cripple",
-     "turns": 2
-    },
-    "status_chance": 0.5
-   },
-   {
-    "display_name": "Rally",
-    "cooldown": 2,
-    "special": "malice_rally",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+    "description": "Deals {=Battle.FLANK_PCT*100}% more to a hero another of its\nwarband has struck since that hero's\nlast turn."
    }
   ]
  },
@@ -575,27 +422,14 @@
     "dmg_type": "fire"
    },
    {
-    "display_name": "Flame Lick",
+    "display_name": "Cinder Flank",
     "cooldown": 2,
-    "damage": 44,
-    "pressure": 12,
-    "delay": 2.5,
+    "damage": 32,
+    "pressure": 20,
+    "delay": 2.0,
     "anim": "attack02",
-    "dmg_type": "fire",
-    "applies_status": {
-     "id": "burn",
-     "turns": 2
-    },
-    "status_chance": 0.6
-   },
-   {
-    "display_name": "Rally",
-    "cooldown": 3,
-    "special": "malice_rally",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+    "description": "Deals {=Battle.FLANK_PCT*100}% more to a hero another of its\nwarband has struck since that hero's\nlast turn.",
+    "dmg_type": "fire"
    }
   ]
  },
@@ -634,12 +468,14 @@
     "anim": "attack01"
    },
    {
-    "display_name": "Overhead Crush",
-    "cooldown": 2,
-    "damage": 56,
+    "display_name": "Skullsplitter",
+    "cooldown": 3,
+    "special": "windup",
+    "damage": 84,
     "pressure": 50,
     "delay": 3.5,
-    "anim": "attack02"
+    "anim": "attack02",
+    "description": "Raises its weapon. It lands next turn:\na heavy blow on one hero. Break, Freeze\nor Stun the Brute to cancel the blow."
    },
    {
     "display_name": "Rally",
@@ -688,27 +524,13 @@
     "anim": "attack01"
    },
    {
-    "display_name": "Swampy Grasp",
-    "cooldown": 2,
-    "damage": 64,
-    "pressure": 18,
-    "delay": 3.0,
-    "anim": "attack02",
-    "dmg_type": "nature",
-    "applies_status": {
-     "id": "slow",
-     "turns": 2
-    },
-    "status_chance": 0.7
-   },
-   {
-    "display_name": "Regenerate",
-    "cooldown": 3,
-    "special": "healing_wave",
+    "display_name": "Bog Guard",
+    "cooldown": 4,
+    "special": "bodyguard",
     "delay": 2.5,
     "anim": "attack02",
     "target": "ally",
-    "description": "Knits its own rubbery flesh back\ntogether: heals 25% of max health."
+    "description": "Guards its warband for {=Battle.BODYGUARD_TURNS} turns: the first\nblow each turn aimed at another of its\nwarband lands on the guard instead.\nA Break or a Dispel ends it."
    },
    {
     "display_name": "Entrench",
@@ -837,12 +659,18 @@
     "anim": "attack02"
    },
    {
-    "display_name": "Chieftain's Maul",
-    "cost": 20,
+    "display_name": "War Cry",
+    "cooldown": 3,
     "damage": 34,
     "pressure": 56,
     "delay": 4.0,
-    "anim": "attack02"
+    "anim": "attack02",
+    "applies_status": {
+     "id": "singled_out",
+     "turns": 2
+    },
+    "description": "Strikes one hero and singles that hero\nout: for {=@applies_status.turns} turns every blow its\nwarband readies is aimed at that hero.",
+    "cost": 20
    },
    {
     "display_name": "Rally",
@@ -963,24 +791,6 @@
     "delay": 1.5,
     "anim": "attack01",
     "dmg_type": "nature"
-   },
-   {
-    "display_name": "Bramble Lunge",
-    "cooldown": 2,
-    "damage": 38,
-    "pressure": 20,
-    "delay": 2.5,
-    "anim": "attack02",
-    "dmg_type": "nature"
-   },
-   {
-    "display_name": "Rally",
-    "cooldown": 3,
-    "special": "malice_rally",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
    }
   ]
  },
@@ -1020,27 +830,14 @@
     "dmg_type": "nature"
    },
    {
-    "display_name": "Trampling Rush",
+    "display_name": "Gang Gore",
     "cooldown": 2,
-    "damage": 55,
-    "pressure": 16,
+    "damage": 36,
+    "pressure": 20,
     "delay": 2.0,
     "anim": "attack02",
-    "applies_status": {
-     "id": "cripple",
-     "turns": 2
-    },
-    "status_chance": 0.5,
+    "description": "Deals {=Battle.FLANK_PCT*100}% more to a hero another of its\nwarband has struck since that hero's\nlast turn.",
     "dmg_type": "nature"
-   },
-   {
-    "display_name": "Rally",
-    "cooldown": 2,
-    "special": "malice_rally",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
    }
   ]
  },
@@ -1078,44 +875,12 @@
     "pressure": 16,
     "delay": 2.0,
     "anim": "attack01",
-    "dmg_type": "nature"
-   },
-   {
-    "display_name": "Choking Spores",
-    "cooldown": 2,
     "dmg_type": "nature",
-    "damage": 29,
-    "pressure": 14,
-    "delay": 2.5,
-    "anim": "attack02",
     "applies_status": {
      "id": "poison",
      "turns": 3
     },
-    "status_chance": 0.7
-   },
-   {
-    "display_name": "Rally",
-    "cooldown": 4,
-    "special": "malice_rally",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
-   },
-   {
-    "display_name": "Sour Cloud",
-    "cooldown": 2,
-    "damage": 10,
-    "delay": 2.5,
-    "anim": "attack02",
-    "aoe": true,
-    "applies_status": {
-     "id": "gall",
-     "turns": 3
-    },
-    "description": "Every hero receives {=Unit.GALL_HEAL_CUT*100}% less healing.",
-    "dmg_type": "nature"
+    "status_chance": 0.3
    }
   ]
  },
@@ -1155,21 +920,13 @@
     "dmg_type": "nature"
    },
    {
-    "display_name": "Shielding",
-    "special": "enemy_shield",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Wards one of its warband: 25% less strike damage taken for 3 turns."
-   },
-   {
-    "display_name": "Entrench",
+    "display_name": "Rootguard",
     "cooldown": 4,
-    "special": "malice_entrench",
+    "special": "bodyguard",
     "delay": 2.5,
     "anim": "attack02",
     "target": "ally",
-    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+    "description": "Guards its warband for {=Battle.BODYGUARD_TURNS} turns: the first\nblow each turn aimed at another of its\nwarband lands on the guard instead.\nA Break or a Dispel ends it."
    }
   ]
  },
@@ -1216,15 +973,6 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Mends the most wounded of its warband\nfor 25% of their max HP, paid in\nMalice (tanks and supports first)."
-   },
-   {
-    "display_name": "Entrench",
-    "cooldown": 2,
-    "special": "malice_entrench",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
    }
   ]
  },
@@ -1265,41 +1013,18 @@
     "dmg_type": "nature"
    },
    {
-    "display_name": "Wilting Curse",
-    "cooldown": 2,
-    "damage": 69,
-    "pressure": 10,
+    "display_name": "Rot Brand",
+    "cooldown": 3,
+    "damage": 44,
+    "pressure": 14,
     "delay": 2.5,
     "anim": "attack02",
-    "dmg_type": "nature",
     "applies_status": {
-     "id": "exposed",
-     "turns": 2
-    },
-    "status_chance": 0.7
-   },
-   {
-    "display_name": "Spore Choke",
-    "cooldown": 2,
-    "damage": 52,
-    "pressure": 34,
-    "delay": 3.0,
-    "anim": "attack02",
-    "dmg_type": "nature",
-    "applies_status": {
-     "id": "sap",
+     "id": "branded",
      "turns": 3
     },
-    "description": "One hero gains {=Unit.SAP_CUT*100}% less Rage or Mana."
-   },
-   {
-    "display_name": "Rally",
-    "cooldown": 4,
-    "special": "malice_rally",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+    "description": "Brands one hero for {=@applies_status.turns} turns: each\nability that hero uses costs it\n{=Battle.BRAND_PCT*100}% of its maximum health.",
+    "dmg_type": "nature"
    }
   ]
  },
@@ -1353,13 +1078,18 @@
     "dmg_type": "nature"
    },
    {
-    "display_name": "Antler Rend",
-    "cost": 20,
+    "display_name": "War Cry",
+    "cooldown": 3,
     "damage": 34,
     "pressure": 56,
     "delay": 4.0,
     "anim": "attack02",
-    "dmg_type": "nature"
+    "applies_status": {
+     "id": "singled_out",
+     "turns": 2
+    },
+    "description": "Strikes one hero and singles that hero\nout: for {=@applies_status.turns} turns every blow its\nwarband readies is aimed at that hero.",
+    "cost": 20
    },
    {
     "display_name": "Rally",
@@ -1465,7 +1195,7 @@
    2
   ],
   "enemy_role": "support",
-  "max_hp": 105,
+  "max_hp": 110,
   "attack": 50,
   "armor": 0.03,
   "speed": 105.0,
@@ -1491,14 +1221,6 @@
     "anim": "attack01"
    },
    {
-    "display_name": "Cleansing Rite",
-    "special": "cleanse_allies",
-    "delay": 3.0,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Strips one harmful effect from each of\nits warband (the longest-lasting one;\nChilled thaws one stack at a time)."
-   },
-   {
     "display_name": "Raise",
     "cooldown": 4,
     "special": "malice_raise",
@@ -1506,15 +1228,6 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Stands a fallen body of its warband back\nup at {=Battle.MALICE_RAISE_PCT*100}% of its maximum health, for\nthat health in Malice (once a body, a fight)."
-   },
-   {
-    "display_name": "Entrench",
-    "cooldown": 4,
-    "special": "malice_entrench",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
    }
   ]
  },
@@ -1529,7 +1242,7 @@
    2
   ],
   "enemy_role": "damage",
-  "max_hp": 190,
+  "max_hp": 250,
   "attack": 100,
   "armor": 0.12,
   "speed": 60.0,
@@ -1622,15 +1335,6 @@
     "anim": "attack02",
     "dmg_type": "shadow",
     "description": "Grows stronger for every one of its\nwarband fallen this battle."
-   },
-   {
-    "display_name": "Rally",
-    "cooldown": 3,
-    "special": "malice_rally",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
    }
   ]
  },
@@ -1645,7 +1349,7 @@
    1
   ],
   "enemy_role": "support",
-  "max_hp": 80,
+  "max_hp": 110,
   "attack": 50,
   "armor": 0.0,
   "speed": 130.0,
@@ -1679,15 +1383,6 @@
     "status_chance": 0.6
    },
    {
-    "display_name": "Dark Vigil",
-    "cooldown": 4,
-    "special": "totem_pulse",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband regains 6% of\ntheir maximum health."
-   },
-   {
     "display_name": "Raise",
     "cooldown": 4,
     "special": "malice_raise",
@@ -1695,27 +1390,6 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Stands a fallen body of its warband back\nup at {=Battle.MALICE_RAISE_PCT*100}% of its maximum health, for\nthat health in Malice (once a body, a fight)."
-   },
-   {
-    "display_name": "Entrench",
-    "cooldown": 4,
-    "special": "malice_entrench",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
-   },
-   {
-    "display_name": "Mire",
-    "cooldown": 2,
-    "damage": 45,
-    "delay": 2.5,
-    "anim": "attack02",
-    "applies_status": {
-     "id": "mire",
-     "turns": 3
-    },
-    "description": "One hero acts {=Unit.MIRE_SLOW*100}% slower; turns\narrive later."
    }
   ]
  },
@@ -1856,29 +1530,12 @@
     "damage": 33,
     "pressure": 12,
     "delay": 2.0,
-    "anim": "attack01"
-   },
-   {
-    "display_name": "Hobbling Bite",
-    "cooldown": 2,
-    "damage": 46,
-    "pressure": 18,
-    "delay": 2.5,
-    "anim": "attack02",
+    "anim": "attack01",
     "applies_status": {
      "id": "slow",
      "turns": 2
     },
-    "status_chance": 0.7
-   },
-   {
-    "display_name": "Rally",
-    "cooldown": 3,
-    "special": "malice_rally",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+    "status_chance": 0.3
    }
   ]
  },
@@ -1892,7 +1549,7 @@
    4
   ],
   "enemy_role": "tank",
-  "max_hp": 190,
+  "max_hp": 160,
   "attack": 75,
   "armor": 0.4,
   "speed": 65.0,
@@ -1917,21 +1574,13 @@
     "anim": "attack01"
    },
    {
-    "display_name": "Glacier Press",
-    "cooldown": 2,
-    "damage": 38,
-    "pressure": 70,
-    "delay": 3.0,
-    "anim": "attack02"
-   },
-   {
-    "display_name": "Entrench",
+    "display_name": "Frozen Stance",
     "cooldown": 3,
-    "special": "malice_entrench",
+    "special": "brace",
     "delay": 2.5,
     "anim": "attack02",
     "target": "ally",
-    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+    "description": "Braces until its next turn: takes\n{=Battle.BRACE_TAKEN*100}% of each blow dealt to it, and\nstrikes back at each hero who hits it\nin melee with a physical blow, for\n{=Battle.BRACE_STRIKE_FRAC*100}% of its basic attack."
    }
   ]
  },
@@ -1968,30 +1617,12 @@
     "pressure": 18,
     "delay": 2.0,
     "anim": "attack01",
-    "dmg_type": "frost"
-   },
-   {
-    "display_name": "Hailstorm",
-    "cooldown": 2,
-    "damage": 8,
-    "pressure": 8,
-    "delay": 3.0,
-    "anim": "attack02",
     "dmg_type": "frost",
-    "aoe": true,
     "applies_status": {
      "id": "dazed",
      "turns": 2
-    }
-   },
-   {
-    "display_name": "Rally",
-    "cooldown": 3,
-    "special": "malice_rally",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+    },
+    "status_chance": 0.3
    }
   ]
  },
@@ -2030,12 +1661,12 @@
     "anim": "attack01"
    },
    {
-    "display_name": "Trampling Charge",
-    "cooldown": 2,
-    "damage": 52,
-    "pressure": 64,
-    "delay": 3.5,
-    "anim": "attack02"
+    "display_name": "Frost Fury",
+    "special": "enrage",
+    "delay": 2.0,
+    "anim": "attack02",
+    "target": "ally",
+    "description": "The first time it falls to\n{=Battle.ENRAGE_AT*100}% of its health or below it roars: its\nblows deal {=Battle.ENRAGE_PCT*100}% more for the rest of the\nfight, unless a Dispel lifts it."
    },
    {
     "display_name": "Rally",
@@ -2091,24 +1722,6 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Mends the most wounded of its warband\nfor 25% of their max HP, paid in\nMalice (tanks and supports first)."
-   },
-   {
-    "display_name": "Raise",
-    "cooldown": 3,
-    "special": "malice_raise",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Stands a fallen body of its warband back\nup at {=Battle.MALICE_RAISE_PCT*100}% of its maximum health, for\nthat health in Malice (once a body, a fight)."
-   },
-   {
-    "display_name": "Entrench",
-    "cooldown": 4,
-    "special": "malice_entrench",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
    }
   ]
  },
@@ -2148,27 +1761,18 @@
     "dmg_type": "frost"
    },
    {
-    "display_name": "Leaching Stillness",
-    "cooldown": 2,
-    "damage": 58,
-    "pressure": 30,
-    "delay": 3.0,
-    "anim": "attack02",
-    "dmg_type": "shadow",
-    "applies_status": {
-     "id": "sap",
-     "turns": 3
-    },
-    "description": "One hero gains {=Unit.SAP_CUT*100}% less Rage or Mana."
-   },
-   {
-    "display_name": "Entrench",
-    "cooldown": 4,
-    "special": "malice_entrench",
+    "display_name": "Stillness",
+    "cooldown": 3,
+    "damage": 46,
+    "pressure": 14,
     "delay": 2.5,
     "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
+    "applies_status": {
+     "id": "silenced",
+     "turns": 2
+    },
+    "description": "Silences one hero: on that hero's next\nturn, only its basic attack.",
+    "dmg_type": "frost"
    }
   ]
  },
@@ -2283,13 +1887,18 @@
     "dmg_type": "frost"
    },
    {
-    "display_name": "Avalanche Maul",
-    "cost": 20,
+    "display_name": "War Cry",
+    "cooldown": 3,
     "damage": 34,
     "pressure": 56,
     "delay": 4.0,
     "anim": "attack02",
-    "dmg_type": "frost"
+    "applies_status": {
+     "id": "singled_out",
+     "turns": 2
+    },
+    "description": "Strikes one hero and singles that hero\nout: for {=@applies_status.turns} turns every blow its\nwarband readies is aimed at that hero.",
+    "cost": 20
    },
    {
     "display_name": "Rally",
@@ -2335,23 +1944,6 @@
     "pressure": 16,
     "delay": 1.5,
     "anim": "attack01"
-   },
-   {
-    "display_name": "Shambling Lurch",
-    "cooldown": 2,
-    "damage": 38,
-    "pressure": 20,
-    "delay": 2.5,
-    "anim": "attack02"
-   },
-   {
-    "display_name": "Rally",
-    "cooldown": 3,
-    "special": "malice_rally",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
    }
   ]
  },
@@ -2391,18 +1983,13 @@
     "anim": "attack01"
    },
    {
-    "display_name": "Silt Smother",
-    "cooldown": 2,
-    "damage": 64,
-    "pressure": 18,
-    "delay": 3.0,
+    "display_name": "Moss Shell",
+    "cooldown": 3,
+    "special": "brace",
+    "delay": 2.5,
     "anim": "attack02",
-    "dmg_type": "nature",
-    "applies_status": {
-     "id": "slow",
-     "turns": 2
-    },
-    "status_chance": 0.7
+    "target": "ally",
+    "description": "Braces until its next turn: takes\n{=Battle.BRACE_TAKEN*100}% of each blow dealt to it, and\nstrikes back at each hero who hits it\nin melee with a physical blow, for\n{=Battle.BRACE_STRIKE_FRAC*100}% of its basic attack."
    },
    {
     "display_name": "Entrench",
@@ -2453,27 +2040,18 @@
     "dmg_type": "shadow"
    },
    {
-    "display_name": "Canker Litany",
-    "cooldown": 2,
-    "damage": 43,
-    "pressure": 34,
-    "delay": 3.0,
-    "anim": "attack02",
-    "dmg_type": "shadow",
-    "applies_status": {
-     "id": "fester",
-     "turns": 3
-    },
-    "description": "One hero takes {=Battle.DOT_STATUSES.fester}% of the applier's Attack\nper stack at the start of each turn, and\ngains a stack and its full clock each\nturn, until cleansed."
-   },
-   {
-    "display_name": "Rally",
-    "cooldown": 4,
-    "special": "malice_rally",
+    "display_name": "Carrion Mark",
+    "cooldown": 3,
+    "damage": 44,
+    "pressure": 14,
     "delay": 2.5,
     "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+    "applies_status": {
+     "id": "doomed",
+     "turns": 2
+    },
+    "description": "Marks one hero for {=@applies_status.turns} turns: every blow\nits warband lands on that hero deals\n{=Battle.MARK_PCT*100}% more.",
+    "dmg_type": "shadow"
    }
   ]
  },
@@ -2512,32 +2090,19 @@
     "anim": "attack01"
    },
    {
-    "display_name": "Worrying Bites",
+    "display_name": "Pack Rend",
     "cooldown": 2,
-    "damage": 55,
-    "pressure": 16,
+    "damage": 36,
+    "pressure": 20,
     "delay": 2.0,
     "anim": "attack02",
-    "applies_status": {
-     "id": "cripple",
-     "turns": 2
-    },
-    "status_chance": 0.5
-   },
-   {
-    "display_name": "Rally",
-    "cooldown": 3,
-    "special": "malice_rally",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
+    "description": "Deals {=Battle.FLANK_PCT*100}% more to a hero another of its\nwarband has struck since that hero's\nlast turn."
    }
   ]
  },
  "rotfiend": {
   "unit_name": "Rotfiend",
-  "power": 1,
+  "power": 2,
   "roles": [
    "skirmisher"
   ],
@@ -2545,7 +2110,7 @@
    6
   ],
   "enemy_role": "damage",
-  "max_hp": 90,
+  "max_hp": 110,
   "attack": 100,
   "armor": 0.05,
   "speed": 115.0,
@@ -2583,27 +2148,6 @@
      "turns": -1
     },
     "description": "The Rotfiend bursts and dies: every\nhero is struck and takes a stack of\nBlack Rot, and one neighbour heals\n{=Battle.CORPSE_EXPLOSION_HEAL_PCT*100}% of that neighbour's maximum\nhealth, paid in Malice. Only while the\nRotfiend is at {=Battle.CORPSE_EXPLOSION_AT*100}% of its health or less."
-   },
-   {
-    "display_name": "Rake",
-    "damage": 13,
-    "pressure": 8,
-    "delay": 1.5,
-    "anim": "attack02",
-    "applies_status": {
-     "id": "black_rot",
-     "turns": -1
-    },
-    "description": "Lays a stack of Black Rot on one hero."
-   },
-   {
-    "display_name": "Rally",
-    "cooldown": 3,
-    "special": "malice_rally",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband deals {=Battle.MALICE_RALLY_PCT*100}% more damage\nwith its blows for {=Battle.MALICE_RALLY_TURNS} turns, for\n{=Battle.MALICE_RALLY_PRICE} Malice."
    }
   ]
  },
@@ -2642,16 +2186,6 @@
     "anim": "attack01",
     "choose_two": true,
     "description": "Strikes two heroes."
-   },
-   {
-    "display_name": "Lacerate",
-    "cooldown": 2,
-    "damage": 55,
-    "pressure": 50,
-    "delay": 3.5,
-    "anim": "attack02",
-    "bleed_build": 20,
-    "description": "Opens a wound: {=@bleed_build} Bleed on one hero."
    },
    {
     "display_name": "Submerge",
@@ -2793,13 +2327,18 @@
     "dmg_type": "shadow"
    },
    {
-    "display_name": "Barrow Maul",
-    "cost": 20,
+    "display_name": "War Cry",
+    "cooldown": 3,
     "damage": 34,
     "pressure": 56,
     "delay": 4.0,
     "anim": "attack02",
-    "dmg_type": "shadow"
+    "applies_status": {
+     "id": "singled_out",
+     "turns": 2
+    },
+    "description": "Strikes one hero and singles that hero\nout: for {=@applies_status.turns} turns every blow its\nwarband readies is aimed at that hero.",
+    "cost": 20
    },
    {
     "display_name": "Rally",
@@ -2857,15 +2396,6 @@
     "anim": "attack02",
     "target": "ally",
     "description": "Mends the most wounded of its warband\nfor 25% of their max HP, paid in\nMalice (tanks and supports first)."
-   },
-   {
-    "display_name": "Entrench",
-    "cooldown": 2,
-    "special": "malice_entrench",
-    "delay": 2.5,
-    "anim": "attack02",
-    "target": "ally",
-    "description": "Its whole warband's armor is multiplied\nby {=Unit.MALICE_ENTRENCH_MULT} for {=Battle.MALICE_ENTRENCH_TURNS} turns, for {=Battle.MALICE_ENTRENCH_PRICE} Malice."
    }
   ]
  }

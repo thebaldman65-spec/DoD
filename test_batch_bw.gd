@@ -1245,10 +1245,15 @@ func _live_feigned_guard() -> void:
 	sm.hp = 100000
 	var raider: BattleUnit = _live_foes(scene)[0]
 	var swing: Ability = raider.abilities[0]
+	var had_bw: Array = sm.statuses.map(func(st): return st.id)
 	_seeded()
 	var before_feign: int = sm.hp
 	await scene.call("_resolve", raider, swing, sm, "good")
 	var under_feign: int = before_feign - sm.hp
+	# BATCH KJ — the Raider's basic can bite (Sunder): whatever the first swing laid comes off before the second.
+	for st in sm.statuses.duplicate():
+		if not had_bw.has(st.id):
+			sm.remove_status(String(st.id))
 	sm.remove_status("feigned_guard")
 	_seeded()
 	var before_plain: int = sm.hp

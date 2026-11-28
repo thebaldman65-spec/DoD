@@ -1,10 +1,15 @@
 # BATCH JK — WHAT THE WARBAND BUYS WITH ITS MALICE.
 #
 #   §0   JJ's SIX RULINGS, ANSWERED: the block left the open queue for the archive, struck, with the answer (H02).
-#   §1   EVERY KIND CAN BUY SOMETHING, DERIVED OFF THE DATA AND NEVER LISTED: every kind's kit holds a move the pool prices that
-#        is no heal (JK's floor — every one holding a Rally or an Entrench — was removed at JX §2 by the designer's ruling, and the
-#        kinds holding neither are printed as a record), and on a board where the pool is full, a body is down and nothing
-#        is hurt, warded or rallied, every kind's own selection declares one (C01); the kept table is the data's. RAISE stands a
+#   §1   WHO CAN BUY, DERIVED OFF THE DATA BY THE RULE AND NEVER LISTED: since KJ (the designer's answer — the tougher enemies
+#        spend) a kind's kit holds a move the pool prices that is no heal exactly where the rule puts one — a kind of tier 3 or
+#        above one, a Rally for a fighter and an Entrench for a tank, a boss the spends it held; below tier 3 a Raise on the two
+#        kinds the designer picked it for — and none elsewhere (`kj_ruled_spends`; JK's floor — every one holding a Rally or an
+#        Entrench — was removed at JX §2 by the designer's ruling, and the kinds holding neither are printed as a record); on a
+#        board where the pool is full, a body is down and nothing is hurt, warded or rallied, every kind the rule gives a spend
+#        declares one and no other kind does (C01); the kept table is the warband's as KJ found it, and each kind's spends today
+#        are its row cut by the rule; since KJ the Ritual Chanter raises, the Orc Brute rallies and the Bog Troll entrenches.
+#        RAISE stands a
 #        fallen body up at its share of its health, un-Broken, once a body a fight (C02, C03); RALLY's blow is struck harder and
 #        no heal it reaches restores or pays past its figure, so the reserve's arithmetic stands (C04); ENTRENCH is read at the one
 #        door every blow's armor passes, and a blow reads it there (C05); OVERRUN is absent and the record says so, and nothing
@@ -15,7 +20,8 @@
 #        (C08); every spend cools, by JI's line, read out of `check_ji` (C10).
 #   §3   THE READING: the record holds the drive's ledger and its spend counts, as the kept table holds them (C11).
 #   §4   WHAT IS DELIBERATELY NOT DONE: the fill, the cap and every heal's price as JJ left them (C12); the deck at twenty-five
-#        (C13); no enemy kind added, and no move but the spends.
+#        (C13); no enemy kind added, and no move but the spends, to the warband as KJ found it (its kept copy: KJ's rework is the
+#        designer's picks).
 #   §5   THE TEXTS FOLLOW THE CONSTANTS: the state and the master document state what each spend buys and costs off the
 #        constants, and the strip's words name them (R01).
 #   §6   THE PLAYER's FILES, as this gate found them.
@@ -46,6 +52,12 @@ const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "r
 const KINDS := 21
 # JK's fifty, and since JO §2 Gall and Mire among them, each a blow given damage (Sap and Fester ride two of the fifty).
 const MOVES_BEFORE := 52
+# BATCH KJ — THE DESIGNER's ANSWER ON WHO SPENDS (KJ's A3, *the tougher enemies*): a spend stands on a kind of this tier or above —
+# a tier-3 kind and an elite one, a Rally for a fighter and an Entrench for a tank, a boss the spends it held — and below it only
+# a Raise, on the kinds the designer picked one for (KJ's picks: the Ritual Chanter's and the Grave Totem's), the one list the
+# tier cannot derive. `kj_ruled_spends` is the rule, read here (§1) and by `check_jl` (§1, §4).
+const SPEND_TIER := 3
+const KJ_RAISE_KEPT := ["chanter", "grave_totem"]
 const DECK_CLOSED_AT := 25
 # THE FILL AND THE HEALS AS JJ LEFT THEM (§4): a point a ten, a kill's 25, the cap of 150, hurt at half a heal's figure.
 const FILL := {"MALICE_DAMAGE_STEP": 10, "MALICE_PER_KILL": 25, "MALICE_CAP": 150}
@@ -228,6 +240,20 @@ func _spend_specials(s: Node) -> Array:
 	return (v as Array) if v != null else []
 
 
+# BATCH KJ — THE SPENDS THE RULE PUTS ON A KIND, as specials (the designer's answer, `SPEND_TIER`): `v` its entry today, `before`
+# the warband as KJ found it (`Gate.warband_before_kj()`), off which a boss's are read — KJ left the bosses whole.
+static func kj_ruled_spends(kind: String, v: Dictionary, before: Dictionary) -> Array:
+	if bool(v.get("is_boss", false)):
+		var kept: Array = []
+		for a in (before.get(kind, {}) as Dictionary).get("abilities", []):
+			if String(a.get("special", "")).begins_with("malice_"):
+				kept.append(String(a.get("special", "")))
+		return kept
+	if int(v.get("power", 1)) >= SPEND_TIER:
+		return ["malice_entrench" if String(v.get("enemy_role", "")) == "tank" else "malice_rally"]
+	return ["malice_raise"] if KJ_RAISE_KEPT.has(kind) else []
+
+
 func _heroes(s: Node) -> Array:
 	return (s.get("heroes") as Array).filter(func(u): return not (u as BattleUnit).is_companion)
 
@@ -333,16 +359,20 @@ func _s0_the_rulings() -> void:
 # ── §1 — EVERY KIND CAN BUY SOMETHING ─────────────────────────────────────────
 
 func _s1_every_kind_buys(s: Node, spends: bool) -> void:
-	print("\n§1 — every kind of the warband can buy something, derived off the data")
+	print("\n§1 — every kind of the warband buys what the rule puts on it, derived off the data")
 	if not spends:
-		for w in ["§1: a kind holds no move the pool buys — no spend in the tree", "§1: a kind declares no spend on a board that wants one — no spend in the tree"]:
+		for w in ["§1: a kind does not hold the spends the rule puts on it — no spend in the tree", "§1: a kind the rule gives a spend declares none on a board that wants one — no spend in the tree"]:
 			ok(false, w)
 		return
 	var specials := _spend_specials(s)
 	var f: BattleUnit = _foes(s)[0]
 	var data: Dictionary = Enemies._load()
+	# BATCH KJ — THE WARBAND AS KJ FOUND IT, off which a boss's spends and the kept table are read.
+	var before: Dictionary = Gate.warband_before_kj()
 	var holds := {}
 	var none: Array = []
+	var off_rule: Array = []
+	var ruled_on := 0
 	var no_floor: Array = []
 	var no_buy: Array = []
 	var own_cooling := 0
@@ -351,6 +381,7 @@ func _s1_every_kind_buys(s: Node, spends: bool) -> void:
 		_as_kind(f, String(kind))
 		var corpse := _spend_board(s)
 		var mine: Array = []
+		var mine_sp: Array = []
 		var cooled_before := false
 		for a in f.abilities:
 			var ab: Ability = a
@@ -358,12 +389,24 @@ func _s1_every_kind_buys(s: Node, spends: bool) -> void:
 			var priced := int(s.call("_malice_price", f, ab, f)) > 0 or int(s.call("_malice_price", f, ab, corpse)) > 0
 			if priced and String(s.call("_intent_category", f, ab)) != "mend":
 				mine.append(ab.display_name)
+				mine_sp.append(String(ab.special))
 				_spends.append([String(kind), ab.display_name, String(ab.special)])
 			elif ab.cooldown > 0:
 				cooled_before = true
 		holds[kind] = mine
 		if mine.is_empty():
 			none.append(String(kind))
+		# BATCH KJ — EVERY KIND HOLDS WHAT THE RULE PUTS ON IT, NO MORE AND NO LESS (the designer's answer, `kj_ruled_spends`): JK
+		# asked that every kind hold one; KJ gave a spend to the tougher kinds only, so the question is the rule's, of every kind.
+		var ruled := kj_ruled_spends(String(kind), data[kind], before)
+		var have_sp := mine_sp.duplicate()
+		have_sp.sort()
+		var want_sp := ruled.duplicate()
+		want_sp.sort()
+		if have_sp != want_sp:
+			off_rule.append("%s holds %s, the rule %s" % [kind, str(have_sp), str(want_sp)])
+		if not ruled.is_empty():
+			ruled_on += 1
 		# JK's FLOOR, REMOVED AT JX §2 (the designer's ruling, as written: "This gate does not need to exsist, remove it"): what it read is printed.
 		if _spend_of(f, "malice_rally") == null and _spend_of(f, "malice_entrench") == null:
 			no_floor.append(String(kind))
@@ -372,8 +415,9 @@ func _s1_every_kind_buys(s: Node, spends: bool) -> void:
 		for sp in got:
 			if specials.has(sp):
 				bought = true
-		if not bought:
-			no_buy.append("%s chose %s" % [kind, str(got)])
+		# BATCH KJ — a kind the rule gives a spend declares one on this board, and a kind it gives none declares none.
+		if bought == ruled.is_empty():
+			no_buy.append("%s chose %s, the rule %s" % [kind, str(got), str(ruled)])
 		if not cooled_before:
 			own_cooling += 1
 			if not mine.is_empty():
@@ -382,24 +426,39 @@ func _s1_every_kind_buys(s: Node, spends: bool) -> void:
 	print("    CHECKED %d of %d kinds; %d spends on their lists; the kinds that own no cooling move of their own: %d, and %d of them hold a spend" % [
 		holds.size(), KINDS, _spends.size(), own_cooling, own_cooling_buy])
 	ok(holds.size() == KINDS + ADDED_SINCE.size(), "§1: the walk read %d kinds, not %d" % [holds.size(), KINDS + ADDED_SINCE.size()])
-	ok(none.is_empty(), "§1: a kind holds no move the pool buys: %s" % [none])
+	# BATCH KJ — JK's `none.is_empty()` asked that every kind can buy; the designer's answer gave a spend to the tougher kinds, so
+	# this asks the rule of every kind, and the kinds holding none are printed as the record of what KJ took.
+	print("    [record] the kinds the rule gives a spend: %d; the kinds holding none since KJ: %d — %s" % [ruled_on, none.size(), str(none)])
+	ok(off_rule.is_empty(), "§1: a kind does not hold the spends the rule puts on it (tier 3 and above one, a boss its own, a Raise where the designer picked one): %s" % [off_rule])
 	print("    [record] the kinds holding neither a Rally nor an Entrench (JK's floor, removed at JX §2): %d — %s" % [no_floor.size(), str(no_floor)])
-	ok(no_buy.is_empty(), "§1: a kind declares no spend on a board that wants one: %s" % [no_buy])
+	ok(no_buy.is_empty(), "§1: a kind the rule gives a spend declares none on a board that wants one, or a kind it gives none declares one: %s" % [no_buy])
 	# THE KEPT TABLE IS THE DATA's: each kind's row names the spends its list holds, each with the cooldown it carries.
+	# BATCH KJ — AS KJ FOUND IT: each row is held to the kept copy (`Gate.warband_before_kj()`), the warband JK and the batches
+	# since left, and each kind's spends today to its row cut by the rule — KJ took spends away, and added and re-cooled none.
 	var rows := _doc(KEPT_COVER).split("\n", false)
 	ok(rows.size() == KINDS + 1, "§1: the kept table %s holds %d rows, not a header and %d kinds" % [KEPT_COVER, rows.size(), KINDS])
 	var wrong: Array = []
 	for r in rows.slice(1):
 		var c := String(r).split("\t")
-		if c.size() < 6 or not data.has(c[0]):
+		if c.size() < 6 or not data.has(c[0]) or not before.has(c[0]):
 			wrong.append(String(r).left(60))
 			continue
+		var ruled_r := kj_ruled_spends(c[0], data[c[0]], before)
+		var then_cells := []
+		var cut := []
+		for a0 in (before[c[0]] as Dictionary).get("abilities", []):
+			if String(a0.get("special", "")).begins_with("malice_"):
+				then_cells.append("%s %d" % [String(a0.get("display_name", "")), int(a0.get("cooldown", 0))])
+				if ruled_r.has(String(a0.get("special", ""))):
+					cut.append(then_cells[then_cells.size() - 1])
 		var want := []
 		for nm in holds.get(c[0], []):
 			want.append("%s %d" % [nm, _data_cd(c[0], String(nm))])
-		if c[5] != ", ".join(PackedStringArray(want)):
-			wrong.append("%s: the table says '%s', the data '%s'" % [c[0], c[5], ", ".join(PackedStringArray(want))])
-	ok(wrong.is_empty(), "§1: the kept table does not say what each kind holds as the data does: %s" % [wrong])
+		if c[5] != ", ".join(PackedStringArray(then_cells)):
+			wrong.append("%s: the table says '%s', the warband as KJ found it '%s'" % [c[0], c[5], ", ".join(PackedStringArray(then_cells))])
+		if ", ".join(PackedStringArray(want)) != ", ".join(PackedStringArray(cut)):
+			wrong.append("%s: the data holds '%s', its row cut by the rule '%s'" % [c[0], ", ".join(PackedStringArray(want)), ", ".join(PackedStringArray(cut))])
+	ok(wrong.is_empty(), "§1: the kept table does not say what each kind held as KJ found it, or the data does not hold its row cut by the rule: %s" % [wrong])
 	_pool(s, 0)
 
 
@@ -420,9 +479,11 @@ func _s1_raise(s: Node, spends: bool) -> void:
 		return
 	var foes := _foes(s)
 	var f: BattleUnit = foes[0]
-	_as_kind(f, "totemist")
+	# BATCH KJ — THE RITUAL CHANTER RAISES: the designer's picks left the Totemist its heal and no Raise, and kept the Raise on the
+	# Chanter and the Grave Totem (`KJ_RAISE_KEPT`).
+	_as_kind(f, "chanter")
 	var raise := _spend_of(f, "malice_raise")
-	ok(raise != null, "§1: the premise — the Totemist holds a Raise")
+	ok(raise != null, "§1: the premise — the Ritual Chanter holds a Raise")
 	if raise == null:
 		return
 	var c := _spend_board(s)
@@ -452,7 +513,8 @@ func _s1_raise(s: Node, spends: bool) -> void:
 	ok(not c.intent.has("gate_sentinel"), "§1: the raised body kept the declaration it died with, and its reserve")
 	# TWO RAISERS, ONE CORPSE: a second body's declared Raise on the corpse keeps this raiser off it; gone, the corpse is its again.
 	var f2: BattleUnit = foes[1]
-	_as_kind(f2, "chanter")
+	# BATCH KJ — the second raiser the Grave Totem, the Chanter raising first.
+	_as_kind(f2, "grave_totem")
 	var c2: BattleUnit = foes[4]
 	c2.hp = 1
 	c2.take_hit(5, 0)
@@ -514,9 +576,10 @@ func _s1_rally(s: Node, spends: bool) -> void:
 	var f: BattleUnit = foes[1]
 	var a: BattleUnit = foes[2]
 	var b: BattleUnit = foes[3]
-	_as_kind(f, "raider")
+	# BATCH KJ — THE ORC BRUTE RALLIES: the designer's picks left the Raider a basic alone; a tier-3 fighter holds the Rally.
+	_as_kind(f, "brute")
 	var rally := _spend_of(f, "malice_rally")
-	ok(rally != null, "§1: the premise — the Raider holds a Rally")
+	ok(rally != null, "§1: the premise — the Orc Brute holds a Rally")
 	if rally == null:
 		return
 	_spend_board(s)
@@ -595,9 +658,11 @@ func _s1_entrench(s: Node, spends: bool) -> void:
 	var f: BattleUnit = foes[2]
 	var a: BattleUnit = foes[3]
 	var b: BattleUnit = foes[1]
-	_as_kind(f, "shieldmaster")
+	# BATCH KJ — THE BOG TROLL ENTRENCHES: the designer's picks gave the Shieldmaster a guard and no spend; a tier-3 tank holds
+	# the Entrench.
+	_as_kind(f, "bog_troll")
 	var entrench := _spend_of(f, "malice_entrench")
-	ok(entrench != null, "§1: the premise — the Shieldmaster holds an Entrench")
+	ok(entrench != null, "§1: the premise — the Bog Troll holds an Entrench")
 	if entrench == null:
 		return
 	_spend_board(s)
@@ -703,10 +768,12 @@ func _s2_the_prices(s: Node, spends: bool) -> void:
 	var f: BattleUnit = _foes(s)[0]
 	var pct := _const_f(s, "MALICE_RAISE_PCT")
 	# A RAISE BY HEALTH (C07): two bodies of different health, two prices, each the health it would stand that body up with.
-	_as_kind(f, "totemist")
+	# BATCH KJ — the Ritual Chanter's Raise, the Raider's Rally the Orc Brute's and the Shieldmaster's Entrench the Bog Troll's, as
+	# §1's drives: each kind the designer's picks left holding the spend.
+	_as_kind(f, "chanter")
 	var raise := _spend_of(f, "malice_raise")
 	if raise == null:
-		ok(false, "§2: the premise — the Totemist holds no Raise to price")
+		ok(false, "§2: the premise — the Ritual Chanter holds no Raise to price")
 		return
 	var by_body: Array = []
 	for e in all.slice(1):
@@ -720,7 +787,7 @@ func _s2_the_prices(s: Node, spends: bool) -> void:
 	print("    a Raise priced on bodies of %s health: %s" % [str(all.slice(1).map(func(x): return (x as BattleUnit).max_hp)), str(distinct.keys())])
 	ok(by_body.is_empty() and distinct.size() >= 2, "§2: a Raise is not priced at the health it stands a body up with: %s" % [by_body])
 	# A RALLY AND AN ENTRENCH FLAT: the same price on every body, the constant's.
-	var flats := {"malice_rally": ["raider", "MALICE_RALLY_PRICE", "Rally"], "malice_entrench": ["shieldmaster", "MALICE_ENTRENCH_PRICE", "Entrench"]}
+	var flats := {"malice_rally": ["brute", "MALICE_RALLY_PRICE", "Rally"], "malice_entrench": ["bog_troll", "MALICE_ENTRENCH_PRICE", "Entrench"]}
 	for sp in flats:
 		_as_kind(f, String(flats[sp][0]))
 		var ab := _spend_of(f, String(sp))
@@ -737,7 +804,7 @@ func _s2_the_prices(s: Node, spends: bool) -> void:
 	var refused: Array = []
 	var never: Array = []
 	var unheld: Array = []
-	for entry in [["totemist", "malice_raise"], ["raider", "malice_rally"], ["shieldmaster", "malice_entrench"]]:
+	for entry in [["chanter", "malice_raise"], ["brute", "malice_rally"], ["bog_troll", "malice_entrench"]]:
 		_as_kind(f, String(entry[0]))
 		var c := _spend_board(s)
 		var ab2 := _spend_of(f, String(entry[1]))
@@ -904,7 +971,9 @@ func _s4_not_done(s: Node) -> void:
 			moved.append("a heal no longer reads `%s`" % site)
 	ok(moved.is_empty(), "§4: the fill, the cap or a heal's price moved: %s" % [moved])
 	ok((_run.MODIFIERS as Dictionary).size() == DECK_CLOSED_AT, "§4: the deck holds %d, not the twenty-five it closed at" % (_run.MODIFIERS as Dictionary).size())
-	var data: Dictionary = Enemies._load()
+	# BATCH KJ — THE WARBAND AS KJ FOUND IT (`Gate.warband_before_kj()`): KJ re-cut every kit by the designer's picks, so the moves
+	# JK left are counted on the kept copy, as a later batch's kinds are set aside by ADDED_SINCE.
+	var data: Dictionary = Gate.warband_before_kj()
 	var moves := 0
 	for k2 in data:
 		if ADDED_SINCE.has(String(k2)):

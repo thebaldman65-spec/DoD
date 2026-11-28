@@ -259,6 +259,10 @@ func _paid(keys: Array, engines: Array, cond: Dictionary, fallen := -1) -> Dicti
 # One seeded blow of `atk`'s basic on `victim`, returning the damage dealt; the
 # victim is whole before and after it.
 func _blow(s: Node, atk: BattleUnit, victim: BattleUnit, sd: int) -> int:
+	# BATCH KJ — the victim is made deep for the reading: KJ's health bands cut the Raider, and the heavy blow below
+	# outran what it held, so its death clamped the larger arm. Its health is put back after.
+	var mhp_was := victim.max_hp
+	victim.max_hp = 100000
 	victim.hp = victim.max_hp
 	victim.pressure = 0
 	victim.broken = false
@@ -267,6 +271,7 @@ func _blow(s: Node, atk: BattleUnit, victim: BattleUnit, sd: int) -> int:
 	var before := victim.hp
 	await s._resolve(atk, atk.abilities[0], victim, "good")
 	var dealt := before - victim.hp
+	victim.max_hp = mhp_was
 	victim.hp = victim.max_hp
 	return dealt
 

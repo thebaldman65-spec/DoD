@@ -7,13 +7,16 @@
 #   §1   BREAK GETS A PRICE: a point of Break damage at a hero turn's damage over the Break meter's size, both figures read where they
 #        stand and named (C01, C02, R01); every gate that prices on JI's line prices one blow, the Break in its sum; the ten JN raised
 #        re-derived — a move that falls under the line priced is brought to it, one that still clears stays where JN put it (C03);
-#        no basic moved (C04); every other band the repaired line moves held at the data's figure, named, and nothing else moved.
+#        no basic moved (C04); every other band the repaired line moves held at the data's figure, named, and nothing else moved —
+#        all of it of the warband JO left, as it stood before KJ's rework (`Gate.warband_before_kj()`).
 #   §2   THE HEXES RIDE BLOWS: no warband move lays a status on a hero and deals nothing, derived off the data (C05); the spends lay
 #        on their own side and deal nothing (C06); a hex folded only onto a move that laid nothing (C07); a hex given damage clears
 #        the line (C08), and so does the move a hex was folded onto (C09); each hex rides a blow — no special, aimed as the attacks
-#        are, rolling its miss as the warband's other status blows do — and lands on a hit, driven (C10).
+#        are, rolling its miss as the warband's other status blows do — and lands on a hit, driven (C10). Gall, Sap and Mire
+#        have no carrier since KJ, by the designer's picks (`KJ_CARRIERLESS`, a ruling owed): each is held carrierless, every arm
+#        is asked of the hex that still rides a blow, and the single-blow half of the drive of KJ's hex moves (`KJ_HEX_BLOWS`).
 #   §3   THE COUNT, WHICH IS CORRECTNESS: the kept table counts each hex laid and the fights it was laid in, each re-derived move
-#        cast, and the party's Breaks — and compares nothing (C11).
+#        cast, and the party's Breaks — and compares nothing (C11). A carrierless hex is held at none laid and its host at none cast.
 #   §4   WHAT IS DELIBERATELY NOT DONE: no balance drive's table (C13); the deck closed at twenty-five, no grade re-authored (C14).
 #   §5   the player's files, as this gate found them.
 #   Every needle is the rule's own words, never the batch code beside them.
@@ -89,6 +92,19 @@ const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "r
 const ROSTERS_SINCE := [4, 5, 6]
 # A HOST's KEYS §2 MOVED: its damage, its cooldown, the special it lost, the status it took and its words.
 const HOST_KEYS := ["damage", "cooldown", "special", "applies_status", "description"]
+# BATCH KJ — THREE OF THE FOUR HEXES HAVE NO CARRIER SINCE KJ: the designer's picks cut every kit to its tier, and Gall (the Orc Archer's
+# and the Spore Lobber's), Sap (the Orc Hexer's, the Blightcap's and the Stillwrought's) and Mire (the Grave Totem's) went with the
+# moves that carried them. Each is named here, carrierless by the designer's picks — a ruling owed: a carrier back, or the hex gone.
+# §2 holds each carrierless in the game today, so an entry reds the day a carrier returns, and asks its other questions of the hex
+# that still rides a blow, Fester on the Rot Behemoth's Wretched Bellow; §3 holds each at none laid.
+const KJ_CARRIERLESS := ["gall", "sap", "mire"]
+# BATCH KJ — THE HEX MOVES KJ's DESIGNER PICKED, each a single blow at its basic's damage (answer 3), "kind/Move": the status it lays:
+# with Sap's and Mire's single blows gone, §2's single-blow half — a hit lays the hex, a miss lays nothing — is asked of these.
+const KJ_HEX_BLOWS := {"hexer/Choking Hex": "silenced", "stillwrought/Stillness": "silenced", "blightcap/Rot Brand": "branded",
+	"blight_speaker/Carrion Mark": "doomed"}
+# §2's CONTROL: the warband's other status blow, a single blow that lays a status that is no hex ([kind, move, status]).
+# BATCH KJ — POISON ARROW WENT WITH KJ's TIER-1 KITS; its Poison rides the Orc Archer's Arrow Shot since, at the bite's chance (C1).
+const STATUS_BLOW := ["archer", "Arrow Shot", "poison"]
 
 var _g := Gate.new()
 var _docs := {}
@@ -247,8 +263,11 @@ func _basic(abilities: Array) -> Dictionary:
 	return {}
 
 
-func _move(kind: String, name: String) -> Dictionary:
-	var data: Dictionary = Enemies._load()
+# BATCH KJ — THESE FOUR READ THE WARBAND THEY ARE HANDED, today's by default (`Enemies._load()`): §1 hands them the warband as it stood
+# before KJ's rework (`Gate.warband_before_kj()`), since its question is of the warband JN and JO left.
+func _move(kind: String, name: String, data: Dictionary = {}) -> Dictionary:
+	if data.is_empty():
+		data = Enemies._load()
 	if not data.has(kind):
 		return {}
 	for a in data[kind]["abilities"]:
@@ -258,23 +277,25 @@ func _move(kind: String, name: String) -> Dictionary:
 
 
 # A move's worth on JI's line, in health, and its multiple of its own kind's basic.
-func _worth(kind: String, a: Dictionary) -> float:
-	var data: Dictionary = Enemies._load()
+func _worth(kind: String, a: Dictionary, data: Dictionary = {}) -> float:
+	if data.is_empty():
+		data = Enemies._load()
 	return JI.line_blow(a, _dot, float(data[kind]["attack"]), float(_fig.get("price", 0.0)))
 
 
-func _multiple(kind: String, a: Dictionary) -> float:
-	var data: Dictionary = Enemies._load()
-	var bp := _worth(kind, _basic(data[kind]["abilities"]))
-	return _worth(kind, a) / bp if bp > 0.0 else -1.0
+func _multiple(kind: String, a: Dictionary, data: Dictionary = {}) -> float:
+	if data.is_empty():
+		data = Enemies._load()
+	var bp := _worth(kind, _basic(data[kind]["abilities"]), data)
+	return _worth(kind, a, data) / bp if bp > 0.0 else -1.0
 
 
 # The least whole damage at which a move clears the line, its other keys as they stand.
-func _least(kind: String, a: Dictionary) -> int:
+func _least(kind: String, a: Dictionary, data: Dictionary = {}) -> int:
 	var probe := a.duplicate(true)
 	var d := 0
 	probe["damage"] = d
-	while _multiple(kind, probe) < JI.LINE and d < 2000:
+	while _multiple(kind, probe, data) < JI.LINE and d < 2000:
 		d += 1
 		probe["damage"] = d
 	return d
@@ -443,8 +464,11 @@ func _s1_the_price() -> void:
 
 # C03: THE TEN JN RAISED, RE-DERIVED WITH THE BREAK IN BOTH SUMS — under the line priced, brought to it; still clear, where JN put it.
 func _s1_the_ten() -> void:
-	print("\n§1 — the ten JN raised, re-derived with Break in the sum")
+	print("\n§1 — the ten JN raised, re-derived with Break in the sum, on the warband before KJ's rework")
 	var jn := _kit(KIT_BEFORE)
+	# BATCH KJ — THE TEN AS JO LEFT THEM: re-derived on the warband as it stood before KJ's rework (`Gate.warband_before_kj()`), since
+	# KJ cut every kit to its tier, the designer's picks, and eight of the ten went with it.
+	var before_kj := Gate.warband_before_kj()
 	var ten: Array = []
 	for c in _rows(_doc(JN_POPULATION)):
 		if c.size() > 13 and String(c[13]) == "yes":
@@ -460,7 +484,7 @@ func _s1_the_ten() -> void:
 		var kind := String(t[0])
 		var name := String(t[1])
 		var key := "%s/%s" % [kind, name]
-		var a := _move(kind, name)
+		var a := _move(kind, name, before_kj)
 		var jn_dmg := -1
 		for r in (jn.get(kind, []) as Array):
 			if String(r).begins_with(name + "|"):
@@ -470,13 +494,13 @@ func _s1_the_ten() -> void:
 			continue
 		var at_jn := a.duplicate(true)
 		at_jn["damage"] = jn_dmg
-		var m_jn := _multiple(kind, at_jn)
-		var want := jn_dmg if m_jn >= JI.LINE else _least(kind, a)
+		var m_jn := _multiple(kind, at_jn, before_kj)
+		var want := jn_dmg if m_jn >= JI.LINE else _least(kind, a, before_kj)
 		if m_jn < JI.LINE:
 			brought += 1
-		var m := _multiple(kind, a)
+		var m := _multiple(kind, a, before_kj)
 		print("    %-12s %-16s at JN's %3d: %.3f; the least that clears %3d; the data %3d (%.3f), band %d, the data's %d" % [
-			kind, name, jn_dmg, m_jn, _least(kind, a), int(a.get("damage", 0)), m, _band(m), int(a.get("cooldown", 0))])
+			kind, name, jn_dmg, m_jn, _least(kind, a, before_kj), int(a.get("damage", 0)), m, _band(m), int(a.get("cooldown", 0))])
 		if int(a.get("damage", 0)) != want:
 			wrong.append("%s carries %d, the re-derivation gives %d (%.2f at JN's %d)" % [key, int(a.get("damage", 0)), want, m_jn, jn_dmg])
 		var row: Array = kept.get(key, [])
@@ -490,8 +514,10 @@ func _s1_the_ten() -> void:
 
 # C04 AND THE REST: NO BASIC MOVED; EVERY MOVE BUT THE NAMED AS JN LANDED IT; EVERY BAND THE LINE MOVES ELSEWHERE HELD AND NAMED.
 func _s1_nothing_else() -> void:
-	print("\n§1 — no basic moved, nothing else moved, every other band the line moves held")
-	var data: Dictionary = Enemies._load()
+	print("\n§1 — no basic moved, nothing else moved, every other band the line moves held, on the warband before KJ's rework")
+	# BATCH KJ — OF THE WARBAND JO LEFT, AS IT STOOD BEFORE KJ's REWORK (`Gate.warband_before_kj()`): KJ cut every kit to its tier and
+	# gave five kinds' basics a bite, the designer's picks, so this walk, its digest and its held bands ask what JO's batch left.
+	var data: Dictionary = Gate.warband_before_kj()
 	var jn := _kit(KIT_BEFORE)
 	for c in _rows(_doc(KEPT_HEXES)):
 		if c.size() > 7:
@@ -539,7 +565,7 @@ func _s1_nothing_else() -> void:
 	for c5 in _rows(_doc(KEPT_HEXES)):
 		if c5.size() > 7:
 			hosts.append("%s/%s" % [c5[0], c5[6]])
-	var raw: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/enemies.json"))
+	var raw: Variant = Gate.warband_before_kj()
 	# BATCH JX §1 — THE ROSTER TAGS AS THEY STOOD BEFORE THE STAGES, put back first (JX folded roster 3 into 1 and 5 into 4): this gate digests the warband its batch left.
 	Gate.rosters_before_jx(raw)
 	# BATCH JR — THREE APPEARANCE TAGS MOVED AFTER THIS GATE LANDED (JR §1), each named in `MOVED_SINCE` and put back
@@ -575,7 +601,7 @@ func _s1_nothing_else() -> void:
 	var off: Array = []
 	for k in held:
 		var parts := String(k).split("/")
-		var a2 := _move(parts[0], parts[1])
+		var a2 := _move(parts[0], parts[1], data)
 		if a2.is_empty() or int(a2.get("cooldown", 0)) != int(held[k]) or int(kept.get(k, -1)) != int(held[k]):
 			off.append("%s: held %d, the data %d, the table %d" % [k, int(held[k]), int(a2.get("cooldown", -1)), int(kept.get(k, -1))])
 	print("    held at the data's figure: %s" % str(held))
@@ -645,6 +671,19 @@ func _s2_the_routes() -> void:
 		var route := String(c[5])
 		var host := String(c[6])
 		seen[hex] = true
+		# BATCH KJ — A HEX CARRIERLESS BY KJ's DESIGNER's PICKS (`KJ_CARRIERLESS`, a ruling owed) is held so: no move in the game lays it.
+		if KJ_CARRIERLESS.has(hex):
+			var laid_by: Array = []
+			var live: Dictionary = Enemies._load()
+			for k9 in live:
+				for a9 in live[k9]["abilities"]:
+					if String(((a9 as Dictionary).get("applies_status", {}) as Dictionary).get("id", "")) == hex:
+						laid_by.append("%s/%s" % [k9, String(a9["display_name"])])
+			print("    %-6s carrierless since KJ, by the designer's picks (its route was %s on %s/%s) — a ruling owed; laid today by %s" % [
+				hex, route, kind, host, str(laid_by)])
+			if not laid_by.is_empty():
+				wrong.append("%s is laid again, by %s — its carrierless entry outlived its reason; route it" % [hex, str(laid_by)])
+			continue
 		var a := _move(kind, host)
 		if a.is_empty():
 			wrong.append("%s's host %s/%s is not in the data" % [hex, kind, host])
@@ -694,12 +733,22 @@ func _s2_the_blows(s: Node) -> void:
 	var f: BattleUnit = foes[0]
 	var wrong: Array = []
 	var shape := {}
-	for c in _rows(_doc(KEPT_HEXES)):
-		if c.size() < 17:
+	var drive: Array = []
+	for c0 in _rows(_doc(KEPT_HEXES)):
+		if c0.size() < 17:
 			continue
+		# BATCH KJ — A CARRIERLESS HEX (`KJ_CARRIERLESS`) rides no blow to drive; the routes above hold it carrierless.
+		if KJ_CARRIERLESS.has(String(c0[2])):
+			print("    %-7s carrierless since KJ, by the designer's picks — no blow carries it" % String(c0[2]))
+			continue
+		drive.append([String(c0[0]), String(c0[2]), String(c0[6])])
+	# BATCH KJ — AND KJ's HEX MOVES (`KJ_HEX_BLOWS`), each a single blow that lays its hex, driven the same way.
+	for kj_key in KJ_HEX_BLOWS:
+		drive.append([String(kj_key).split("/")[0], String(KJ_HEX_BLOWS[kj_key]), String(kj_key).split("/")[1]])
+	for c in drive:
 		var kind := String(c[0])
-		var hex := String(c[2])
-		var host := String(c[6])
+		var hex := String(c[1])
+		var host := String(c[2])
 		var cfg := Enemies.config(kind)
 		var ab: Ability = null
 		for x in cfg["abilities"]:
@@ -737,12 +786,15 @@ func _s2_the_blows(s: Node) -> void:
 			if aim.has_status(hex) or aim.hp < aim.max_hp:
 				wrong.append("%s on %s at a hero behind a Mirror Image did not miss" % [hex, host])
 			_clean(aim)
-	# THE WARBAND's OTHER STATUS BLOW, THE SAME WAY: Poison Arrow misses its image and lays nothing.
-	var acfg := Enemies.config("archer")
+	# THE WARBAND's OTHER STATUS BLOW, THE SAME WAY: it misses its image and lays nothing (`STATUS_BLOW`).
+	var acfg := Enemies.config(String(STATUS_BLOW[0]))
 	var pa: Ability = null
 	for x2 in acfg["abilities"]:
-		if (x2 as Ability).display_name == "Poison Arrow":
+		if (x2 as Ability).display_name == String(STATUS_BLOW[1]):
 			pa = x2
+	# BATCH KJ — A CONTROL THAT FINDS NO BLOW PROVES NOTHING, and says so.
+	if pa == null:
+		wrong.append("no %s in %s's kit — the control's status blow is gone, so the drive proves nothing" % [STATUS_BLOW[1], STATUS_BLOW[0]])
 	if pa != null:
 		var aim2: BattleUnit = heroes[2]
 		_clean(aim2)
@@ -750,9 +802,10 @@ func _s2_the_blows(s: Node) -> void:
 		f.no_cover = 0
 		s._apply_status(aim2, "mirror", 3, 2)
 		await s._resolve(f, pa, aim2, "good")
-		print("    Poison Arrow at a hero behind a Mirror Image: poisoned %s, hurt %s; the hexes' single blows: %s" % [str(aim2.has_status("poison")), str(aim2.hp < aim2.max_hp), str(shape)])
-		if aim2.has_status("poison") or aim2.hp < aim2.max_hp:
-			wrong.append("Poison Arrow did not miss its image either — the drive proves nothing")
+		print("    %s at a hero behind a Mirror Image: %s %s, hurt %s; the hexes' single blows: %s" % [STATUS_BLOW[1], STATUS_BLOW[2],
+			str(aim2.has_status(String(STATUS_BLOW[2]))), str(aim2.hp < aim2.max_hp), str(shape)])
+		if aim2.has_status(String(STATUS_BLOW[2])) or aim2.hp < aim2.max_hp:
+			wrong.append("%s did not miss its image either — the drive proves nothing" % STATUS_BLOW[1])
 		_clean(aim2)
 	ok(shape.size() >= 2, "§2: the drive missed %d single blows that carry a hex, not two" % shape.size())
 	ok(wrong.is_empty(), "§2: a hex does not ride a blow as the warband's other status blows do: %s" % [wrong])
@@ -822,13 +875,23 @@ func _s3_the_carriers_turns(s: Node) -> void:
 					if (h2 as BattleUnit).has_status(String(hx3)):
 						laid[hx3] = int(laid[hx3]) + 1
 	var host_casts := {}
+	# BATCH KJ — A CARRIERLESS HEX's HOST (`KJ_CARRIERLESS`) is in no kit since KJ: held at none cast, and its hex at none laid.
+	var gone_casts := {}
 	for k in hosts:
-		host_casts[String(hosts[k][1])] = int(cast.get(String(hosts[k][1]), 0))
-	print("    CHECKED %d carriers, %d actions; laid on the party's side: %s; the hosts cast: %s" % [carriers.size(), actions, str(laid), str(host_casts)])
-	var silent: Array = HEXES.keys().filter(func(h): return int(laid[h]) < 1)
+		if KJ_CARRIERLESS.has(String(hosts[k][0])):
+			gone_casts[String(hosts[k][1])] = int(cast.get(String(hosts[k][1]), 0))
+		else:
+			host_casts[String(hosts[k][1])] = int(cast.get(String(hosts[k][1]), 0))
+	print("    CHECKED %d carriers, %d actions; laid on the party's side: %s; the hosts cast: %s; the carrierless hexes' hosts cast: %s" % [
+		carriers.size(), actions, str(laid), str(host_casts), str(gone_casts)])
+	var silent: Array = HEXES.keys().filter(func(h): return int(laid[h]) < 1 and not KJ_CARRIERLESS.has(String(h)))
+	for h0 in KJ_CARRIERLESS:
+		if int(laid.get(h0, 0)) > 0:
+			silent.append("%s (carrierless since KJ, yet laid %d)" % [h0, int(laid[h0])])
 	ok(carriers.size() == HEXES.size(), "§3: the board holds %d of the four carriers" % carriers.size())
 	ok(silent.is_empty(), "§3: a hex was never laid in its carrier's own turns — the code does not fire: %s" % [silent])
-	ok(host_casts.values().all(func(n): return int(n) >= 1), "§3: a move that carries a hex was never chosen in its carrier's own turns: %s" % str(host_casts))
+	ok(host_casts.values().all(func(n): return int(n) >= 1) and gone_casts.values().all(func(n): return int(n) == 0),
+		"§3: a move that carries a hex was never chosen in its carrier's own turns, or a carrierless hex's host was: %s, %s" % [str(host_casts), str(gone_casts)])
 	Engine.time_scale = 1.0
 
 

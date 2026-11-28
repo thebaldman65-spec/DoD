@@ -8,7 +8,8 @@
 #        each new roster fields four to six bodies, DERIVED through the composer's list (which the game's draw counts, `check_jv`)
 #        for every budget a fight node rolls
 #        (C03); a player's run and a sim's draw every zone at every stage (since JX), and a sim's flag
-#        holds the first (DRIVEN); each of the six's shares of a fight node as the state records it; and every background dict
+#        holds the first (DRIVEN); each of the six's shares of a fight node as the state records it (JS's world replayed: since
+#        KJ its kits, tiers and healths as KJ found them); and every background dict
 #        names the zone and a zone it does not name falls back (C05: the battle's DRIVEN, the map's and the event screen's read).
 #   §2   THE SIX KINDS: each its role, power and enemy role, its Attack its role's (C07), the zone's signature — frost resisted,
 #        fire not, slower and more armoured than the kind it stands for (the rule that picks it, DERIVED); each second move the
@@ -16,12 +17,16 @@
 #        cooldown the line's band (C06); the line's reference board where it stood, so no existing band moved; what each lays an
 #        existing status, and no status new (C08); the Sleetveil Matron a mender that Raises and heals — its heal chosen by the
 #        warband's door, DRIVEN — and the Stillwrought a second carrier of Sap (C09); the kept table `JS-kinds.tsv` re-derived
-#        row by row, and master §9's table row for each of the seven read against the data (H02).
+#        row by row, and master §9's table row for each of the seven read against the data (H02). Since KJ what §2 asks of JS's
+#        authorship — the kind each stands for, the second moves, what they lay, the spends, Sap's carriers, the Matron's Raise, the
+#        board, the kept table and the state's record — is asked of the six as KJ found them (`Gate.warband_before_kj()`); their
+#        shape and master's rows are read live.
 #   §3   THE ICEWROUGHT TITAN: the Frozen Plains' boss lays `frozen` on one hero for one turn with a blow (C10); DRIVEN on a real
 #        board — the freeze lands and costs the hero exactly one turn, a Block or a miss lays nothing, Ironclad and Hallowed refuse
 #        it, a cleanse lifts it (C11); no ability of its tagged with a rung, its kit the same at every rung (C12).
 #   §4   THE COUNT: the kept table carries the attacking fights' number on every row and says why a kind it never met was not met (C13).
-#   §5   WHAT IS DELIBERATELY NOT DONE: the warband's data with JS's additions taken out reads as JR landed it, the Cleric's cut
+#   §5   WHAT IS DELIBERATELY NOT DONE: the warband's data with JS's additions taken out (and since KJ, KJ's rework set aside)
+#        reads as JR landed it, the Cleric's cut
 #        stands (C14); the deck closed at twenty-five (C16).
 #   §6   the two readings and the projection; the player's files, as this gate found them.
 #   Every needle is the rule's own words, never the batch code beside them — but for the blocks' headings §0 reads, which are named for
@@ -91,7 +96,12 @@ const LAID := ["slow", "dazed", "sap", "frozen"]
 const STATUS_IDS_AT_HEAD := 168
 const STATUS_IDS_MD5 := "73daa5a35fc15fe44b74bf493d079976"
 # BATCH JW §3 — THE STATUSES AUTHORED SINCE, set aside from the digest: Black Rot, Noxious Fumes and Submerged.
-const STATUSES_SINCE := ["black_rot", "noxious_fumes", "submerged"]
+# BATCH KJ — and the enemy rework's seven: four hexes the warband lays on a hero, three a body of it wears.
+const STATUSES_SINCE := ["black_rot", "noxious_fumes", "submerged",
+	"silenced", "branded", "doomed", "singled_out", "guarding", "hunkered", "fury"]
+# BATCH KJ — WHAT KJ's REWORK MOVED IN A KIND (the designer's picks: each kit cut to its tier, two kinds a tier up, seven healths
+# into their band): §1's replay of JS's world reads these as KJ found them, and the live ones come back after it.
+const KJ_FIELDS := ["abilities", "power", "max_hp"]
 # THE REFERENCE BOARD THE LINE PRICES HEALS AND SPENDS ON (`check_ji` §1a, `check_jk` §2): the median composable body and the
 # median basic, DERIVED with the seven taken out and with them in. JS's six straddle both, so no band of an existing kind moved.
 # THE STATE's RECORD OF THE SIX SECOND MOVES' FIGURES (R01): the sentence and the moves it names, each read against the data.
@@ -159,6 +169,16 @@ func _initialize() -> void:
 	var live_zones := {}
 	for lk in Enemies._load():
 		live_zones[lk] = ((Enemies._load()[lk] as Dictionary).get("zones", []) as Array).duplicate()
+	# BATCH KJ — AND THE WARBAND AS KJ FOUND IT: KJ's rework is no part of JS's world, so the replay reads each kind's kit, power and
+	# health as they stood before it (`Gate.warband_before_kj()`, `KJ_FIELDS`), and the live ones come back with the tags.
+	var kj_before: Dictionary = Gate.warband_before_kj()
+	var live_kj := {}
+	for kk in Enemies._load():
+		if kj_before.has(kk):
+			live_kj[kk] = {}
+			for kf in KJ_FIELDS:
+				live_kj[kk][kf] = (Enemies._load()[kk] as Dictionary).get(kf)
+				(Enemies._load()[kk] as Dictionary)[kf] = (kj_before[kk] as Dictionary).get(kf)
 	Gate.rosters_before_jx(Enemies._load())
 	# BATCH KH §1 — AND THE KINDS ADDED SINCE STAND ASIDE FROM THE REPLAY, as `check_jr` §1's do: JS's world held none of them, and
 	# KH's seven stand in roster 1, where they would join JS's warbands. The live tags above bring them back.
@@ -168,8 +188,15 @@ func _initialize() -> void:
 	_s1_the_zone()
 	for lk in live_zones:
 		(Enemies._load()[lk] as Dictionary)["zones"] = live_zones[lk]
+	for kk2 in live_kj:
+		for kf2 in KJ_FIELDS:
+			(Enemies._load()[kk2] as Dictionary)[kf2] = live_kj[kk2][kf2]
 	var back := live_zones.keys().all(func(lk): return (Enemies._load()[lk] as Dictionary).get("zones", []) == live_zones[lk])
-	ok(back, "§1: the live roster tags did not come back after JS's replay — a later section reads rosters no build fields")
+	for kk3 in live_kj:
+		for kf3 in KJ_FIELDS:
+			if not is_same((Enemies._load()[kk3] as Dictionary).get(kf3), live_kj[kk3][kf3]):
+				back = false
+	ok(back, "§1: the live roster tags, or KJ's kits, tiers and healths, did not come back after JS's replay — a later section reads rosters no build fields")
 	_s1_the_draw()
 	_s2_the_six()
 	_s3_the_titan_data()
@@ -599,6 +626,13 @@ func _s1_the_backdrop(here: String, nowhere: String) -> void:
 func _s2_the_six() -> void:
 	print("\n§2 — the six kinds: role, Attack, the zone's signature, each second move at JI's line, the statuses they lay")
 	var data: Dictionary = Enemies._load()
+	# BATCH KJ — THE SIX AS JS AUTHORED THEM, AND THE WARBAND JS STOOD AMONG (`Gate.warband_before_kj()`): KJ cut every kit to its
+	# tier and gave each kind a move of the designer's (the Thrall and the Hailcaster a bite on the basic alone, the Bulwark a
+	# brace, the Rimehorn a fury, the Matron a heal without the Raise, the Stillwrought a Silence), and moved the Totemist a tier.
+	# What §2 asks of JS's authorship — the kind each stands for, each second move at JI's line and what it lays, the spends,
+	# Sap's carriers, the Matron's Raise, no status laid but those standing before JS, the reference board, the kept table and
+	# the state's record — is asked of the six as KJ found them; their shape is read live, and master §9's rows against the data.
+	var js_data: Dictionary = Gate.warband_before_kj()
 	var price := float(JI.break_figures().get("price", -1.0))
 	ok(price > 0.0, "§2: the Break price could not be read off check_ji")
 	var dot := _dot(null)
@@ -629,12 +663,13 @@ func _s2_the_six() -> void:
 			wrong.append("%s does not resist frost and fall to fire: %s" % [k, str(res)])
 		if eq.is_empty() or not (float(kd.get("speed", 999.0)) < float(eq.get("speed", 0.0)) and float(kd.get("armor", 0.0)) > float(eq.get("armor", 1.0))):
 			wrong.append("%s is not slower and more armoured than the %s it stands for" % [k, String(spec[3])])
-		var picked := _stands_for(data, kd)
+		var picked := _stands_for(js_data, kd)
 		if picked != String(spec[3]):
 			wrong.append("%s stands for the %s by the rule, not the %s" % [k, picked, String(spec[3])])
 		# C06 — THE SECOND MOVE: the least whole damage that clears the line, its cooldown the line's band.
-		var basic := _basic(kd)
-		var second := _move(kd, String(spec[5]))
+		var js_kd: Dictionary = js_data.get(k, {})
+		var basic := _basic(js_kd)
+		var second := _move(js_kd, String(spec[5]))
 		if basic.is_empty() or second.is_empty():
 			line_wrong.append("%s holds no basic or no %s" % [k, spec[5]])
 			continue
@@ -644,9 +679,9 @@ func _s2_the_six() -> void:
 		var least := true
 		if String(spec[6]) == "heal":
 			var bodies: Array = []
-			for k2 in data:
-				if not bool((data[k2] as Dictionary).get("is_boss", false)):
-					bodies.append(float(data[k2]["max_hp"]))
+			for k2 in js_data:
+				if not bool((js_data[k2] as Dictionary).get("is_boss", false)):
+					bodies.append(float(js_data[k2]["max_hp"]))
 			m = float(JI.HEALS.get(String(second.get("special", "")), 0.0)) * _median(bodies) / bp
 		else:
 			m = JI.line_blow(second, dot, atk, price) / bp
@@ -673,7 +708,7 @@ func _s2_the_six() -> void:
 			laid_wrong.append("%s's %s lays Dazed on one hero, not over an area" % [k, spec[5]])
 		# ITS SPEND.
 		var spend := false
-		for a in kd.get("abilities", []):
+		for a in js_kd.get("abilities", []):
 			if String((a as Dictionary).get("special", "")) == String(spec[7]) and int((a as Dictionary).get("cooldown", 0)) > 0:
 				spend = true
 		if not spend:
@@ -695,19 +730,19 @@ func _s2_the_six() -> void:
 	ok(laid_wrong.is_empty(), "§2: a kind does not lay, heal or spend what the brief gives it: %s" % [laid_wrong])
 	# C09 — THE WARDEN IS A MENDER THAT HEALS AND RAISES IN THE FINALE; THE STILLWROUGHT CARRIES SAP THERE.
 	var sap_by: Array = []
-	for k4 in data:
-		for a2 in (data[k4] as Dictionary).get("abilities", []):
+	for k4 in js_data:
+		for a2 in (js_data[k4] as Dictionary).get("abilities", []):
 			if String(((a2 as Dictionary).get("applies_status", {}) as Dictionary).get("id", "")) == "sap" and not sap_by.has(k4):
 				sap_by.append(k4)
 	sap_by.sort()
 	print("    Sap is laid by %s" % str(sap_by))
 	ok(sap_by.has("stillwrought") and sap_by.has("hexer"), "§2: Sap is laid by %s — the Stillwrought is its second carrier, beside the Orc Hexer" % str(sap_by))
-	ok(data.has("hoarfrost_warden") and (data["hoarfrost_warden"]["roles"] as Array).has("mender") and not _move(data.get("hoarfrost_warden", {}), "Raise").is_empty(),
+	ok(js_data.has("hoarfrost_warden") and (js_data["hoarfrost_warden"]["roles"] as Array).has("mender") and not _move(js_data.get("hoarfrost_warden", {}), "Raise").is_empty(),
 		"§2: the Sleetveil Matron is not a mender that Raises")
 	# C08 — NO STATUS AUTHORED: what the seven lay stood before JS, and STATUS_INFO holds the ids it held.
 	var bad: Array = []
 	for k5 in SIX.keys() + [BOSS]:
-		for a3 in (data.get(k5, {}) as Dictionary).get("abilities", []):
+		for a3 in (js_data.get(k5, {}) as Dictionary).get("abilities", []):
 			var id := String(((a3 as Dictionary).get("applies_status", {}) as Dictionary).get("id", ""))
 			if id != "" and not LAID.has(id):
 				bad.append("%s lays %s" % [k5, id])
@@ -723,15 +758,15 @@ func _s2_the_six() -> void:
 	var basics: Array = []
 	var bodies_before: Array = []
 	var basics_before: Array = []
-	for k6 in data:
-		if not bool((data[k6] as Dictionary).get("is_boss", false)):
+	for k6 in js_data:
+		if not bool((js_data[k6] as Dictionary).get("is_boss", false)):
 			var is_js: bool = SIX.has(k6) or String(k6) == BOSS
-			bodies2.append(float(data[k6]["max_hp"]))
+			bodies2.append(float(js_data[k6]["max_hp"]))
 			if not is_js:
-				bodies_before.append(float(data[k6]["max_hp"]))
-			var b6 := _basic(data[k6])
+				bodies_before.append(float(js_data[k6]["max_hp"]))
+			var b6 := _basic(js_data[k6])
 			if not b6.is_empty():
-				var w6: float = JI.line_blow(b6, dot, float(data[k6]["attack"]), price)
+				var w6: float = JI.line_blow(b6, dot, float(js_data[k6]["attack"]), price)
 				basics.append(w6)
 				if not is_js:
 					basics_before.append(w6)
@@ -747,16 +782,16 @@ func _s2_the_six() -> void:
 	ok(rec.contains(RECORD_SAYS), "§2: the state holds no record of the second moves' figures (%s)" % RECORD_HEAD)
 	var stale: Array = []
 	for k7 in SIX.keys() + [BOSS]:
-		if not data.has(k7):
+		if not js_data.has(k7):
 			continue
 		var nm := String(SIX[k7][5]) if SIX.has(k7) else FREEZE
-		var mv := _move(data[k7], nm)
+		var mv := _move(js_data[k7], nm)
 		if mv.is_empty() or int(mv.get("damage", 0)) <= 0:
 			continue
 		if not rec.contains("%s %d" % [nm, int(mv["damage"])]):
 			stale.append("%s %d" % [nm, int(mv["damage"])])
 	ok(stale.is_empty(), "§2: the state's record does not state the second moves as the data holds them: %s" % [stale])
-	_s2_the_kept_table(data, dot, price)
+	_s2_the_kept_table(js_data, dot, price)
 	_s2_the_master_rows(data)
 
 
@@ -1179,7 +1214,9 @@ func _s4_the_count() -> void:
 
 func _s5_not_done() -> void:
 	print("\n§5 — the warband as JR landed it beside JS's additions, the Cleric's cut, the deck at twenty-five")
-	var data: Dictionary = Enemies._load().duplicate(true)
+	# BATCH KJ — THE WARBAND AS KJ FOUND IT (`Gate.warband_before_kj()`): KJ's rework, the designer's picks, is set aside as a
+	# later batch's kinds are, so the digest goes on asking whether anything else moved in the warband JS's batch left.
+	var data: Dictionary = Gate.warband_before_kj().duplicate(true)
 	# BATCH JX §1 — THE ROSTER TAGS AS THEY STOOD BEFORE THE STAGES, put back first (JX folded roster 3 into 1 and 5 into 4): this gate digests the warband its batch left.
 	Gate.rosters_before_jx(data)
 	for k in SIX.keys() + [BOSS] + ADDED_SINCE:

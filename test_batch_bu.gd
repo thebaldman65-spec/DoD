@@ -315,7 +315,12 @@ func _synergy_rule() -> void:
 	ok(at_block > 0, "the BU block is anchored in classes.gd")
 	if at_block <= 0:
 		return
-	var block := src.substr(at_block)
+	# REPAIRED AT KJ §1 (IT's positional census, its STANDING row on this pick, owed by KJ's touch of the file): the block ran
+	# to the end of the file, so a card of the nine defined in any later tranche still sat "inside the BU block". It ends
+	# where the Cleric tranche does, at the next tranche's header.
+	var end_block := src.find("THE HUNTER NINE ==========", at_block)
+	ok(end_block > at_block, "the BU block ends at the next tranche's header")
+	var block := src.substr(at_block, (end_block - at_block) if end_block > at_block else -1)
 	for n in NINE:
 		var at := block.find('"%s":' % n)
 		ok(at > 0, "%s sits inside the BU block" % n)
@@ -795,6 +800,9 @@ func _live_reprisal() -> void:
 	holy.heal_by_turn.clear()
 	holy.heal_by_turn[9] = 200
 	var foe: BattleUnit = _live_foes(scene)[0]
+	# BATCH KJ — made deep, so the doubled blow below is read whole: KJ's health bands cut the foe, and its death
+	# clamped the larger arm.
+	foe.max_hp = 100000
 	foe.hp = foe.max_hp
 	var foe_was: int = foe.hp
 	var pressure_was: int = foe.pressure

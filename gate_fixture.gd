@@ -1059,3 +1059,15 @@ static func menu_button(screen: Node) -> MenuButton:
 		for k in cur.get_children():
 			stack.append(k)
 	return null
+
+
+# BATCH KJ — THE WARBAND AS IT STOOD BEFORE KJ's REWORK, a kept copy (`docs/reports/KJ-warband-before.json`, KI's data byte for
+# byte). KJ cut every kind's kit to its tier and authored new moves, the designer's picks; a gate that holds the warband its own
+# batch left reads this door, so KJ's rework is set aside as a later batch's kinds are by ADDED_SINCE, and the gate goes on
+# asking its own question of what its batch left. `Enemies._load()` stays the door for anything about the game today.
+const KJ_WARBAND_BEFORE := "res://docs/reports/KJ-warband-before.json"
+
+
+static func warband_before_kj() -> Dictionary:
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(KJ_WARBAND_BEFORE))
+	return parsed if parsed is Dictionary else {}

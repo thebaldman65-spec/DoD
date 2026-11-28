@@ -3,12 +3,14 @@
 #   §1a  THE POPULATION, DERIVED FROM THE DATA AND NEVER LISTED: every enemy ability priced against its own enemy's basic
 #        attack — a blow by its damage and the Burn, Poison or Fester it lays, and since JO §1 its Break damage, times the heroes it
 #        reaches; a heal by the health it restores — and every one at or past the line carries exactly the figure its multiple names, every other none, and a
-#        basic never one (C01, C02). The table prints, every battery.
+#        basic never one (C01, C02); a cooldown a designer set by hand carries the designer's figure, named beside the line
+#        (`TUNED`; KJ's rework's in `KJ_RULED`, each with its reason, an entry the line agrees with or the data lacks red). The
+#        table prints, every battery.
 #   §1b  THE UNIT IS THE ENEMY's OWN TURN: the loop ticks a unit's cooldowns at its own turn's start on all three of its paths
 #        and nowhere else, held at source (C03); and a move cast is refused for exactly its cooldown of the unit's own ticks
-#        after it, driven by this gate's hand.
+#        after it, driven by this gate's hand on one plain blow that cools (`TICK_DRIVE`).
 #   §1c  THE SELECTION ASKS THE COOLDOWN: at a declaration, a move still cooling when its turn comes is never chosen, a move
-#        ready by then is; at re-validation nothing falls back; a support cast the same (C04); and the callers pass the ticks
+#        ready by then is; at re-validation nothing falls back; a support cast the same — a heal, a guard, a brace (C04); and the callers pass the ticks
 #        that fall before the move — one at a turn's end, two from a stunned or frozen turn, none at re-validation (C04b–d).
 #   §1d  EVERY KIND KEEPS A MOVE: with every move but its basic cooling, every kind still declares its basic (C04, C05).
 #   §1e  THE PLATE: a cast lays the chip, each of the enemy's own turns counts it down, and it is gone when the move is back;
@@ -18,7 +20,8 @@
 #   §2   ENCUMBERED BINDS BOTH SIDES: one branch stamps every unit on the field, so an enemy's cooling move costs two more of
 #        its turns and its basic none; the record says so and calls its reading stale (C07).
 #   §3   THE BEFORE FIGURE: the record holds the reading the arc's fifth batch starts from, as its kept table holds it (C08).
-#   §4   WHAT IS DELIBERATELY NOT DONE: no enemy figure but the cooldown key moved; the deck closed; Encumbered's grade.
+#   §4   WHAT IS DELIBERATELY NOT DONE: no enemy figure but the cooldown key moved, of the warband as it stood before KJ's rework
+#        (`Gate.warband_before_kj()`; KJ's kits are the designer's picks); the deck closed; Encumbered's grade.
 #   §5   THE PLAYER'S FILES, as this gate found them.
 #
 #   Every needle is the rule's own words, never the batch code beside them (EA §2).
@@ -39,6 +42,26 @@ const LINE := 1.4
 # BATCH KH §1 — and the Antlered Huntmaster's, the Chief's Maul copied with his every figure, the designer's (RECORD_KH,
 # answer 3: *Each copies its Orc*).
 const TUNED := {"rimeclad_warlord/Avalanche Maul": 0, "drowned_thane/Barrow Maul": 0, "antlered_huntmaster/Antler Rend": 0}
+# BATCH KJ — THE THREE MAUL COPIES ABOVE ARE NOT IN THE GAME SINCE KJ (War Cry took each Maul's place, the designer's F1 pick), nor are
+# nine of the moves `HELD` names below: KJ cut every kit to its tier. Their entries stand as KG's, KH's and JO's records of the
+# warband before KJ — `check_jo` §1 holds `HELD` against that warband, `check_jk` §2 reads it for the spends still in the game — and
+# §1a meets only the moves the game still holds.
+# BATCH KJ — THE COOLDOWNS KJ's DESIGNER SET BY HAND ("kind/Move": its cooldown), held beside the line as `TUNED` is: the enemy
+# rework's new moves, each figure the designer's (KJ's record, the seven answers) — the four Flank moves at their basic's numbers
+# (answer 1), the Brute's Skullsplitter (answer 2), the four hex moves at their basic's damage (answer 3), the two braces (answer 4),
+# the three guards (answer 5) and the elites' War Cry, the Maul's blow (answer 6). The line gives none of them its figure: a guard and
+# a brace deal nothing, a Flank or a hex move prices as its own basic, Skullsplitter and War Cry under twice theirs. §1a prints the
+# line's band beside each, and reds an entry the line agrees with (its reason gone) or one the data no longer holds.
+const KJ_RULED := {"wolfrider/Harrying Bite": 2, "ashblade/Cinder Flank": 2, "bristleback/Gang Gore": 2, "carrion_pack/Pack Rend": 2,
+	"brute/Skullsplitter": 3,
+	"hexer/Choking Hex": 3, "stillwrought/Stillness": 3, "blightcap/Rot Brand": 3, "blight_speaker/Carrion Mark": 3,
+	"icebound_bulwark/Frozen Stance": 3, "mossback/Moss Shell": 3,
+	"shieldmaster/Shield Guard": 4, "heartwood_sentinel/Rootguard": 4, "bog_troll/Bog Guard": 4,
+	"chief/War Cry": 3, "antlered_huntmaster/War Cry": 3, "rimeclad_warlord/War Cry": 3, "drowned_thane/War Cry": 3}
+# §1b's DRIVE: one plain blow that cools, cast and ticked by this gate's hand ([kind, move]).
+# BATCH KJ — THE WHELP's RECKLESS LUNGE WENT WITH KJ's TIER-1 KITS (the basic alone, the designer's picks), so the drive takes a plain
+# blow that cools in the game today: the Wolfrider's Harrying Bite.
+const TICK_DRIVE := ["wolfrider", "Harrying Bite"]
 const FIGURES := [[2.0, 2], [3.0, 3]]
 const TOP := 4
 # JO §1 — A POINT OF BREAK DAMAGE IS PRICED AT A HERO TURN's DAMAGE DIVIDED BY THE BREAK METER's SIZE (the designer's). A filled meter
@@ -71,6 +94,9 @@ const HEAL_SITES := {"healing_wave": "target.max_hp * 0.25", "wild_growth": "tar
 const SELF_HEALS := ["Regenerate"]
 # A ward and a cleanse have no exchange rate on the enemy's own data, so they are not priced.
 const UNPRICED := ["enemy_shield", "cleanse_allies"]
+# BATCH KJ — THE SUPPORT HALF's OTHER CASTS THAT COOL: the guard and the brace KJ's designer picked (`_enemy_support_action` finds each
+# by its payload). §1c drives each on the support board, as a heal is, since a taunt passes the support half by.
+const SUPPORT_CASTS := ["bodyguard", "brace"]
 # The data as it stood before the warband took cooldowns, every `cooldown` key aside: no other figure moved.
 # JJ §3 re-pinned it: Healing Wave's words lost *under 40% health* with the policy that read it (the healers heal whenever the
 # warband's pool allows and a body is hurt); its 25% and every other figure stand.
@@ -79,6 +105,8 @@ const UNPRICED := ["enemy_shield", "cleanse_allies"]
 # JO re-pinned it: seven of those ten brought to the line priced with their Break, and the four hexes onto blows — Sap and Fester
 # folded onto Bone Rattle and the Wretched Bellow, Gall and Mire given damage, the hex special gone — and `check_jo` §1 and §2 hold
 # that nothing else moved; every other figure stands.
+# BATCH KJ — AND SINCE KJ §4 READS IT OFF THE WARBAND AS IT STOOD BEFORE KJ's REWORK (`Gate.warband_before_kj()`): KJ's kits are the
+# designer's picks, and this digest is of the warband JI's arc left.
 const DATA_BEFORE := "ac418b1c8b40987acda318ffd3b457c2"
 # BATCH JR — THREE APPEARANCE TAGS MOVED AFTER THIS GATE LANDED (JR §1): the Grave Totem and the Rot Behemoth each took a
 # roster, the Orc Hexer a second role. Each is named here and put back before the digest, so it goes on asking whether
@@ -366,6 +394,7 @@ func _s1a_the_population(s: Node) -> void:
 	var spends := 0
 	var hexes := 0
 	var stale_holds: Array = []
+	var kj_seen: Array = []
 	for kind in data:
 		var k: Dictionary = data[kind]
 		var basic: Dictionary = {}
@@ -412,6 +441,14 @@ func _s1a_the_population(s: Node) -> void:
 			var want := 0 if (m < 0.0 or a == basic) else _figure(m)
 			if TUNED.has("%s/%s" % [kind, name]):
 				want = int(TUNED["%s/%s" % [kind, name]])
+			# BATCH KJ — A COOLDOWN KJ's DESIGNER SET BY HAND (`KJ_RULED`): the designer's figure, the line's printed beside it; an entry
+			# the line agrees with outlived its reason, as a stale hold does.
+			if KJ_RULED.has("%s/%s" % [kind, name]):
+				kj_seen.append("%s/%s" % [kind, name])
+				if want == int(KJ_RULED["%s/%s" % [kind, name]]):
+					stale_holds.append("%s/%s (the designer's, by hand)" % [kind, name])
+				how += "; the line gives %d, the designer's %d" % [want, int(KJ_RULED["%s/%s" % [kind, name]])]
+				want = int(KJ_RULED["%s/%s" % [kind, name]])
 			# A HELD BAND: the data keeps its figure, the line's printed beside it; a hold the line agrees with is a stale one.
 			if HELD.has("%s/%s" % [kind, name]):
 				if want == int(HELD["%s/%s" % [kind, name]]):
@@ -424,12 +461,17 @@ func _s1a_the_population(s: Node) -> void:
 				_pop.append([String(kind), name, want])
 			if want != have:
 				wrong.append("%s's %s carries %d, the rule gives %d (%s)" % [kind, name, have, want, how])
+	# BATCH KJ — AN ENTRY OF `KJ_RULED` THE DATA NO LONGER HOLDS outlived its move: it reds with the data's disagreements.
+	for kj_key in KJ_RULED:
+		if not kj_seen.has(kj_key):
+			wrong.append("%s: the designer's cooldown is held for a move the data does not hold" % kj_key)
 	rows.sort_custom(func(x, y): return float(x[0]) > float(y[0]))
 	for r in rows:
 		if float(r[0]) >= 1.0 and String(r[5]) != "its basic" or int(r[4]) > 0:
 			print("    %5.2f  %-16s %-18s rule %d, data %d  — %s" % [float(r[0]), r[1], r[2], int(r[3]), int(r[4]), r[5]])
 	print("    CHECKED %d of %d moves in %d kinds; the median composable body %.1f; %d take a cooldown" % [rows.size(), total, data.size(), body, _pop.size()])
 	print("    and %d Malice spends beside them, priced by check_jk §2; %d moves lay a hex and deal nothing (the hexes ride blows, priced above)" % [spends, hexes])
+	print("    %d of %d cooling moves carry a figure the designer set by hand (KJ_RULED), the line's band printed beside each" % [kj_seen.size(), _pop.size()])
 	ok(rows.size() == total and total >= 50, "§1a: the walk priced %d of %d moves" % [rows.size(), total])
 	ok(wrong.is_empty(), "§1a: the data and the rule disagree: %s" % [wrong])
 	ok(basics_cooling.is_empty(), "§1a: a basic attack carries a cooldown: %s" % [basics_cooling])
@@ -450,15 +492,15 @@ func _s1b_the_tick(s: Node) -> void:
 	ok(res.contains("\t\telse:\n\t\t\tattacker.start_cooldown(ab)\n"), "§1b: `_resolve` no longer starts the cooldown of whoever cast")
 	var foes := _foes(s)
 	var w: BattleUnit = foes[0]
-	_as_kind(w, "whelp")
-	var lunge := _ab(w, "Reckless Lunge")
+	_as_kind(w, String(TICK_DRIVE[0]))
+	var lunge := _ab(w, String(TICK_DRIVE[1]))
 	var cd := lunge.cooldown if lunge != null else 0
-	ok(lunge != null and cd == _data_cd("whelp", "Reckless Lunge") and cd > 0, "§1b: the Whelp's Reckless Lunge carries no cooldown (%d)" % cd)
+	ok(lunge != null and cd == _data_cd(String(TICK_DRIVE[0]), String(TICK_DRIVE[1])) and cd > 0, "§1b: the %s's %s carries no cooldown (%d)" % [TICK_DRIVE[0], TICK_DRIVE[1], cd])
 	if lunge == null or cd <= 0:
 		return
 	var heroes := _heroes(s)
 	await s._resolve(w, lunge, heroes[0], "good")
-	ok(int(w.cooldowns.get("Reckless Lunge", 0)) == cd + 1, "§1b: the cast set its counter to %d, not one past its cooldown" % int(w.cooldowns.get("Reckless Lunge", 0)))
+	ok(int(w.cooldowns.get(String(TICK_DRIVE[1]), 0)) == cd + 1, "§1b: the cast set its counter to %d, not one past its cooldown" % int(w.cooldowns.get(String(TICK_DRIVE[1]), 0)))
 	# THE UNIT's OWN TICK, BY THIS GATE's HAND: what is measured is the cast's one-past against the tick's one-less; WHERE the loop
 	# ticks (each unit's own turn, on all three paths, and nowhere else) is held by the source arms above (C03).
 	var back_on := -1
@@ -467,7 +509,7 @@ func _s1b_the_tick(s: Node) -> void:
 		w.tick_cooldowns()
 		if back_on < 0 and bool(s._intent_ability_usable(w, lunge)):
 			back_on = turn
-	print("    Reckless Lunge (cooldown %d): back on the Whelp's own turn %d after the cast" % [cd, back_on])
+	print("    %s (cooldown %d): back on the %s's own turn %d after the cast" % [TICK_DRIVE[1], cd, TICK_DRIVE[0], back_on])
 	ok(back_on == cd + 1, "§1b: the move came back on its turn %d, not %d — it waited %d of its turns, not %d" % [back_on, cd + 1, back_on - 1, cd])
 
 
@@ -513,7 +555,8 @@ func _s1c_the_selection(s: Node) -> void:
 		var name := String(entry[1])
 		_as_kind(f, kind)
 		var ab := _ab(f, name)
-		if ab != null and HEALS.has(ab.special):
+		# BATCH KJ — and the guard and the brace (`SUPPORT_CASTS`), the support half's casts as a heal is.
+		if ab != null and (HEALS.has(ab.special) or SUPPORT_CASTS.has(ab.special)):
 			_support_board(f, others)
 			_full_pool(s)
 		elif ab != null:
@@ -591,7 +634,7 @@ func _s1c_the_callers(s: Node, f: BattleUnit, others: Array) -> void:
 		var ab := _ab(f, name)
 		if ab == null:
 			continue
-		if HEALS.has(ab.special):
+		if HEALS.has(ab.special) or SUPPORT_CASTS.has(ab.special):
 			_support_board(f, others)
 			_full_pool(s)
 		else:
@@ -844,7 +887,9 @@ func _strip(v: Variant) -> Variant:
 
 func _s4_not_done() -> void:
 	print("\n§4 — no enemy figure but the cooldown moved; the deck closed; Encumbered's grade")
-	var raw: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/enemies.json"))
+	# BATCH KJ — THE WARBAND AS IT STOOD BEFORE KJ's REWORK (`Gate.warband_before_kj()`): KJ cut every kit to its tier and authored
+	# new moves, the designer's picks, so this digest asks its question of the warband JI's arc left, as the strips below do.
+	var raw: Variant = Gate.warband_before_kj()
 	# BATCH JX §1 — THE ROSTER TAGS AS THEY STOOD BEFORE THE STAGES, put back first (JX folded roster 3 into 1 and 5 into 4): this gate digests the warband its batch left.
 	Gate.rosters_before_jx(raw)
 	# BATCH JR — THREE APPEARANCE TAGS MOVED AFTER THIS GATE LANDED (JR §1), each named in `MOVED_SINCE` and put back
@@ -863,7 +908,7 @@ func _s4_not_done() -> void:
 	# whether anything else in the warband's data moved.
 	((raw as Dictionary).get("withered_warden", {}) as Dictionary).erase("rootbound")
 	var digest := JSON.stringify(_strip(raw)).md5_text()
-	print("    the data, every cooldown key aside: %s" % digest)
+	print("    the warband before KJ's rework, every cooldown key aside: %s" % digest)
 	ok(digest == DATA_BEFORE, "§4: a figure of the warband moved beside its cooldowns (%s)" % digest)
 	ok((_run.MODIFIERS as Dictionary).size() == DECK_CLOSED_AT, "§4: the deck holds %d, not the twenty-five it closed at" % (_run.MODIFIERS as Dictionary).size())
 	var enc: Dictionary = _run.MODIFIERS.get("encumbered", {})

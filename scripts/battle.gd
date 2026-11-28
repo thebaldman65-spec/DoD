@@ -251,7 +251,15 @@ const STATUS_INFO := {
 	"black_rot": ["Black Rot", "Rk", Color(0.30, 0.34, 0.22), "Takes %d%% of its own maximum health per\nstack at the start of each turn. It never\nruns out; a cleanse lifts it." % [int(round(BattleUnit.BLACK_ROT_PCT * 100))]],
 	"noxious_fumes": ["Noxious Fumes", "Fu", Color(0.56, 0.64, 0.30), "Single-target attacks are %d%%\nmore likely to miss." % [int(round(NOXIOUS_FUMES_MISS_PCT * 100))]],
 	"submerged": ["Submerged", "Su", Color(0.30, 0.50, 0.56), "Beneath the water: no blow, card or\nspell can pick it. It still acts."],
-	"shielded": ["Shielded", "Sh", Color(0.95, 0.65, 0.25), "Takes 25% less strike damage\n(a Shieldmaster's or a Sentinel's\nward, or the Hollow Crown's Regalia)."],
+	"shielded": ["Shielded", "Sh", Color(0.95, 0.65, 0.25), "Takes 25% less strike damage\n(the Hollow Crown's Regalia)."],
+	# BATCH KJ — THE REWORK's STATUSES: four afflictions the warband lays on a hero, three a body of it wears.
+	"silenced": ["Silenced", "Sd", Color(0.70, 0.75, 0.95), "On this hero's next turn, only its\nbasic attack (a Silence)."],
+	"branded": ["Branded", "Bm", Color(0.85, 0.45, 0.35), "Each ability this hero uses costs it\n%d%% of its maximum health (a Brand)." % [int(round(BRAND_PCT * 100))]],
+	"doomed": ["Doomed", "Dm", Color(0.75, 0.35, 0.45), "Every blow of the warband on this\nhero deals %d%% more (Carrion Mark)." % [int(round(MARK_PCT * 100))]],
+	"singled_out": ["Singled Out", "S!", Color(0.95, 0.40, 0.30), "The warband aims every blow it\nreadies at this hero (War Cry); a\ntaunt still draws them."],
+	"guarding": ["Guarding", "Gd", Color(0.60, 0.70, 0.90), "The first blow each turn aimed at\nanother body of its warband lands on\nthis guard instead. A Break or a\nDispel ends it."],
+	"hunkered": ["Hunkered", "Hk", Color(0.55, 0.75, 0.85), "Takes %d%% of each blow until its next\nturn, and strikes back at each hero\nwho hits it in melee with a\nphysical blow." % [int(round(BRACE_TAKEN * 100))]],
+	"fury": ["Fury", "Fy", Color(0.95, 0.30, 0.25), "Its blows deal %d%% more for the rest\nof the fight, unless a Dispel lifts it." % [int(round(ENRAGE_PCT * 100))]],
 	"wrath": ["Divine Wrath", "DW", Color(1.0, 0.85, 0.35), "+15% damage dealt and +15% speed."],
 	"umbral_sigil": ["Umbral Sigil", "US", Color(0.55, 0.30, 0.70), "Branded: half of every strike this\nunit takes echoes to its whole\nwarband."],
 	# BATCH CK §3 — THIS FALLBACK CARRIES NO MAGNITUDE ON PURPOSE, AND THAT IS
@@ -1149,6 +1157,35 @@ const CORPSE_EXPLOSION_HEAL_PCT := 0.15       # Corpse Explosion: the share of i
 const CORPSE_EXPLOSION_AT := 0.5              # Corpse Explosion: declared only at or under this share of the Rotfiend's health
 const SUBMERGE_TURNS := 3                     # Submerge: the turns it lays
 const SUBMERGE_AT := 0.5                      # Submerge: cast once a fight, under this share of the Fen Lurker's health
+# BATCH KJ — THE ENEMY REWORK's FIGURES, every one the designer's (KJ's record: the options page and the seven answers), each
+# its own constant: a re-tune of one moves none of the others.
+const FLANK_PCT := 0.5                        # a Flank move: more to a hero another body struck since that hero's last turn
+const FLANK_MOVES := ["Harrying Bite", "Cinder Flank", "Gang Gore", "Pack Rend"]  # the Flank moves, by name (the support half's way)
+const MARK_PCT := 0.25                        # Doomed (Carrion Mark): more from every blow of the warband on the hero
+const BRAND_PCT := 0.06                       # Branded (Rot Brand): of the hero's maximum health, for each ability it uses
+const BODYGUARD_TURNS := 2                    # Shield Guard, Rootguard, Bog Guard: the turns it guards
+const BRACE_TAKEN := 0.5                      # Frozen Stance, Moss Shell: the share of a blow a Hunkered body takes
+const BRACE_STRIKE_FRAC := 0.5                # ... and the share of its basic attack it strikes back with
+const ENRAGE_AT := 0.5                        # Frost Fury: roars the first time it falls to this share of its health
+const ENRAGE_PCT := 0.3                       # ... and its blows land this much harder for the rest of the fight
+const KJ_HEAL_SPECIALS := ["healing_wave", "wild_growth", "totem_pulse"]  # the heals the warband casts (Static Charge counts them)
+# THE TWELVE RECIPE COMBOS (`Run.THEMES`' names), each the designer's pick and figure.
+const COMBINED_ARMS_KINDS := 3                # Warband: the kinds that must stand
+const COMBINED_ARMS_PCT := 0.15               # ... and how much harder the warband's blows land
+const PACK_TACTICS_PCT := 0.08                # Swarm: a skirmisher's or an archer's, for each other body standing
+const ALPHA_PCT := 0.2                        # Monster Den: the rest of the warband while a brute stands
+const ALPHA_DAZE_TURNS := 2                   # ... Dazed when the last brute falls: its holder's next turn (it ticks at its start)
+const CURSE_DEBUFFS := 2                      # Cursed Company: the debuffs a hero must carry
+const CURSE_PCT := 0.25                       # ... and how much more it takes from the warband
+const HONOR_GUARD_CUT := 0.4                  # Honor Guard: less the elite takes while a tank stands
+const RITE_TURNS := 4                         # Ritual: the count, in healers' turns
+const FOCUS_FIRE_PCT := 0.15                  # Poison Volley: more the most-poisoned hero takes from archers
+const STATIC_CHARGES := 3                     # Lightning Storm: the heals that charge the next blow to strike every hero
+const BLOOD_WATER_AT := 0.5                   # Rage Company: the share of its health a hero falls under to draw the skirmishers
+const INTERLOCK_CUT := 0.08                   # Guardian Circle: less the warband takes for each tank standing
+const FIELD_MEDIC_PCT := 0.5                  # Elite Patrol: larger the heals on the elite
+const RETINUE_ESCORTS := 2                    # Boss Escort: the escort that must stand
+const RETINUE_CUT := 0.25                     # ... and less the boss takes while it does
 const SNARE_LINE_TURNS := 2                   # Snare Line
 const LOADED_SHOT_PERFECT_POISON_TURNS := 2   # Loaded Shot: the Poison's turns (Perfect)
 const HUNT_PERFECT_PCT := 0.20                # Hunt (Perfect)
@@ -2159,6 +2196,7 @@ func _spawn_units() -> void:
 				sw_budget, sw_zone])
 		else:
 			composition = sw_band
+			_kj_combo = env_theme if KJ_COMBOS.has(env_theme) else ""
 	elif env_theme != "":
 		# DOD_SIM_THEME="Cursed Company" rolls a fresh warband of that theme
 		# for EVERY sim battle (DOD_SIM_BUDGET, default 6, sets the exact
@@ -2176,8 +2214,12 @@ func _spawn_units() -> void:
 				env_theme, t_budget, t_zone])
 		else:
 			composition = themed
+			_kj_combo = env_theme if KJ_COMBOS.has(env_theme) else ""
 	elif Run.active and Run.encounter.has("enemies"):
 		composition = Run.encounter["enemies"]
+		# BATCH KJ — THE FIGHT's RECIPE CARRIES ITS COMBO: the theme the map drew beside the warband it drew.
+		var kj_theme := String(Run.encounter.get("theme", ""))
+		_kj_combo = kj_theme if KJ_COMBOS.has(kj_theme) else ""
 	var layout: Array = ENEMY_LAYOUTS[clampi(composition.size(), 1, 6)]
 	# Scaling rebase (Batch 36, rates halved in Batch T): each zone runs its
 	# OWN tier ladder (+2% Attack / +2.5% HP of base per tier) — 1..16 since
@@ -2248,6 +2290,8 @@ func _spawn_units() -> void:
 	_fit_enemy_target_zones(enemies)
 	# BATCH JJ §2 — and its pool stands above it, empty, for the whole fight.
 	_draw_malice_strip()
+	# BATCH KJ — and the recipe's combo beside it, when the fight carries one.
+	_draw_combo_row()
 
 	_apply_battle_modifier()
 	_stamp_fk_enemy_runes()
@@ -3624,6 +3668,9 @@ func _run_battle() -> void:
 			break
 		_clock = u.next_time  # where "now" is, for anything rejoining the timeline
 		_ambush_spend(u)
+		# BATCH KJ — A NEW TURN: the guards may each take one blow in it, and a healer's turn moves The Rite.
+		_kj_guard_used.clear()
+		_kj_rite_turn(u)
 		# Field-size proxy: count the enemies still standing as round 3 opens
 		# (every unit at speed 100 acts once per 100 timeline ticks).
 		if sim and not _r3_recorded and u.next_time >= 200.0:
@@ -3653,6 +3700,9 @@ func _run_battle() -> void:
 		# identically.
 		u.note_momentum_turn()
 		u.refresh_meter_chips()  # JZ §4: the step just booked shows before he chooses
+		# BATCH KJ — FLANK's SPAN IS MOMENTUM's: "since that hero's last turn" ends when the hero is chosen to act — and a
+		# companion's, which takes no turn of its own, with its master's (`_kj_close_span`).
+		_kj_close_span(u)
 		# BATCH GO — THE SAME MOMENT CLOSES POUNCE'S QUIET SPAN (the Skirmisher's until KB) AND TRUES
 		# UP THE OATHKEEPER'S BOND, for Momentum's reason: the span is "since this
 		# unit's last turn", so it ends when the unit is chosen to act.
@@ -7363,6 +7413,9 @@ func _ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# free-summon clause (No Beast Left's, dormant since FX) can never pass a spent call.
 	if u.silenced(ab):
 		return false
+	# BATCH KJ — SILENCED (Choking Hex, Stillness): this turn the hero may use its basic attack and nothing else.
+	if _kj_silenced_from(u, ab):
+		return false
 	if not u.ability_ready(ab) \
 			and not (ab.special == "summon" and u.free_summons > 0):
 		return false
@@ -8344,7 +8397,11 @@ func _intent_hover_text(u: BattleUnit) -> String:
 		var st_line := "Applies %s" % (String(STATUS_INFO[sid][0]) if STATUS_INFO.has(sid)
 			else sid.capitalize())
 		var st_turns := int(ab.applies_status.get("turns", 0))
-		if st_turns > 0:
+		# BATCH KJ — a Silence binds its bearer's next turn (laid for two: a clock ticks before its bearer acts), and its line
+		# says so, as its chip and its description do — never "for 2 turns" beside "next turn".
+		if sid == "silenced":
+			st_line += " on that hero's next turn"
+		elif st_turns > 0:
 			st_line += " for %d turn%s" % [st_turns, "" if st_turns == 1 else "s"]
 		if ab.status_chance < 1.0:
 			st_line += " (%d%% chance)" % int(round(ab.status_chance * 100.0))
@@ -8427,6 +8484,9 @@ func _ability_tooltip(u: BattleUnit, ab: Ability) -> String:
 	if u.silenced(ab):
 		var ls_cfg: Dictionary = Run.MODIFIERS["long_silence"]
 		tip += "\nUsed this fight — %s: %s" % [String(ls_cfg["name"]), String(ls_cfg["desc"])]
+	# BATCH KJ — and a Silenced hero's darkened card says why.
+	if _kj_silenced_from(u, ab):
+		tip += "\nSilenced: only the basic attack this turn."
 	# Mini-boss upgrades on this ability (Batch AP §4): NAMES ONLY. Every
 	# number above already reflects them — the upgrade was baked into the
 	# Ability at spawn — so repeating the magnitudes here would be a second
@@ -8802,11 +8862,13 @@ func _intent_category(u: BattleUnit, ab: Ability) -> String:
 		# Only when the status is the point. An ability that both afflicts and
 		# hits harder than anything else this unit owns is read as the hit —
 		# calling the boss's biggest blow "Afflict" would teach the player to
-		# under-prepare for it.
+		# under-prepare for it. BATCH KJ — read against the body's OTHER moves: a hex move
+		# that hits as hard as its basic adds only the status, so the status is its point.
 		var hardest := 0
 		for a in u.abilities:
-			hardest = maxi(hardest, a.damage)
-		if ab.damage < hardest:
+			if a != ab:
+				hardest = maxi(hardest, a.damage)
+		if ab.damage <= hardest:
 			return "afflict"
 	return "strike"
 
@@ -9028,9 +9090,9 @@ func _intent_ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# **IT REFUSES EVERYTHING BUT THE UNIT'S OWN BASIC ATTACK, AND THE TEST IS
 	# IDENTITY AGAINST `_cheapest_attack` RATHER THAN `cost > 0`.** The first
 	# version of this clause tested cost, on the assumption that an enemy's
-	# better options are the ones it pays for. **THEY ARE NOT: 46 OF THE 50 (70 OF 74 WITH JK's SPENDS, 74 OF 78 WITH JL's HEXES, 72 OF 76 SINCE JO §2 FOLDED TWO)
-	# ENEMY ABILITIES IN `data/enemies.json` COST ZERO** — Chain Lightning,
-	# Healing Wave, Sundering Strike and Poison Arrow among them — so a cost
+	# better options are the ones it pays for. **THEY ARE NOT: 46 OF THE 50 (70 OF 74 WITH JK's SPENDS, 74 OF 78 WITH JL's HEXES, 72 OF 76 SINCE JO §2 FOLDED TWO,
+	# 97 OF 107 SINCE KJ CUT EVERY KIT TO ITS TIER) ENEMY ABILITIES IN `data/enemies.json` COST ZERO** — Chain Lightning and
+	# Healing Wave among them, and Sundering Strike and Poison Arrow until KJ cut them — so a cost
 	# test would have left the card refusing FOUR abilities in the whole game
 	# and reading as working the entire time. Measured, not assumed: a live
 	# fixture put a suppressed enemy at "0 refused, 2 kept".
@@ -9092,6 +9154,7 @@ func _enemy_turn(u: BattleUnit) -> void:
 		# BATCH BL §1: the stored blow comes out of `intent`, the ONE declared-
 		# action store — the status no longer carries an ability name of its own.
 		var ch_stored: Ability = u.intent.get("ability")
+		var ch_aim: Variant = u.intent.get("target")
 		u.remove_status("charging")
 		u.intent = {}
 		_refresh_intent_plate(u)
@@ -9105,7 +9168,12 @@ func _enemy_turn(u: BattleUnit) -> void:
 			_log("%s unleashes the charged %s!" % [u.unit_name,
 				ch_stored.display_name], "#e08850")
 			await _wait(0.4)
-			await _resolve(u, ch_copy, ch_pool.pick_random(), "good")
+			var ch_t: BattleUnit = ch_pool.pick_random()
+			# BATCH KJ — A SINGLE-TARGET WIND-UP (Skullsplitter) LANDS ON THE HERO IT WAS RAISED AT while that hero can still be
+			# struck; the draw above is kept, so an area wind-up's dice are the Hurler's as they were.
+			if not ch_stored.aoe and ch_aim is BattleUnit and ch_pool.has(ch_aim):
+				ch_t = ch_aim
+			await _resolve(u, ch_copy, ch_t, "good")
 		return
 	# Mass Hysteria: the maddened strike a fellow with doubled Break damage,
 	# Sundering them (the status holds until they act).
@@ -9226,6 +9294,14 @@ func _enemy_turn(u: BattleUnit) -> void:
 			_log("%s swings at the opening and finds %s instead (Feint)" % [
 				u.unit_name, d_target.unit_name], "#7cc8f0")
 			await _wait(0.4)
+	# BATCH KJ — STATIC CHARGE (Lightning Storm): at full charge the warband's next single blow strikes every hero, and the
+	# charges clear.
+	if _kj_combo == "Lightning Storm" and _kj_charges >= STATIC_CHARGES and d_ab != null and d_ab.damage > 0 \
+			and not d_ab.aoe and d_ab.special == "" and not bool(decl.get("support", false)):
+		d_ab = _kj_area_copy(d_ab)
+		_kj_charges = 0
+		_kj_refresh_combo_row()
+		_log("   → Static Charge: %s's %s strikes every hero" % [u.unit_name, d_ab.display_name], "#9cc8f0")
 	await _resolve(u, d_ab, d_target, "good")
 	if bool(decl.get("support", false)):
 		_forest_bite(u)
@@ -9270,7 +9346,12 @@ func _choose_enemy_action(u: BattleUnit, ticks_ahead := 1) -> Dictionary:
 		elif mocker_idx >= 0 and mocker_idx < heroes.size() and not heroes[mocker_idx].dead:
 			living = [heroes[mocker_idx]]
 			is_mocked = true
-	# Support behaviors (Shielding, Wild Growth) — a taunt forces attacking instead.
+	# BATCH KJ — WHO THE WARBAND AIMS AT, BELOW A HERO's TAUNT: War Cry's Singled Out, then the recipe's draws (`_kj_aim`).
+	if not is_mocked:
+		var kj_aim := _kj_aim(u, living)
+		if not kj_aim.is_empty():
+			living = kj_aim
+	# Support behaviors (Wild Growth, the heals, the guards) — a taunt forces attacking instead.
 	if not is_mocked:
 		var support := _enemy_support_action(u, ticks_ahead)
 		if not support.is_empty():
@@ -9424,6 +9505,11 @@ func _enemy_support_action(u: BattleUnit, ticks_ahead := 1) -> Array:
 	if wave != null:
 		var hurt: Array = allies.filter(func(a): return _malice_hurt(wave, a) and _enemy_ready(u, wave, ticks_ahead, a))
 		if not hurt.is_empty():
+			# BATCH KJ — FIELD MEDIC (Elite Patrol): a hurt elite is healed first.
+			if _kj_combo == "Elite Patrol":
+				var fm_elites: Array = hurt.filter(func(a): return Enemies.roles(a.enemy_kind).has("elite"))
+				if not fm_elites.is_empty():
+					return [wave, _lowest_hp(fm_elites)]
 			var prio: Array = hurt.filter(
 				func(a): return a.enemy_role in ["tank", "support"])
 			return [wave, _lowest_hp(prio if not prio.is_empty() else hurt)]
@@ -9437,7 +9523,8 @@ func _enemy_support_action(u: BattleUnit, ticks_ahead := 1) -> Array:
 	var rite := _find_ready(u, "Cleansing Rite", ticks_ahead)
 	if rite != null and allies.any(func(a): return not _cleansable_debuffs(a).is_empty()):
 		return [rite, u]
-	# Shieldmaster: always keeps exactly one ally Shielded (lowest HP first).
+	# Shielding: keeps exactly one ally Shielded (lowest HP first). BATCH KJ — no kind carries it since KJ (the Shieldmaster
+	# and the Sentinel guard instead); the arm stands for a kind that carries it again.
 	var shield_ab := _find_ready(u, "Shielding", ticks_ahead)
 	if shield_ab != null \
 			and not allies.any(func(a): return a.has_status("shielded")):
@@ -9479,6 +9566,16 @@ func _enemy_support_action(u: BattleUnit, ticks_ahead := 1) -> Array:
 		var nicked: Array = allies.filter(func(a): return _malice_hurt(vigil, a))
 		if nicked.size() >= 2 and _enemy_ready(u, vigil, ticks_ahead, u):
 			return [vigil, u]
+	# BATCH KJ — THE GUARD AND THE BRACE, found by their payload (the spends' way): a guard stands over its warband while
+	# another body of it can be picked and it guards none already; a body braces while it is hurt and not already braced.
+	for kj_ab in u.abilities:
+		if not _enemy_ready(u, kj_ab, ticks_ahead):
+			continue
+		if kj_ab.special == "bodyguard" and not u.has_status("guarding") \
+				and allies.any(func(a): return a != u):
+			return [kj_ab, u]
+		if kj_ab.special == "brace" and not u.has_status("hunkered") and u.hp < u.max_hp:
+			return [kj_ab, u]
 	# BATCH JW §3 — THE FEN LURKER SUBMERGES, once a fight, on a turn it stands under `SUBMERGE_AT` of its health while another
 	# body of its warband can be picked (`_submerge_holds`): a self-cast, after every heal and ward (a taunt passes the half by).
 	var dive := _find_ready(u, "Submerge", ticks_ahead)
@@ -9571,17 +9668,20 @@ func _malice_free(exclude: BattleUnit = null) -> int:
 # `_resolve_special` heals by, lifted out of them unchanged (JJ §3) so the price the selection asks and the heal that lands
 # read one figure. `check_ij` §3 and `check_ji` §1a pin each line here.
 func _warband_heal_figure(special: String, target: BattleUnit) -> int:
+	# BATCH KJ — FIELD MEDIC (Elite Patrol): a heal on the elite is larger, here at the one figure the price, the hurt test and
+	# the cast all read.
+	var fm := FIELD_MEDIC_PCT if (_kj_combo == "Elite Patrol" and _kj_has_role(target, "elite")) else 0.0
 	match special:
 		"healing_wave":
 			var wave_heal := maxi(int(round(target.max_hp * 0.25)), 1)
-			return wave_heal
+			return maxi(int(round(wave_heal * (1.0 + fm))), 1)
 		"wild_growth":
 			var growth := maxi(int(round(target.max_hp * 0.20)), 1)
-			return growth
+			return maxi(int(round(growth * (1.0 + fm))), 1)
 		"totem_pulse":
 			var tp_a := target
 			var tp_amt := maxi(int(round(tp_a.max_hp * 0.06)), 1)
-			return tp_amt
+			return maxi(int(round(tp_amt * (1.0 + fm))), 1)
 	return 0
 
 
@@ -9892,6 +9992,32 @@ var _malice_drawn := -1
 var _enemy_stack_span := Vector2(ENEMY_PLATE_TOP, ENEMY_PLATE_TOP)  # the warband's stack, top and foot (`_stack_enemy_plates`)
 
 
+# BATCH KJ — THE RECIPE's COMBO, by the theme's name: its label on the row beside MALICE and the words on its hover.
+const KJ_COMBOS := {
+	"Warband": ["COMBINED ARMS", "While %d or more kinds of the warband\nstand, its blows deal %d%% more." % [COMBINED_ARMS_KINDS, int(round(COMBINED_ARMS_PCT * 100))]],
+	"Swarm": ["PACK TACTICS", "Each skirmisher and archer of the\nwarband deals %d%% more for every\nother body of it standing." % [int(round(PACK_TACTICS_PCT * 100))]],
+	"Monster Den": ["ALPHA", "While a brute stands, the rest of the\nwarband deal %d%% more. When the last\nbrute falls, the rest are Dazed." % [int(round(ALPHA_PCT * 100))]],
+	"Cursed Company": ["COMPOUNDING CURSE", "A hero carrying %d or more of the\nwarband's debuffs takes %d%% more\nfrom it." % [CURSE_DEBUFFS, int(round(CURSE_PCT * 100))]],
+	"Honor Guard": ["BODYGUARDS", "While a tank of the warband stands\nunbroken, its elite takes %d%% less\nfrom blows." % [int(round(HONOR_GUARD_CUT * 100))]],
+	"Ritual": ["THE RITE", "Counts down on each healer's turn. At\nzero every body of the warband heals to\nfull and the count restarts. A healer\nStunned, Frozen or Broken on its turn\nadds one."],
+	"Poison Volley": ["FOCUS FIRE", "Every archer aims at the hero with the\nmost Poison, and that hero takes %d%%\nmore from archers." % [int(round(FOCUS_FIRE_PCT * 100))]],
+	"Lightning Storm": ["STATIC CHARGE", "Each heal the warband casts adds a\ncharge. At %d its next single blow\nstrikes every hero, and the charges\nclear." % [STATIC_CHARGES]],
+	"Rage Company": ["BLOOD IN THE WATER", "Every skirmisher aims at a hero under\n%d%% of its health." % [int(round(BLOOD_WATER_AT * 100))]],
+	"Guardian Circle": ["INTERLOCKED SHIELDS", "The warband takes %d%% less from blows\nfor each tank of it standing." % [int(round(INTERLOCK_CUT * 100))]],
+	"Elite Patrol": ["FIELD MEDIC", "Its healers heal the elite first, and\ntheir heals on it are %d%% larger." % [int(round(FIELD_MEDIC_PCT * 100))]],
+	"Boss Escort": ["LOYAL RETINUE", "While %d or more of its escort stand,\nthe boss takes %d%% less from blows." % [RETINUE_ESCORTS, int(round(RETINUE_CUT * 100))]],
+}
+const KJ_COMBO_W := 196.0                     # the combo row's width, ending left of the MALICE row
+var _kj_combo := ""                           # this fight's recipe, when it carries a combo; "" for none
+var _kj_struck := {}                          # a hero -> the bodies that struck it since its last turn (Flank)
+var _kj_guard_used := {}                      # a guard -> true once it took a blow in the acting unit's turn
+var _kj_roared := {}                          # a body -> true once Frost Fury fired (the page's "The first time")
+var _kj_rite_left := 0                        # The Rite's count
+var _kj_charges := 0                          # Static Charge's charges
+var _kj_combo_label: Label = null
+var _kj_combo_hover: Control = null
+
+
 func _draw_malice_strip() -> void:
 	if sim:
 		return
@@ -10018,6 +10144,243 @@ func _cancel_charge(u: BattleUnit, cause: String) -> void:
 # Everything a Cleansing Rite may strip: harmful, not a meter state
 # (Broken and the Bleed buildup stay), never sticky (Slow Acting /
 # Perfected Toxin poison refuse every cleanse, this one included).
+# ══ BATCH KJ — THE ENEMY REWORK's HELPERS ══════════════════════════════════════════════════════════════════════════════
+# The warband standing: every body of it that lives (a submerged one stands; it only cannot be picked).
+func _kj_standing() -> Array:
+	return enemies.filter(func(e): return not e.dead)
+
+
+func _kj_has_role(u: BattleUnit, role: String) -> bool:
+	return u != null and not u.is_hero and Enemies.roles(u.enemy_kind).has(role)
+
+
+# A Silenced hero's card other than its basic attack (the hex moves Choking Hex and Stillness).
+func _kj_silenced_from(u: BattleUnit, ab: Ability) -> bool:
+	return u != null and u.is_hero and u.has_status("silenced") and not u.abilities.is_empty() and ab != u.abilities[0]
+
+
+# Who the warband aims at, below a hero's taunt: a Singled Out hero (War Cry), then the recipe's draws — Focus Fire's archers at
+# the most-poisoned hero, Blood in the Water's skirmishers at a hero under half. Empty: the ordinary pick.
+func _kj_aim(u: BattleUnit, living: Array) -> Array:
+	var singled: Array = living.filter(func(h): return h.has_status("singled_out"))
+	if not singled.is_empty():
+		return singled
+	if _kj_combo == "Poison Volley" and _kj_has_role(u, "sniper"):
+		var ff := _kj_focus_fire(living)
+		if ff != null:
+			return [ff]
+	if _kj_combo == "Rage Company" and _kj_has_role(u, "skirmisher"):
+		var low: Array = living.filter(func(h): return h.is_hero and h.hp < h.max_hp * BLOOD_WATER_AT)
+		if not low.is_empty():
+			return [_lowest_hp(low)]
+	return []
+
+
+# Focus Fire's mark: the living hero carrying the most Poison, or null while none carries any.
+func _kj_focus_fire(pool: Array) -> BattleUnit:
+	var best: BattleUnit = null
+	var most := 0
+	for h in pool:
+		if not h.is_hero or h.dead:
+			continue
+		var st: int = h.status_stacks("poison")
+		if st > most:
+			most = st
+			best = h
+	return best
+
+
+# The debuffs a hero carries from this warband (the page's *"two or more debuffs from this warband"*): each whose source is a
+# body of the warband, standing or fallen.
+func _kj_debuff_count(h: BattleUnit) -> int:
+	var warband := {}
+	for e in enemies:
+		warband[(e as BattleUnit).unit_name] = true
+	return h.statuses.filter(func(s): return BattleUnit.DEBUFF_IDS.has(s.id) and s.id != "broken" \
+			and warband.has(String(s.get("src_name", "")))).size()
+
+
+# A unit chosen to act closes its Flank span, and its companions' with it: a companion has no turn, and its statuses tick
+# with its master (`_player_turn`), so its span "since that hero's last turn" is its master's — never the whole fight.
+func _kj_close_span(u: BattleUnit) -> void:
+	_kj_struck.erase(u)
+	for b in _beasts(u):
+		_kj_struck.erase(b)
+
+
+func _kj_note_struck(hero: BattleUnit, body: BattleUnit) -> void:
+	var by: Array = _kj_struck.get(hero, [])
+	if not by.has(body):
+		by.append(body)
+	_kj_struck[hero] = by
+
+
+# How much harder a blow of the warband lands on a hero: a Flank move, a Doomed hero, a body in its Fury, the recipe's combo.
+func _kj_out_mult(body: BattleUnit, hero: BattleUnit, ab: Ability) -> float:
+	var m := 1.0
+	if FLANK_MOVES.has(ab.display_name) \
+			and (_kj_struck.get(hero, []) as Array).any(func(e): return e != body):
+		m *= 1.0 + FLANK_PCT
+		_log("   → Flank: %s strikes where another already struck (+%d%%)" % [body.unit_name,
+			int(round(FLANK_PCT * 100))], "#e0a060")
+	if hero.has_status("doomed"):
+		m *= 1.0 + MARK_PCT
+	if body.has_status("fury"):
+		m *= 1.0 + ENRAGE_PCT
+	var standing := _kj_standing()
+	match _kj_combo:
+		"Warband":
+			var kinds := {}
+			for e in standing:
+				kinds[e.enemy_kind] = true
+			if kinds.size() >= COMBINED_ARMS_KINDS:
+				m *= 1.0 + COMBINED_ARMS_PCT
+		"Swarm":
+			if _kj_has_role(body, "skirmisher") or _kj_has_role(body, "sniper"):
+				m *= 1.0 + PACK_TACTICS_PCT * maxi(standing.size() - 1, 0)
+		"Monster Den":
+			if not _kj_has_role(body, "brute") and standing.any(func(e): return _kj_has_role(e, "brute")):
+				m *= 1.0 + ALPHA_PCT
+		"Cursed Company":
+			if _kj_debuff_count(hero) >= CURSE_DEBUFFS:
+				m *= 1.0 + CURSE_PCT
+		"Poison Volley":
+			if _kj_has_role(body, "sniper") and _kj_focus_fire(heroes) == hero:
+				m *= 1.0 + FOCUS_FIRE_PCT
+	return m
+
+
+# How much of a hero's blow a body of the warband takes: Hunkered, and the recipe's guards.
+func _kj_in_mult(body: BattleUnit) -> float:
+	var m := 1.0
+	if body.has_status("hunkered"):
+		m *= BRACE_TAKEN
+	var standing := _kj_standing()
+	match _kj_combo:
+		"Honor Guard":
+			if _kj_has_role(body, "elite") and standing.any(func(e): return e != body and not e.broken and _kj_has_role(e, "bulwark")):
+				m *= 1.0 - HONOR_GUARD_CUT
+		"Guardian Circle":
+			var tanks: int = standing.filter(func(e): return _kj_has_role(e, "bulwark")).size()
+			m *= maxf(1.0 - INTERLOCK_CUT * tanks, 0.0)
+		"Boss Escort":
+			if body.is_boss and standing.filter(func(e): return e != body).size() >= RETINUE_ESCORTS:
+				m *= 1.0 - RETINUE_CUT
+	return m
+
+
+# The guard that takes a blow aimed at `target`: a living, pickable body of its warband that is Guarding, not Broken, and has not
+# yet taken one this turn, or null (a Break ends the guard as well: `unit.gd`, where the Break is laid).
+func _kj_guard_for(target: BattleUnit) -> BattleUnit:
+	for e in enemies:
+		if e != target and not e.dead and not e.broken and e.has_status("guarding") and _pickable(e) \
+				and not _kj_guard_used.has(e):
+			return e
+	return null
+
+
+# The brace's strike back: the body's basic attack at `BRACE_STRIKE_FRAC`, as a counter (no bar, and none drawn in turn).
+func _kj_strike_back(body: BattleUnit, hero: BattleUnit) -> void:
+	var basic := _cheapest_attack(body)
+	if basic == null or not _pickable(hero):
+		return
+	var sb: Ability = Ability.make({"display_name": basic.display_name,
+		"damage": maxi(int(round(basic.damage * BRACE_STRIKE_FRAC)), 1),
+		"pressure": int(round(basic.pressure * BRACE_STRIKE_FRAC)), "dmg_type": basic.dmg_type,
+		"anim": basic.anim, "delay": basic.delay})
+	body.float_text("STRIKES BACK", Color(0.55, 0.75, 0.85))
+	_log("%s strikes back from its stance" % body.unit_name, "#8cc8e0")
+	await _wait(0.3)
+	await _resolve(body, sb, hero, "good", true)
+
+
+# Static Charge's area copy of a blow: the same blow, striking every hero.
+func _kj_area_copy(ab: Ability) -> Ability:
+	return Ability.make({"display_name": ab.display_name, "damage": ab.damage, "pressure": ab.pressure,
+		"dmg_type": ab.dmg_type, "anim": ab.anim, "delay": ab.delay, "aoe": true,
+		"applies_status": ab.applies_status.duplicate(), "status_chance": ab.status_chance})
+
+
+func _kj_add_charge(body: BattleUnit, ab: Ability) -> void:
+	if _kj_combo != "Lightning Storm" or _kj_charges >= STATIC_CHARGES:
+		return
+	_kj_charges += 1
+	_log("   → Static Charge: %s's %s adds a charge (%d/%d)" % [body.unit_name, ab.display_name, _kj_charges,
+		STATIC_CHARGES], "#9cc8f0")
+	_kj_refresh_combo_row()
+
+
+# The Rite: a healer's turn moves its count down — or up, when the healer loses the turn (stunned, frozen or Broken); at zero
+# every body of the warband heals to full and the count restarts.
+func _kj_rite_turn(u: BattleUnit) -> void:
+	if _kj_combo != "Ritual" or u == null or u.is_hero or not _kj_has_role(u, "mender"):
+		return
+	if u.has_status("stunned") or u.has_status("frozen") or u.broken_pending:
+		_kj_rite_left += 1
+		_log("   → The Rite falters: %s loses its turn (%d to go)" % [u.unit_name, _kj_rite_left], "#c0a0e0")
+	else:
+		_kj_rite_left -= 1
+		if _kj_rite_left <= 0:
+			for e in _kj_standing():
+				var rt_missing: int = e.max_hp - e.hp
+				if rt_missing > 0:
+					e.heal_amount(rt_missing)
+					e.refresh_bars()
+			_kj_rite_left = RITE_TURNS
+			_log("The Rite is complete — the warband rises whole", "#c070e0")
+	_kj_refresh_combo_row()
+
+
+# Alpha: when the last brute of the warband falls, the rest are Dazed.
+func _kj_alpha_falls(u: BattleUnit) -> void:
+	if _kj_combo != "Monster Den" or not _kj_has_role(u, "brute"):
+		return
+	var rest := _kj_standing().filter(func(e): return e != u)
+	if rest.any(func(e): return _kj_has_role(e, "brute")):
+		return
+	for e in rest:
+		_apply_status(e, "dazed", ALPHA_DAZE_TURNS)
+	_log("   → Alpha: the last brute falls, and its warband reels (Dazed)", "#e0a060")
+
+
+# The combo's row, left of the MALICE row: its name, and The Rite's count or Static Charge's charges; hover for its words.
+func _draw_combo_row() -> void:
+	if _kj_combo == "" or not KJ_COMBOS.has(_kj_combo):
+		return
+	if _kj_combo == "Ritual":
+		_kj_rite_left = RITE_TURNS
+	var right := MALICE_BAR_X + MALICE_BAR_W
+	var box := Rect2(right - 124.0 - 4.0 - KJ_COMBO_W, MALICE_HEAD_Y, KJ_COMBO_W, MALICE_HEAD_H)
+	if sim:
+		return
+	var row := Node2D.new()
+	add_child(row)
+	_kj_combo_label = Label.new()
+	_kj_combo_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_kj_combo_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_kj_combo_label.add_theme_font_size_override("font_size", 12)
+	_kj_combo_label.add_theme_color_override("font_color", MALICE_COLOR)
+	_kj_combo_label.add_theme_stylebox_override("normal", _malice_head_box())
+	_kj_combo_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	BattleUnit._put(row, _kj_combo_label, box.position, box.size)
+	_kj_combo_hover = Control.new()
+	_kj_combo_hover.mouse_filter = Control.MOUSE_FILTER_STOP
+	_kj_combo_hover.tooltip_text = String(KJ_COMBOS[_kj_combo][1])
+	BattleUnit._put(row, _kj_combo_hover, box.position, box.size)
+	_kj_refresh_combo_row()
+
+
+func _kj_refresh_combo_row() -> void:
+	if _kj_combo_label == null or not is_instance_valid(_kj_combo_label):
+		return
+	var t := String(KJ_COMBOS[_kj_combo][0])
+	if _kj_combo == "Ritual":
+		t += " %d" % _kj_rite_left
+	elif _kj_combo == "Lightning Storm":
+		t += " %d/%d" % [_kj_charges, STATIC_CHARGES]
+	_kj_combo_label.text = t
+
+
 func _cleansable_debuffs(u: BattleUnit) -> Array:
 	var out: Array = []
 	for s in u.statuses:
@@ -10472,6 +10835,16 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		_log("%s: %s cannot reach %s — it is beneath the water" % [attacker.unit_name, ab.display_name, target.unit_name],
 			"#909090")
 		return
+	# BATCH KJ — THE GUARD TAKES THE BLOW (Shield Guard, Rootguard, Bog Guard): the first single blow the hero side aims at
+	# another body of a guarding warband in each unit's turn lands on the guard instead (`_kj_guard_for`).
+	if target != null and attacker.is_hero and not is_counter and not target.is_hero and not target.dead \
+			and not ab.aoe and ab.random_hits == 0 and not ab.choose_two and not ab.choose_three \
+			and (ab.damage > 0 or Ability.DAMAGE_SPECIALS.has(ab.special)):
+		var kj_guard := _kj_guard_for(target)
+		if kj_guard != null:
+			_kj_guard_used[kj_guard] = true
+			_log("   → Guarding: %s takes the blow meant for %s" % [kj_guard.unit_name, target.unit_name], "#9cb8e0")
+			target = kj_guard
 	# BATCH BL §2 — THE ATTRIBUTION FRAME, set once at the top and covering
 	# everything this cast does to anyone's health: the strike itself, its
 	# splash and echoes, the reflect and retaliation it draws, and the recoil
@@ -10541,6 +10914,17 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 	# not a use. What it books is the name `BattleUnit.silenced` reads.
 	if attacker.mod_silence and not is_counter:
 		attacker.silence_spent[ab.display_name] = true
+	# BATCH KJ — BRANDED (Rot Brand): each ability a Branded hero uses costs it `BRAND_PCT` of its maximum health, here at the
+	# line every cast pays at and by its definition of a cast; the basic attack is no ability, and the price never fells.
+	if attacker.is_hero and not attacker.is_companion and not is_counter and attacker.has_status("branded") \
+			and not attacker.abilities.is_empty() and ab != attacker.abilities[0]:
+		var br_cost := maxi(int(round(attacker.max_hp * BRAND_PCT)), 1)
+		var br_before: int = attacker.hp
+		attacker.hp = maxi(attacker.hp - br_cost, 1)
+		_book_self_cost(attacker, br_before, ab.display_name)
+		attacker.float_text("-%d" % (br_before - attacker.hp), Color(0.85, 0.45, 0.35))
+		_log("   → Branded: %s pays %d health for %s" % [attacker.unit_name, br_before - attacker.hp,
+			ab.display_name], "#d07858")
 	attacker.refresh_bars()
 	# BATCH HZ §2 — BOIL OVER POURS OUT THE WHOLE BAR, HERE, beside the line every
 	# price is paid at and for the same reason: the bar leaves before the strike, so
@@ -10913,6 +11297,7 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 		if ab.display_name == "Calibrating Shot" and target != null:
 			calib_missing = maxi(target.max_hp - target.hp, 0)
 		var total_dealt := 0
+		var kj_braced: Array = []  # BATCH KJ — each Hunkered body a strike of this blow landed on (the brace strikes back)
 		var enemies_struck := 0  # landed strikes (Magi's Wrath recoil fades per hit)
 		var struck_before: BattleUnit = null  # last random-hit victim (Explosion)
 		# Batch AH: victims already hit by THIS cast, for the two scatter
@@ -11105,6 +11490,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# door in `unit._report_taken` cannot see it. It sits ABOVE the Block
 			# roll because a blocked blow `continue`s out of this iteration.
 			strike_target.note_blow_met()
+			# BATCH KJ — FLANK's RECORD: a body of the warband that reaches a hero is booked on it until the hero's next turn.
+			if not attacker.is_hero and strike_target.is_hero:
+				_kj_note_struck(strike_target, attacker)
 			# Block: negates 100% of the hit — damage, Break damage, and on-hit
 			# effects. Sources (logged): Interpose charges (guaranteed), the
 			# base Block stat, or Heavy Plating. Broken units cannot Block.
@@ -11876,6 +12264,10 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# this line, so the pool's one-for-one and the reserve stand.
 			if attacker.has_status("warband_rally"):
 				raw *= 1.0 + MALICE_RALLY_PCT
+			# BATCH KJ — THE REWORK's OUTGOING READS, beside Rally: a Flank move, a Doomed hero, a body in its Fury, and the
+			# recipe's combo (`_kj_out_mult`).
+			if not attacker.is_hero and strike_target.is_hero:
+				raw *= _kj_out_mult(attacker, strike_target, ab)
 			# Conviction: each Faith stack sharpens the blade — +1.5% a stack,
 			# raised to +3% by Apostle and +4.5% by both it and Fervor (the
 			# multiplier is a SUM, Batch BI §1) — while the Devout stands. It
@@ -12920,9 +13312,12 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 					raw *= 1.0 + 0.01 * (2 + ruin_occ.deep_hex_step
 						+ ruin_occ.rune_deep_hex_step) \
 						* strike_target.status_stacks("ruin")
-			# Shielded: the Orc Shieldmaster's single-ally ward.
+			# Shielded: the Hollow Crown's Regalia, its ward on itself.
 			if strike_target.has_status("shielded"):
 				raw *= 0.75
+			# BATCH KJ — THE REWORK's INCOMING CUTS, beside Shielded: a Hunkered body, and the recipe's guards (`_kj_in_mult`).
+			if attacker.is_hero and not strike_target.is_hero:
+				raw *= _kj_in_mult(strike_target)
 			# BATCH KE §1 — ROOTBOUND, ASKED ONCE A STRIKE ABOVE ITS FIGURE (IC §1b): while another body of its warband stands, the
 			# blow is cut here, beside Shielded, so every reader below — the credit, `total_dealt`, the float, the line — reads what
 			# lands; `rootbound_precut` (set at the door call) keeps the door from cutting it twice.
@@ -13360,6 +13755,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				_stat("dmg_enemy", final)
 			total_dealt += final
 			enemies_struck += 1
+			if final > 0 and not strike_target.is_hero and strike_target.has_status("hunkered") \
+					and not kj_braced.has(strike_target):
+				kj_braced.append(strike_target)
 			# Wrath of the Old Gods: heroes striking a Ruined target drink
 			# deep. BATCH AX §1 — THE DRAUGHT IS PER STACK (2% each, replacing
 			# the flat 10%-while-any-Ruin), so it finally rewards the depth the
@@ -15246,6 +15644,18 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 				if attacker.apex > 0 and ab.display_name == "Quick Shot" \
 						and not cs_b.dead and not comp_target.dead:
 					await _companion_strike(cs_b, comp_target, 1.0, false)
+		# BATCH KJ — A HUNKERED BODY STRIKES BACK (Frozen Stance, Moss Shell) at each hero who hits it in melee with a
+		# physical blow, with `BRACE_STRIKE_FRAC` of its basic attack, as a counter. A spell is spared — the page's *"or use
+		# spells"* — and a spell is a blow that is not physical, the project's one reading of the word (`CHANNEL_SPARES_PHYSICAL`).
+		# Each braced body the blow struck strikes back — the one it was aimed at and any an area blow caught beside it (the
+		# page's *"each hero who hits it in melee"*; `kj_braced`, booked where a strike lands).
+		if attacker.is_hero and not attacker.is_companion and not is_counter \
+				and not attacker.is_ranged and ab.dmg_type == "physical":
+			for kj_b in kj_braced:
+				if attacker.dead or kj_b.dead or not kj_b.has_status("hunkered"):
+					continue
+				await _kj_strike_back(kj_b, attacker)
+				_dmg_frame(attacker, ab.display_name)
 		# Tripwire: rigged ground bites every attacking melee enemy (Snap
 		# Shut / The Whole Forest extend it to ranged; Reinforced Wire and
 		# Cruel Devices sharpen it).
@@ -17630,6 +18040,8 @@ func _on_unit_died(u: BattleUnit) -> void:
 		_surface_if_alone()
 		# BATCH KE §1 — AND A BODY OF THE WARBAND FALLS: the last one standing beside a Rootbound body takes its chip off.
 		_sync_rootbound()
+		# BATCH KJ — ALPHA (Monster Den): when the last brute falls, the rest of the warband is Dazed.
+		_kj_alpha_falls(u)
 		# BATCH JJ §2 — A BODY OF THE WARBAND FALLS: its pool fills by a kill's worth, whoever dealt it.
 		# BATCH JQ §1 — UNLESS IT DIES FORSAKEN, AND THEN THE KILL FEEDS NOTHING. Every death of the warband passes here, from
 		# `unit._die`, before the body's statuses are cleared — a strike's, a handler's, a tick's, a debug kill's — so the mark
@@ -21143,6 +21555,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 	var empowered := _consume_empower(attacker, ab)
 	if empowered:
 		is_perfect = false
+	# BATCH KJ — STATIC CHARGE (Lightning Storm): each heal the warband casts adds a charge.
+	if not attacker.is_hero and KJ_HEAL_SPECIALS.has(ab.special):
+		_kj_add_charge(attacker, ab)
 	match ab.special:
 		"rally":
 			# BATCH CR §2 — 50 WAS THE PERFECT'S NUMBER AND IS BACK TO THE BASE'S.
@@ -25338,6 +25753,22 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			_message("%s brands %s!" % [attacker.unit_name, target.unit_name])
 			_log("%s: Umbral Sigil on %s — its warband shares its pain" % [
 				attacker.unit_name, target.unit_name], "#c070e0")
+		"bodyguard":
+			# BATCH KJ — THE GUARD (Shield Guard, Rootguard, Bog Guard): for `BODYGUARD_TURNS` it takes the first blow each
+			# turn aimed at another body of its warband (`_kj_guard_for`, at the top of `_resolve`).
+			_apply_status(attacker, "guarding", BODYGUARD_TURNS, 0, 0, attacker)
+			_sfx("parry", -7.0, 0.6)
+			_message("%s stands guard!" % attacker.unit_name)
+			_log("%s: %s — it guards its warband" % [attacker.unit_name, ab.display_name], "#9cb8e0")
+		"brace":
+			# BATCH KJ — THE BRACE (Frozen Stance, Moss Shell): Hunkered until its next turn (`_kj_in_mult`, `_kj_strike_back`).
+			_apply_status(attacker, "hunkered", 1, 0, 0, attacker)
+			_sfx("parry", -7.0, 0.6)
+			_message("%s braces!" % attacker.unit_name)
+			_log("%s: %s — it hunkers down" % [attacker.unit_name, ab.display_name], "#8cc8e0")
+		"enrage":
+			# BATCH KJ — FROST FURY IS A SLOT, NOT A TURN: it fires at the damage door (`_on_damage_taken`) and is never cast.
+			pass
 		"enemy_shield":
 			# The Shieldmaster's ward: one ally holds it at a time.
 			#
@@ -25442,7 +25873,8 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			# (the turn loop owns both the landing and the cancel).
 			_sfx("break", -10.0, 0.5)
 			attacker.add_status("charging", "Charging", "!!", Color(1.0, 0.62, 0.3), -1,
-				"%s lands at this unit's next turn:\nheavy damage to every ally.\nBreak, Freeze, or Stun the charger\nto cancel the blow." % ab.display_name)
+				"%s lands at this unit's next turn:\n%s.\nBreak, Freeze, or Stun the charger\nto cancel the blow." % [ab.display_name,
+				"heavy damage to every ally" if ab.aoe else "a heavy blow on one hero"])
 			# BATCH BL §1 — THE WIND-UP IS A DECLARATION, stored in the same one
 			# place every other declaration is stored. The status used to carry
 			# an "ability" name of its own; it does not any more, because two
@@ -25453,6 +25885,9 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 				"ability": ab, "target": null, "turns": 1, "support": false,
 				"message": "", "logs": [], "category": "windup",
 			}
+			# BATCH KJ — a single-target wind-up keeps the hero it was raised at (an area one keeps none).
+			if not ab.aoe:
+				attacker.intent["target"] = target
 			_istat("intent_declared")
 			_refresh_intent_plate(attacker)
 			_message("%s hoists a massive blow!" % attacker.unit_name)
@@ -32435,6 +32870,17 @@ func _bank_run_ledgers() -> void:
 func _on_damage_taken(victim: BattleUnit, lost: int, hp_before: int, past_last := 0) -> void:
 	if lost <= 0 or victim == null:
 		return
+	# BATCH KJ — FROST FURY: a body carrying an `enrage` move roars the first time a blow or a tick takes it from above
+	# `ENRAGE_AT` of its health to at or under it, while it lives — once a fight (`_kj_roared`): a Fury a Dispel lifts does
+	# not come back when the body is healed above its share and falls again (the page's *"The first time"*).
+	if not victim.is_hero and victim.hp > 0 and not _kj_roared.has(victim) \
+			and hp_before > victim.max_hp * ENRAGE_AT and victim.hp <= victim.max_hp * ENRAGE_AT \
+			and victim.abilities.any(func(a): return a.special == "enrage"):
+		_kj_roared[victim] = true
+		_apply_status(victim, "fury", -1, 0, 0, victim)
+		victim.float_text("FURY", Color(0.95, 0.3, 0.25))
+		_log("%s roars — its blows land %d%% harder for the rest of the fight, unless a Dispel lifts it" % [victim.unit_name,
+			int(round(ENRAGE_PCT * 100))], "#e06050")
 	# BATCH CB — FROSTBIND'S SECOND CLAUSE, AND IT SITS ABOVE THE HERO GATE
 	# BELOW ON PURPOSE. Its victims are ENEMIES, and every line under that gate
 	# is hero-side bookkeeping (Backblast, the recap's taken ledger); putting the

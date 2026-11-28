@@ -26,6 +26,8 @@ const REPRISAL_WINDOW_TURNS := 2              # Reprisal: the turns it reads (th
 # one. This registry backs talents that count debuffs (Dominant Presence,
 # Iron Will — its chip updates live in _refresh_chips) and future dispels.
 const DEBUFF_IDS := ["slow", "chilled", "frozen", "frostbite", "burn", "poison",
+	# BATCH KJ — the warband's four new afflictions on a hero, each one a cleanse lifts (the designer's picks); none is a hex (`HEX_IDS`).
+	"silenced", "branded", "doomed", "singled_out",
 	"bleed", "sunder", "mocked", "stunned", "exposed", "cripple", "dazed",
 	"bewitch", "psychosis", "decay", "ruin", "hysteria",
 	"umbral_sigil", "elem_weak", "melted", "blind", "snared", "caught", "broken",
@@ -5273,6 +5275,9 @@ func take_hit(amount: int, pressure_add: int) -> Dictionary:
 			modulate = Color(0.85, 0.6, 1.0)
 			add_status("broken", "BROKEN", "B", Color(0.8, 0.4, 1.0), 1,
 				"Loses next turn. -30% armor, +25% crit chance against this unit.")
+			# BATCH KJ — a Break ends a guard (the designer's pick: Breaking the guard is how it is played around).
+			if has_status("guarding"):
+				remove_status("guarding", "a Break")
 	if hp <= 0:
 		_die()
 	elif not just_broke:

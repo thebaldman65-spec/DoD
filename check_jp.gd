@@ -2,7 +2,8 @@
 #
 #   §0   JO's EIGHT RULINGS answered and archived, and no living text citing them as owed; THE THREE DIALS recorded and not pulled —
 #        each reversal written where its change is recorded, every key and figure off the kept table, the table's "now" the tree's
-#        and its "back to" the record it returns to (C06, C07).
+#        and its "back to" the record it returns to (C06, C07); a dial whose move KJ took out of its kit is read where the
+#        warband stood before KJ.
 #   §1   THE COUNT GETS FIGHTS WHERE THE WARBAND ATTACKS: the kept count is taken over those fights alone (C01) and every row carries
 #        how many there were (C02); its population the four hexes, the ten JO re-derived, every kind of the warband; nothing
 #        compared; the rule written beside the floor and in no other rule file; and every gate that needs the warband's attacks off
@@ -10,8 +11,8 @@
 #   §2   THE THREE ANSWERS, READ AT SOURCE: every door of the kept readout names a file and a function that exist and quotes a line
 #        standing in that function, and each of the three answers carries its doors (C04).
 #   §3   WHAT IS DELIBERATELY NOT DONE: no card, talent, rune, status or ability authored (C05); no basic, hex, spend or Malice term
-#        changed (C09); JO's counts as they were taken (C08); the deck closed at twenty-five (C10); no table beside the report a
-#        drive's.
+#        changed (C09) — read on the warband as KJ found it, KJ's rework set aside; JO's counts as they were taken (C08); the deck
+#        closed at twenty-five (C10); no table beside the report a drive's.
 #   §4   the player's files, as this gate found them.
 #   Every needle is the rule's own words, never the batch code beside them. **It drives no fight and loads no scene**: what it holds
 #   is the kept tables, the documents, the source and the data — the count's fights are the battery's own, read off its logs before
@@ -34,7 +35,9 @@ const CONTENT_AT_HEAD := {"abilities": "b40ad23bc9956e7e48f579d9a98b6da4", "tale
 # WHAT A LATER BATCH AUTHORED, EACH NAMED AND LEFT OUT OF THE DIGESTS ABOVE, so they go on asking whether JP's own tree authored
 # anything: the two cards and the status of the party's three answers, built after JP (Forsake, Read the Tell, Forsaken).
 # BATCH JW §3 — and the Drowned Barrow's three statuses, which a warband move lays or wears.
-const AUTHORED_SINCE := {"abilities": ["Forsake", "Read the Tell"], "statuses": ["forsaken", "black_rot", "noxious_fumes", "submerged"]}
+# BATCH KJ — and the enemy rework's seven: four hexes the warband lays on a hero, three a body of it wears.
+const AUTHORED_SINCE := {"abilities": ["Forsake", "Read the Tell"], "statuses": ["forsaken", "black_rot", "noxious_fumes", "submerged",
+	"silenced", "branded", "doomed", "singled_out", "guarding", "hunkered", "fury"]}
 # BATCH KB — TWO CARDS RENAMED AND FOUR RUNE ROWS MOVED AFTER THIS GATE LANDED, PUT BACK (the designer's renames and the
 # conversion): the names read as JP's tree held them, both at once, and the rune rows as they stood, the two cores KB added out.
 const RENAMED_SINCE := {"Greater Heal": "Heal", "Heal": "Ministration"}
@@ -190,7 +193,17 @@ func _move(kind: String, name: String) -> Dictionary:
 	for a in data[kind]["abilities"]:
 		if String((a as Dictionary).get("display_name", "")) == name:
 			return a
+	# BATCH KJ — A DIAL's MOVE THAT KJ TOOK OUT OF ITS KIT (the designer's picks cut every kit to its tier) is read where the warband
+	# stood before KJ (`Gate.warband_before_kj()`): KJ's rework pulled no dial, and a move still in its kit is read live above, so a
+	# dial pulled on it reds as it did.
+	for b in ((Gate.warband_before_kj().get(kind, {}) as Dictionary).get("abilities", []) as Array):
+		if String((b as Dictionary).get("display_name", "")) == name:
+			_kept_dials += 1
+			return b
 	return {}
+
+
+var _kept_dials := 0
 
 
 # A table's row by the cells it holds at two columns.
@@ -239,7 +252,9 @@ func _runes_as_landed() -> Dictionary:
 
 # THE WARBAND's DATA WITH A LATER BATCH's APPEARANCE TAGS PUT BACK (`MOVED_SINCE`).
 func _warband_as_landed() -> Dictionary:
-	var d: Dictionary = Enemies._load().duplicate(true)
+	# BATCH KJ — THE WARBAND AS KJ FOUND IT (`Gate.warband_before_kj()`): KJ's rework — every kit cut to its tier, the designer's
+	# picks — is set aside as a later batch's kinds are, so the digest goes on asking whether anything else moved in what JP left.
+	var d: Dictionary = Gate.warband_before_kj().duplicate(true)
 	# BATCH JX §1 — THE ROSTER TAGS AS THEY STOOD BEFORE THE STAGES, put back first (JX folded roster 3 into 1 and 5 into 4): this gate digests the warband its batch left.
 	Gate.rosters_before_jx(d)
 	for kind in MOVED_SINCE:
@@ -354,6 +369,7 @@ func _s0_the_dials() -> void:
 	ok((by["1"] as Array).size() == 1 and (by["2"] as Array).size() == 7 and (by["3"] as Array).size() == 19,
 		"§0: the dials' table does not hold the cut, JO's seven and JN's ten with their nine bands (%d, %d, %d)" % [
 			(by["1"] as Array).size(), (by["2"] as Array).size(), (by["3"] as Array).size()])
+	print("    the dials' moves read where the warband stood before KJ (KJ took them out of their kits): %d" % _kept_dials)
 	ok(pulled.is_empty(), "§0: a dial was pulled — %s" % [pulled])
 	ok(not_its_record.is_empty(), "§0: a reversal's figure is not the record it returns to — %s" % [not_its_record])
 	ok(unrecorded.is_empty(), "§0: a reversal is not written where its change is recorded, with its keys and figures — %s" % [unrecorded])

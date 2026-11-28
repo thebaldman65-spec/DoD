@@ -3,16 +3,21 @@
 #   §0   GALL MOVES AND REACHES EVERY HERO: JL's twelve rulings answered and archived; Gall carried by the kind the data names a
 #        hexer that met the heroes most, read off the kept drive table (C01), the Hexer keeping Sap; Gall reaching every hero,
 #        laid on every hero standing by one cast and read at each hero's own healing door (C02); its cooldown its worth's band on
-#        JI's line, its worth what it denies on all four heroes against its carrier's basic, and the kept table saying so (C03)
+#        JI's line, its worth what it denies on all four heroes against its carrier's basic, and the kept table saying so (C03).
+#        Gall and Sap have no carrier since KJ, by the designer's picks (`KJ_CARRIERLESS`, a ruling owed): each is held carrierless
+#        in the game today, and §0 asks its questions of Gall's blow as the warband before KJ carried it, through the game's own
+#        doors (`Gate.warband_before_kj()`)
 #   §1   WHAT THE ARC DID: the kept reading names the tree before the arc by its commit, driven as it stands (C04), reads the
 #        warband's blows a fight beside the outcomes (C05), and names every impurity with the way it pushes (C06)
 #   §2   THE GAME AS IT IS PLAYED: the arm's relics are read off its own line and are not the default (C07), and the figures stand
 #        in a block of their own, every older figure where it stood (C08)
 #   §3   THE FIVE CARDS: each re-read on the tree that lands (C09), each band the point estimate's, a tie at a cut named and never
 #        resolved upward (C10), the five and no sixth, and no grade in the deck re-authored (C11)
-#   §4   NOTHING TUNED BUT GALL: every other move of the warband and every figure of the hexes and the pool as they stood (C12);
+#   §4   NOTHING TUNED BUT GALL: every other move of the warband — as it stood before KJ's rework — and every figure of the hexes and
+#        the pool as they stood (C12);
 #        the deck closed at twenty-five (C13)
-#   §5   THE TEXTS FOLLOW THE CONSTANT: what Gall does, stated off its constant where the record states it (R01)
+#   §5   THE TEXTS FOLLOW THE CONSTANT: what Gall does, stated off its constant where the record states it (R01), with no clock
+#        while no move lays it (a hex no move lays states none, as `check_jl` §5 reads it)
 #   §6   the player's files, as this gate found them
 #   Every needle is the rule's own words, never the batch code beside them.
 extends SceneTree
@@ -51,6 +56,14 @@ const KEPT_GRADES := "res://docs/reports/JM-grades.tsv"
 # SINCE JO IT IS JO's, Gall among its moves: seven of the ten brought to the line priced with their Break, and the four hexes onto
 # blows (`check_jo` §1, §2).
 const KIT_PIN := "res://docs/reports/JO-kit.json"
+# BATCH KJ — SINCE KJ §4's KIT IS READ OFF THE WARBAND AS IT STOOD BEFORE KJ's REWORK (`Gate.warband_before_kj()`), not re-pointed at
+# KJ's kit: KJ cut every kit to its tier, the designer's picks, and this gate holds the warband JM's arc left.
+# BATCH KJ — GALL AND SAP HAVE NO CARRIER SINCE KJ: the designer's picks cut every kit to its tier, and Gall went with the Orc Archer's
+# and the Spore Lobber's kits, Sap with the Orc Hexer's, the Blightcap's and the Stillwrought's. Each is named here, carrierless by
+# the designer's picks — a ruling owed: a carrier back, or the hex gone. §0 holds each carrierless in the game today, so an entry reds
+# the day a carrier returns, and asks Gall's reach, selection and band of its blow as the warband before KJ carried it; §5 holds
+# Gall's sentence with no clock while no move lays it.
+const KJ_CARRIERLESS := ["gall", "sap"]
 # BATCH JS — SEVEN KINDS JOINED THE WARBAND AFTER THIS GATE LANDED (JS §1–§3): the Frozen Plains' six and its boss. Each
 # is named here and read apart, so this gate goes on asking its own question of the warband its batch left; `check_js` holds
 # the seven. (Rosters 4 and 5 joined too; nothing this gate counts reads a roster.)
@@ -242,10 +255,10 @@ func _clean(h: BattleUnit) -> void:
 		h.remove_status(st)
 
 
-# Each kind's hexes, off the data: {hex id: [kind, ...]}.
-func _carriers() -> Dictionary:
+# Each kind's hexes, off the data it is handed: {hex id: [kind, ...]}.
+# BATCH KJ — today's data or the warband as it stood before KJ's rework (`Gate.warband_before_kj()`), as the caller asks.
+func _carriers(data: Dictionary) -> Dictionary:
 	var out := {}
-	var data: Dictionary = Enemies._load()
 	for kind in data:
 		for a in data[kind]["abilities"]:
 			var id := String((a.get("applies_status", {}) as Dictionary).get("id", ""))
@@ -256,14 +269,28 @@ func _carriers() -> Dictionary:
 	return out
 
 
-func _gall_move(kind: String) -> Dictionary:
-	var data: Dictionary = Enemies._load()
+func _gall_move(kind: String, data: Dictionary) -> Dictionary:
 	if not data.has(kind):
 		return {}
 	for a in data[kind]["abilities"]:
 		if String((a.get("applies_status", {}) as Dictionary).get("id", "")) == "gall":
 			return a
 	return {}
+
+
+# BATCH KJ — GALL's SOURCE WHILE IT STANDS CARRIERLESS (`KJ_CARRIERLESS`): the warband as it stood before KJ's rework, the last that
+# carried it; and a kind's config off that warband through the game's own door, `Enemies.config` — the door's table pointed at it
+# for the one call and put back.
+func _gall_source() -> Dictionary:
+	return Gate.warband_before_kj() if KJ_CARRIERLESS.has("gall") else Enemies._load()
+
+
+func _config_in(kind: String, data: Dictionary) -> Dictionary:
+	var live: Dictionary = Enemies._load()
+	Enemies._data = data
+	var cfg := Enemies.config(kind)
+	Enemies._data = live
+	return cfg
 
 
 # The tree's game, digested: every script and every data file, each file's md5 in name order, the whole hashed again.
@@ -310,7 +337,9 @@ func _s0_the_rulings() -> void:
 # most fights; Sap stays with the Orc Hexer.
 func _s0_the_carrier() -> void:
 	print("\n§0 — Gall's carrier: the hexer the heroes meet most")
-	var data: Dictionary = Enemies._load()
+	# BATCH KJ — JM's QUESTION OF THE WARBAND JM's ARC LEFT, as it stood before KJ's rework (`Gate.warband_before_kj()`); and each hex
+	# `KJ_CARRIERLESS` names held carrierless in the game today.
+	var data: Dictionary = Gate.warband_before_kj()
 	var met := {}
 	var rx := RegEx.new()
 	rx.compile("^fights acted in: (.+) \\(role hexer\\)$")
@@ -329,12 +358,19 @@ func _s0_the_carrier() -> void:
 		if n > most:
 			most = n
 			best = String(kind)
-	var car := _carriers()
-	print("    the hexers met: %s; the most, %s (%d fights); Gall on %s, Sap on %s" % [str(met), best, most, str(car.get("gall", [])), str(car.get("sap", []))])
+	var car := _carriers(data)
+	var today := _carriers(Enemies._load())
+	print("    the hexers met: %s; the most, %s (%d fights); Gall on %s, Sap on %s; in the game today Gall on %s, Sap on %s" % [str(met), best,
+		most, str(car.get("gall", [])), str(car.get("sap", [])), str(today.get("gall", [])), str(today.get("sap", []))])
 	ok(met.size() >= 5 and best != "", "§0: the kept drive table does not say how often each hexer met the heroes: %s" % str(met))
 	# BATCH KH §1 — the kinds added since set aside, as the Sap arm below sets them: the Spore Lobber carries the Archer's Gall.
-	ok((car.get("gall", []) as Array).filter(func(k): return not ADDED_SINCE.has(String(k))) == [best], "§0: Gall is not carried by the hexer the heroes meet most (%s), but by %s" % [best, str(car.get("gall", []))])
-	ok((car.get("sap", []) as Array).filter(func(k): return not ADDED_SINCE.has(String(k))) == ["hexer"], "§0: Sap is not the Orc Hexer's alone: %s" % str(car.get("sap", [])))
+	# BATCH KJ — and a hex `KJ_CARRIERLESS` names is carried by nothing today: an entry reds the day a carrier returns.
+	ok((car.get("gall", []) as Array).filter(func(k): return not ADDED_SINCE.has(String(k))) == [best]
+		and (not KJ_CARRIERLESS.has("gall") or (today.get("gall", []) as Array).is_empty()),
+		"§0: Gall is not carried by the hexer the heroes meet most (%s), but by %s — or it is carried today (%s) while named carrierless" % [best, str(car.get("gall", [])), str(today.get("gall", []))])
+	ok((car.get("sap", []) as Array).filter(func(k): return not ADDED_SINCE.has(String(k))) == ["hexer"]
+		and (not KJ_CARRIERLESS.has("sap") or (today.get("sap", []) as Array).is_empty()),
+		"§0: Sap is not the Orc Hexer's alone: %s — or it is carried today (%s) while named carrierless" % [str(car.get("sap", [])), str(today.get("sap", []))])
 
 
 # C02: GALL REACHES EVERY HERO — the move's own reach, and one cast lays it on every hero standing, each hero's heal then halved
@@ -342,12 +378,14 @@ func _s0_the_carrier() -> void:
 # among them — and its hover names that reach; JM's *never a companion* went with the hex special.
 func _s0_the_reach(s: Node) -> void:
 	print("\n§0 — Gall's reach: one cast, every ally standing")
-	var car := _carriers()
+	# BATCH KJ — GALL's BLOW AS THE WARBAND BEFORE KJ CARRIED IT while it stands carrierless (`_gall_source`), through today's doors.
+	var src := _gall_source()
+	var car := _carriers(src)
 	var kind := String((car.get("gall", [""]) as Array)[0]) if not (car.get("gall", []) as Array).is_empty() else ""
-	var mv := _gall_move(kind)
+	var mv := _gall_move(kind, src)
 	ok(bool(mv.get("aoe", false)), "§0: Gall does not reach every hero — the move on %s carries no reach of every hero" % kind)
 	var e: BattleUnit = _foes(s)[0]
-	var cfg := Enemies.config(kind) if kind != "" else {}
+	var cfg := _config_in(kind, src) if kind != "" else {}
 	var gall: Ability = null
 	for a in cfg.get("abilities", []):
 		if String((a as Ability).applies_status.get("id", "")) == "gall":
@@ -419,13 +457,15 @@ func _s0_the_reach(s: Node) -> void:
 # every hero carries it: a blow is never withheld for the status it lays.
 func _s0_the_selection(s: Node) -> void:
 	print("\n§0 — the selection: Gall's carrier chooses it among the attacks")
-	var car := _carriers()
+	# BATCH KJ — GALL's CARRIER AS THE WARBAND BEFORE KJ HELD IT while Gall stands carrierless (`_gall_source`), through today's selection.
+	var src := _gall_source()
+	var car := _carriers(src)
 	var kind := String((car.get("gall", [""]) as Array)[0]) if not (car.get("gall", []) as Array).is_empty() else ""
 	if kind == "":
 		ok(false, "§0: no kind carries Gall, so no selection lays it")
 		return
 	var f: BattleUnit = _foes(s)[0]
-	var cfg := Enemies.config(kind)
+	var cfg := _config_in(kind, src)
 	f.abilities = cfg["abilities"]
 	f.intent = {}
 	for h in _heroes(s):
@@ -469,13 +509,15 @@ func _s0_the_band(s: Node) -> void:
 	ok(line > 1.0, "§0: JI's line could not be read out of %s" % LINE_SOURCE)
 	var price := float(JI.break_figures().get("price", -1.0))
 	ok(price > 0.0, "§0: the Break price could not be read off check_ji")
-	var car := _carriers()
+	# BATCH KJ — GALL's BLOW AND ITS CARRIER's BASIC AS THE WARBAND BEFORE KJ HELD THEM while Gall stands carrierless (`_gall_source`).
+	var src := _gall_source()
+	var car := _carriers(src)
 	var kind := String((car.get("gall", [""]) as Array)[0]) if not (car.get("gall", []) as Array).is_empty() else ""
-	var mv := _gall_move(kind)
+	var mv := _gall_move(kind, src)
 	if mv.is_empty() or line <= 1.0:
 		ok(false, "§0: no kind carries Gall, so nothing prices it")
 		return
-	var data: Dictionary = Enemies._load()
+	var data: Dictionary = src
 	var kd: Dictionary = data[kind]
 	var basic: Dictionary = {}
 	for a in kd["abilities"]:
@@ -652,7 +694,9 @@ func _s4_not_done(s: Node) -> void:
 	ok(pin is Dictionary and (pin as Dictionary).size() > 0, "§4: the kept kit %s is not in the tree" % KIT_PIN)
 	var moved: Array = []
 	if pin is Dictionary:
-		var data: Dictionary = Enemies._load()
+		# BATCH KJ — THE WARBAND AS IT STOOD BEFORE KJ's REWORK (`Gate.warband_before_kj()`): KJ cut every kit to its tier, the designer's
+		# picks, and this arm holds the warband JM's arc left; the hexes' and the pool's figures below are the game's today.
+		var data: Dictionary = Gate.warband_before_kj()
 		for kind in pin:
 			var have: Array = []
 			for a in (data.get(kind, {}) as Dictionary).get("abilities", []):
@@ -686,16 +730,25 @@ func _s4_not_done(s: Node) -> void:
 func _s5_the_texts() -> void:
 	print("\n§5 — what Gall does, stated off its constant")
 	var cut := int(round(_unit_f("GALL_HEAL_CUT") * 100))
-	var car := _carriers()
+	# BATCH KJ — A HEX NO MOVE LAYS HAS NO CLOCK TO STATE (as `check_jl` §5 reads the hexes' sentence): the turns are the laying
+	# move's (`applies_status.turns`), read off the game today, so while Gall stands carrierless (`KJ_CARRIERLESS`) the sentence states
+	# its constant alone and a clock left beside it reds; the card arm below reads Gall's blow as the warband before KJ carried it.
+	var today := _carriers(Enemies._load())
+	var t_kind := String((today.get("gall", [""]) as Array)[0]) if not (today.get("gall", []) as Array).is_empty() else ""
+	var turns := int((_gall_move(t_kind, Enemies._load()).get("applies_status", {}) as Dictionary).get("turns", -1))
+	var clock := (" for %d turns" % turns) if t_kind != "" else ""
+	var sentence := "Gall cuts the healing every hero receives by %d%%%s" % [cut, clock]
+	var src := _gall_source()
+	var car := _carriers(src)
 	var kind := String((car.get("gall", [""]) as Array)[0]) if not (car.get("gall", []) as Array).is_empty() else ""
-	var turns := int((_gall_move(kind).get("applies_status", {}) as Dictionary).get("turns", -1))
-	var sentence := "Gall cuts the healing every hero receives by %d%% for %d turns" % [cut, turns]
 	var off: Array = []
-	if not _flat(_block(_doc("res://docs/state.md"), HEXES_HEAD)).contains(sentence):
+	var hexes_said := _flat(_block(_doc("res://docs/state.md"), HEXES_HEAD))
+	if not hexes_said.contains(sentence) or (clock == "" and hexes_said.contains(sentence + " for ")):
 		off.append("the hexes' block")
-	if not _untagged(_doc("res://docs/master.html")).contains(sentence):
+	var master_said := _untagged(_doc("res://docs/master.html"))
+	if not master_said.contains(sentence) or (clock == "" and master_said.contains(sentence + " for ")):
 		off.append("the master document")
-	var cfg := Enemies.config(kind) if kind != "" else {}
+	var cfg := _config_in(kind, src) if kind != "" else {}
 	for a in cfg.get("abilities", []):
 		if String((a as Ability).applies_status.get("id", "")) == "gall" \
 				and not (a as Ability).description.contains("Every hero receives %d%%" % cut):

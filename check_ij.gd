@@ -534,7 +534,9 @@ const REPAIRS := [
 	["status:parry_up", "+25% parry", "+15% parry"],
 	["status:unity", "the damage of every blow, recoil and bleedout", "all damage received"],
 	["status:devotion", "We Do Not Break: takes", "The Devout's presence: takes 15%"],
-	["status:shielded", "ward, or the Hollow Crown's Regalia).", "Shieldmaster's ward)."],
+	# BATCH KJ — RE-POINTED: the Shieldmaster and the Heartwood Sentinel guard since KJ (the designer's picks) and ward no one, so
+	# the chip names the one ward a kind carries, the Crown's; the false clause IJ found stays gone.
+	["status:shielded", "(the Hollow Crown's Regalia).", "Shieldmaster's ward)."],
 	["status:bulwark_line", "+12% Block", "+10% Block"],
 	["status:arcane_echo", "Barrage echoes once for every bolt.", "three-bolt Barrage echoes three times."],
 	["status:vespers", "absorbed, up to 20% of her maximum health.", "is absorbed. It"],
@@ -644,11 +646,14 @@ const REPAIRS := [
 	["status:divine_presence", "on which no hero fell below the window", "no ally fell"],
 	["engine:conviction", "the hero is healed for", "the ally is healed for"],
 	["lit:data/enemies.json", "Mends the most wounded of its warband", "Mends the most wounded ally", 2],
-	["lit:data/enemies.json", "Wards one of its warband: 25% less strike damage taken", "Wards an ally"],  # IK §5: the strike named
+	# BATCH KJ — Shielding's row stood here; KJ took the move out of every kit (the Shieldmaster and the Heartwood Sentinel guard
+	# instead, the designer's picks), and its text with it.
 	["lit:data/enemies.json", "Heals one of its warband for 20%", "Heals an ally for 20%"],
-	["lit:data/enemies.json", "Strips one harmful effect from each of its warband", "from each ally"],
+	# BATCH KJ — Cleansing Rite's row stood here; KJ cut the Orc Ritual Chanter's kit to its tier (Warding Chant and Raise, the
+	# designer's picks), and the move's text left with it.
 	["lit:data/enemies.json", "for every one of its warband fallen this battle", "for every ally that has fallen"],
-	["lit:data/enemies.json", "Its whole warband regains 6% of their maximum health", "Every ally regains 6%"],
+	# BATCH KJ — Dark Vigil's row stood here; KJ cut the Grave Totem's kit to its tier (Grasping Roots and Raise, the designer's
+	# picks), and the move's text left with it. Its log line, the row below, stands with the arm `battle.gd` keeps.
 	["lit:scripts/battle.gd:_resolve_special", "Dark Vigil — its whole warband regains", "Dark Vigil — every ally regains"],
 ]
 
@@ -1137,13 +1142,16 @@ const PINS := [
 	# BATCH JJ §3 RE-POINTED THE FOUR WARBAND-HEAL ROWS: their lines moved, unchanged, out of `_resolve_special`'s arms into
 	# `_warband_heal_figure`, the one door the arms and the pool's price read.
 	["lit:data/enemies.json", "for 25% of their max HP", "scripts/battle.gd", "_warband_heal_figure", "var wave_heal := maxi(int(round(target.max_hp * 0.25)), 1)"],
-	["lit:data/enemies.json", "heals 25% of max health", "scripts/battle.gd", "_warband_heal_figure", "var wave_heal := maxi(int(round(target.max_hp * 0.25)), 1)"],
+	# BATCH KJ — Regenerate's row stood here; KJ gave the Bog Troll Bog Guard in its place (the designer's E pick), and the move's
+	# text left with it. The code it pinned is held by Healing Wave's row above.
 	# BATCH IK §5 — the two wards name the strike; the figure and its code are unmoved.
-	["lit:data/enemies.json", "Wards one of its warband: 25% less strike damage taken for 3 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"shielded\", 3)"],
+	# BATCH KJ — Shielding's row stood here; KJ took the move out of every kit, and its text with it. The code it pinned is held
+	# by the Crown's row below.
 	["lit:data/enemies.json", "The Crown wards itself: 25% less strike damage taken for 3 turns", "scripts/battle.gd", "_resolve_special", "_apply_status(target, \"shielded\", 3)"],
 	["lit:data/enemies.json", "for 20% of their max health", "scripts/battle.gd", "_warband_heal_figure", "var growth := maxi(int(round(target.max_hp * 0.20)), 1)"],
 	["lit:data/enemies.json", "It lands next turn", "scripts/battle.gd", "_resolve_special", "\"ability\": ab, \"target\": null, \"turns\": 1, \"support\": false"],
-	["lit:data/enemies.json", "regains 6% of their maximum health", "scripts/battle.gd", "_warband_heal_figure", "var tp_amt := maxi(int(round(tp_a.max_hp * 0.06)), 1)"],
+	# BATCH KJ — Dark Vigil's row stood here; KJ cut the Grave Totem's kit to its tier, and the move's text left with it: no text a
+	# surface reads states the figure the arm `battle.gd` keeps still decides.
 	["upgrade:up_damage", "+50% damage", "scripts/run_state.gd", "_stamp_upgrade", "ab.damage * 1.5"],
 	["upgrade:up_cooldown", "-2 turns cooldown (minimum 0)", "scripts/run_state.gd", "_stamp_upgrade", "maxi(ab.cooldown - 2, 0)"],
 	["upgrade:up_speed", "Arrives 25% sooner", "scripts/run_state.gd", "_stamp_upgrade", "ab.delay * 0.75"],

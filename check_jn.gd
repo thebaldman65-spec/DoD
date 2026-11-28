@@ -8,7 +8,9 @@
 #   §1   EVERY KIND's SECOND DAMAGING MOVE PRICES AT THE LINE OR BETTER: the population derived off the data by JI's rule, read
 #        out of `check_ji` (C01, R01); no basic moved (C02); a raised move's damage and band the only keys that moved (C03); a
 #        kind that already cleared untouched (C04); each raised move's band the rule's (C05); no move authored for a kind whose
-#        only other move deals nothing (C06); the kept table states the before and the after as the data does.
+#        only other move deals nothing (C06); the kept table states the before and the after as the data does. The rule is asked
+#        of the game today, a move whose figures KJ's designer set by hand held at them (`check_ji`'s `KJ_RULED`, with the reason);
+#        the raise, its kit and its digest of the warband JN left, as it stood before KJ (`Gate.warband_before_kj()`).
 #   §2   THE TWO ARMS: Arm A's kept reading names the warband's blows a fight beside the outcomes (C12); Arm B wore talents,
 #        read off its own line, under a policy the census names (C11).
 #   §3   THE DECK closed at twenty-five, no grade re-authored (C13).
@@ -38,6 +40,8 @@ const CENSUS := "res://docs/reports/IU-bot-divergence.tsv"
 # THE DATA AS IT STOOD, every cooldown key aside and each raised move's damage aside: no other figure moved (C03). Printed below.
 # JO re-pinned it: JO §2 put the four hexes onto blows — Sap and Fester folded onto Bone Rattle and the Wretched Bellow, Gall and Mire
 # given damage, the hex special gone — and `check_jo` §1 and §2 hold that nothing else moved.
+# BATCH KJ — AND SINCE KJ IT IS READ OFF THE WARBAND AS IT STOOD BEFORE KJ's REWORK (`Gate.warband_before_kj()`): KJ's kits are the
+# designer's picks, and this digest is of the warband JN left.
 const DATA_REST := "09f6815f57f2a8d102ed42c543304d82"
 # BATCH JR — THREE APPEARANCE TAGS MOVED AFTER THIS GATE LANDED (JR §1): the Grave Totem and the Rot Behemoth each took a
 # roster, the Orc Hexer a second role. Each is named here and put back before the digest, so it goes on asking whether
@@ -545,6 +549,28 @@ func _s1_the_population() -> void:
 		if c0.size() > 13 and String(c0[13]) == "yes":
 			jn_ten["%s/%s" % [c0[0], c0[4]]] = true
 	ok(jn_ten.size() == 10, "§1: JN's kept table names %d raised moves, not ten" % jn_ten.size())
+	# BATCH KJ — JN's RAISE IS OF THE WARBAND JN LEFT, AS IT STOOD BEFORE KJ's REWORK (`Gate.warband_before_kj()`): KJ cut every kit to
+	# its tier, the designer's picks, and eight of the ten went with it. So the ten are read off that warband — each one's figure, band
+	# and multiple as JN's record states them — and §1's kit, digest and texts go on asking what JN did; the rule below is asked of
+	# the game today.
+	var kept_kj := Gate.warband_before_kj()
+	for kk in kept_kj:
+		var kabs: Array = kept_kj[kk]["abilities"]
+		var kb := _basic_at(kabs)
+		var kj := _second_at(kabs, kb) if kb >= 0 else -1
+		if kj < 0:
+			continue
+		var ka: Dictionary = kabs[kj]
+		var katk := float(kept_kj[kk]["attack"])
+		var km := _blow(ka, dot, katk) / _blow(kabs[kb], dot, katk)
+		var kname := String(ka["display_name"])
+		var kwas := ""
+		for rk in (before.get(kk, []) as Array):
+			if String(rk).begins_with(kname + "|"):
+				kwas = String(rk)
+		if kwas != "" and jn_ten.has("%s/%s" % [kk, kname]):
+			_pop.append([String(kk), kname, int(ka.get("damage", 0)), _figure(km), km])
+			print("    raised by JN, before KJ: %-16s %-18s %5.2f of its basic, band %d" % [kk, kname, km, _figure(km)])
 	var under: Array = []
 	var bands: Array = []
 	var none: Array = []
@@ -572,13 +598,17 @@ func _s1_the_population() -> void:
 		# gave Mire damage, so a move's damage beside JM's kit no longer says what JN raised; a raise was a move that stood under JN's
 		# line (C04 found the walk counting any moved second move as raised), and the table holds exactly those.
 		var raised := was != "" and jn_ten.has("%s/%s" % [kind, name])
-		if raised:
-			_pop.append([String(kind), name, int(a.get("damage", 0)), _figure(m), m])
-		print("    %-16s %-18s %5.2f of its basic, band %d, the data %d%s" % [kind, name, m, _figure(m), int(a.get("cooldown", 0)), "  (raised)" if raised else ""])
-		if m < _line:
+		# BATCH KJ — A MOVE WHOSE FIGURES KJ's DESIGNER SET BY HAND (`check_ji`'s `KJ_RULED`, its reason there): the Flank and hex moves
+		# at their basic's numbers (answers 1 and 3), so under the line by the designer's word, and Skullsplitter's band (answer 2) — each
+		# held at the designer's figure; the line holds every other kind's second damaging move.
+		var ruled := JI.KJ_RULED.has("%s/%s" % [kind, name])
+		var band := int(JI.KJ_RULED["%s/%s" % [kind, name]]) if ruled else _figure(m)
+		var tag := "  (raised)" if raised else ("  (the designer's by hand; the line's band %d)" % _figure(m) if ruled else "")
+		print("    %-16s %-18s %5.2f of its basic, band %d, the data %d%s" % [kind, name, m, band, int(a.get("cooldown", 0)), tag])
+		if m < _line and not ruled:
 			under.append("%s's %s at %.2f" % [kind, name, m])
-		if _figure(m) != int(a.get("cooldown", 0)):
-			bands.append("%s's %s: the rule gives %d, the data %d" % [kind, name, _figure(m), int(a.get("cooldown", 0))])
+		if band != int(a.get("cooldown", 0)):
+			bands.append("%s's %s: the rule gives %d, the data %d" % [kind, name, band, int(a.get("cooldown", 0))])
 	print("    CHECKED %d kinds' second damaging moves of %d kinds; %d raised; %d kinds hold none: %s" % [checked, data.size(), _pop.size(), none.size(), str(none)])
 	ok(checked + none.size() == data.size() and checked >= 10, "§1: the walk priced %d of %d kinds" % [checked, data.size()])
 	ok(under.is_empty(), "§1: a kind's second damaging move prices under the line: %s" % [under])
@@ -650,7 +680,9 @@ func _s1_the_kit() -> void:
 	ok(authored.is_empty(), "§1: a move was authored or taken away: %s" % [authored])
 	# AND EVERY OTHER KEY OF THE DATA — the status's chance, the damage's type, the words — as it stood: the data with every cooldown
 	# key and each raised move's damage set aside, digested.
-	var raw: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/enemies.json"))
+	# BATCH KJ — THE WARBAND AS IT STOOD BEFORE KJ's REWORK (`Gate.warband_before_kj()`): KJ cut every kit to its tier, the designer's
+	# picks, so this digest asks its question of the warband JN left, as the strips below do.
+	var raw: Variant = Gate.warband_before_kj()
 	# BATCH JX §1 — THE ROSTER TAGS AS THEY STOOD BEFORE THE STAGES, put back first (JX folded roster 3 into 1 and 5 into 4): this gate digests the warband its batch left.
 	Gate.rosters_before_jx(raw)
 	# BATCH JR — THREE APPEARANCE TAGS MOVED AFTER THIS GATE LANDED (JR §1), each named in `MOVED_SINCE` and put back
@@ -669,7 +701,7 @@ func _s1_the_kit() -> void:
 	# whether anything else in the warband's data moved.
 	((raw as Dictionary).get("withered_warden", {}) as Dictionary).erase("rootbound")
 	var rest := JSON.stringify(_strip(raw, raised, "")).md5_text()
-	print("    the data, every cooldown and each raised move's damage aside: %s" % rest)
+	print("    the warband before KJ's rework, every cooldown and each raised move's damage aside: %s" % rest)
 	ok(rest == DATA_REST, "§1: a figure of the warband moved beside the raised moves' damage and bands (%s)" % rest)
 
 

@@ -8,7 +8,8 @@
 #   §1a THE ENEMY'S DECLARED ATTACK, ON HOVER — THE EFFECT, NEVER THE TARGET. On a real battle: the plate's
 #       intent line carries the detail as its tooltip — the name, the band (`_damage_line`'s own line),
 #       what it applies, its Break damage and how many it hits — and no hero's name. Negative arms: an
-#       attack that applies nothing prints no effect line; an enemy that declares nothing shows nothing.
+#       attack that applies nothing prints no effect line; an enemy that declares nothing shows nothing. The pair
+#       declared is the Orc Hexer's since KJ (the raider holds its basic alone), on the board's raider.
 #       A census over every enemy ability in the data: each detail reads off its own fields.
 #   §1b THE KIT PREVIEW, FROM THE DRAFT AND THE SHOP — read-only, an overlay that loses nothing: opened
 #       mid-draft from a column, closed, and the staged pick confirmed and landed; from a rune cache's
@@ -452,18 +453,23 @@ func _s1a_the_telegraph() -> void:
 	var heroes: Array = (s.get("heroes") as Array).filter(func(h): return not h.is_companion)
 	var with_status: Ability = null
 	var plain: Ability = null
-	for a in foe.abilities:
+	# BATCH KJ — THE PAIR IS THE ORC HEXER's: KJ cut the Orc Raider to its basic alone (the designer's tier-1 pick, a 30% Sunder
+	# bite on it), so the board's raider carries no attack that applies nothing beside one that applies a status. The Hexer
+	# carries both — Hex Bolt, and Choking Hex's Silence — built by `Enemies.config` as the battle builds a kit, and each is
+	# declared on the board's raider, as the census below declares every enemy ability there.
+	var pair_kind := "hexer"
+	for a in (Enemies.config(pair_kind).get("abilities", []) as Array):
 		var ab: Ability = a
 		if ab.damage > 0 and not ab.applies_status.is_empty() and with_status == null:
 			with_status = ab
 		elif ab.damage > 0 and ab.applies_status.is_empty() and plain == null:
 			plain = ab
 	var ws_pick := ("%s (applies %s), the %s's first damaging ability that applies a status, in its kit order" % [
-		with_status.display_name, String(with_status.applies_status.get("id", "")), foe.unit_name]) if with_status != null else "none"
+		with_status.display_name, String(with_status.applies_status.get("id", "")), Enemies.unit_name(pair_kind)]) if with_status != null else "none"
 	var plain_pick := ("%s, the %s's first damaging ability that applies nothing, in its kit order" % [
-		plain.display_name, foe.unit_name]) if plain != null else "none"
+		plain.display_name, Enemies.unit_name(pair_kind)]) if plain != null else "none"
 	ok(with_status != null and plain != null,
-		"§1a: the raider carries an attack that applies a status and one that applies nothing")
+		"§1a: the Orc Hexer carries an attack that applies a status and one that applies nothing")
 	# THE POSITIVE ARM — the attack that applies something, aimed at the Warden.
 	if with_status != null:
 		_declare(s, foe, with_status, w)
@@ -473,6 +479,9 @@ func _s1a_the_telegraph() -> void:
 		var st_label := String((s.get("STATUS_INFO") as Dictionary)[sid][0])
 		var st_turns := int(with_status.applies_status.get("turns", 0))
 		var want_applies := "Applies %s for %d turn%s" % [st_label, st_turns, "" if st_turns == 1 else "s"]
+		# A Silence binds its bearer's next turn, and its line says so, as its chip and its description do.
+		if sid == "silenced":
+			want_applies = "Applies %s on that hero's next turn" % st_label
 		if with_status.status_chance < 1.0:
 			want_applies += " (%d%% chance)" % int(round(with_status.status_chance * 100.0))
 		ok(txt != "" and _intent_label(foe).mouse_filter == Control.MOUSE_FILTER_PASS,

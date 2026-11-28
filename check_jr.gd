@@ -6,7 +6,10 @@
 #        holds the two one answer) for every roster and every budget a fight
 #        node rolls (C01); every hex is still laid by the one kind that laid it, and no move moved (C02); no kind fielded by a rule
 #        rather than a draw — a boss, an elite — is drawn by a fight, and none of the three is one (C03); and nothing in the
-#        warband's data moved but the three appearance tags JR set (C15).
+#        warband's data moved but the three appearance tags JR set (C15). The rates, the tags, the rule-fielded and the digest are of
+#        the warband JR left, as it stood before KJ's rework (`Gate.warband_before_kj()`, the composer pointed at it); C02 asks the
+#        game today, the carriers KJ's designer's picks took named (`CARRIERS_TAKEN_KJ`) — Gall, Sap and Mire carrierless, a
+#        ruling owed.
 #   §2   A CITATION IS THE TEXT: no `file:NNN` citation, in any of its four spellings, stands in a document this gate holds (C04);
 #        none was replaced by another spelling of a line number (C05); the rule stands in `docs/ways-of-working.md` (C06); every
 #        kind of record that keeps a line is excluded HERE, by name and with its reason, and every excluded record is held at its
@@ -68,6 +71,11 @@ const ROSTERS_SINCE := [4, 5, 6]
 # BATCH KH §1 — the Spore Lobber's Sour Cloud lays Gall and the Blightcap's Spore Choke Sap, their Orcs' hexes copied; the list is in
 # the data's order, and the seven stand before the Stillwrought.
 const CARRIERS_SINCE := {"gall": ["spore_lobber"], "sap": ["blightcap", "stillwrought"], "fester": ["blight_speaker"]}
+# BATCH KJ — THE CARRIERS KJ's DESIGNER's PICKS TOOK: every kit cut to its tier, so Gall, Sap and Mire went with every move that laid
+# them, and Fester with the Blight-Speaker's Canker Litany (its Carrion Mark took the slot). Gall, Sap and Mire are carrierless, a
+# ruling owed — a carrier back, or the hex gone. C02 asks each hex's carriers less these, so an entry reds the day one returns.
+const CARRIERS_TAKEN_KJ := {"gall": ["archer", "spore_lobber"], "sap": ["hexer", "blightcap", "stillwrought"], "mire": ["grave_totem"],
+	"fester": ["blight_speaker"]}
 # BATCH JW §2 — and the Bone Shepherd, the Drowned Barrow's boss.
 # BATCH KG §1 — and the two new zones' own elites, fielded by the elite themes as the Chief is.
 # BATCH KH §1 — and the Forest of Old's own elite.
@@ -364,13 +372,18 @@ func _rates() -> Dictionary:
 
 func _s1_the_carriers() -> void:
 	print("\n§1 — the three rare carriers fielded more often, derived off the data; every hex on its carrier; no rule-fielded kind drawn")
-	var data: Dictionary = Enemies._load()
+	# BATCH KJ — JR's RATES, TAGS, RULE-FIELDED KINDS AND DIGEST ARE OF THE WARBAND JR LEFT: KJ's rework (the designer's picks) cut
+	# every kit and moved two kinds' power, which the composer prices by. So the composer's table is pointed at the warband as it stood
+	# before KJ (`Gate.warband_before_kj()`) for this section, and the live table comes back at its end; C02 asks the game today.
+	var live: Dictionary = Enemies._load()
+	var data: Dictionary = Gate.warband_before_kj()
+	Enemies._data = data
 	# BATCH JX §1 — JR's RATES ARE OF ROSTERS 1, 2 AND 3, which JX folded (3 into 1, 5 into 4): the tags as they stood before JX go
 	# into the warband's own table, which the composer reads, for this section, and the live ones come back at its end (KF §2:
 	# since KF the live tags are not JX's).
 	var live_zones := {}
-	for lk in data:
-		live_zones[lk] = ((data[lk] as Dictionary).get("zones", []) as Array).duplicate()
+	for lk in live:
+		live_zones[lk] = ((live[lk] as Dictionary).get("zones", []) as Array).duplicate()
 	Gate.rosters_before_jx(data)
 	# THE TAGS, AS JR SET THEM.
 	for kind in AS_JR:
@@ -424,9 +437,10 @@ func _s1_the_carriers() -> void:
 		ok(absf(mean - float(RATE_AT_JR[kind])) < 0.0005, "§1: %s's derived rate %.4f is not the %.4f JR recorded" % [kind, mean, float(RATE_AT_JR[kind])])
 		ok(not cells.has("0.0000"), "§1: %s is still absent from a roster's fights: %s" % [kind, str(cells)])
 	# C02 — EVERY HEX ON ITS ONE CARRIER.
+	# BATCH KJ — ASKED OF THE GAME TODAY: each hex's carriers less those KJ's designer's picks took (`CARRIERS_TAKEN_KJ`).
 	var carriers := {}
-	for kind in data:
-		for a in (data[kind] as Dictionary).get("abilities", []):
+	for kind in live:
+		for a in (live[kind] as Dictionary).get("abilities", []):
 			var st: Variant = (a as Dictionary).get("applies_status", null)
 			if st is Dictionary and HEX_CARRIER.has(String(st.get("id", ""))):
 				var h := String(st["id"])
@@ -436,7 +450,9 @@ func _s1_the_carriers() -> void:
 					(carriers[h] as Array).append(kind)
 	print("    the hexes' carriers: %s" % str(carriers))
 	for h in HEX_CARRIER:
-		ok(carriers.get(h, []) == [HEX_CARRIER[h]] + (CARRIERS_SINCE.get(h, []) as Array), "§1: %s is laid by %s, not by %s alone — a hex moved or a carrier was added" % [h, str(carriers.get(h, [])), HEX_CARRIER[h]])
+		var want_h: Array = ([HEX_CARRIER[h]] + (CARRIERS_SINCE.get(h, []) as Array)).filter(func(k): return not (CARRIERS_TAKEN_KJ.get(h, []) as Array).has(k))
+		ok(carriers.get(h, []) == want_h, "§1: %s is laid by %s, not by %s — a hex moved or a carrier was added (KJ's picks took %s)" % [h, str(carriers.get(h, [])),
+			str(want_h), str(CARRIERS_TAKEN_KJ.get(h, []))])
 	# C03 — A KIND FIELDED BY A RULE IS NEVER DRAWN BY A FIGHT, AND NONE OF THE THREE IS ONE.
 	var ruled: Array = []
 	for kind in data:
@@ -478,9 +494,9 @@ func _s1_the_carriers() -> void:
 	var d := JSON.stringify(as_head, "", true).md5_text()
 	print("    the warband's data with the three tags put back: %s" % d)
 	ok(d == WARBAND_AT_HEAD_MD5, "§1: something in the warband's data moved besides the three tags — a move, a figure, a kind")
-	for lk in live_zones:
-		(data[lk] as Dictionary)["zones"] = live_zones[lk]
-	var back := live_zones.keys().all(func(lk): return (data[lk] as Dictionary).get("zones", []) == live_zones[lk])
+	# BATCH KJ — THE COMPOSER's TABLE PUT BACK: the live warband, its own tags, as it stood before this section.
+	Enemies._data = live
+	var back := is_same(Enemies._load(), live) and live_zones.keys().all(func(lk): return (live[lk] as Dictionary).get("zones", []) == live_zones[lk])
 	ok(back, "§1: the live roster tags did not come back after JR's replay — a later section reads rosters no build fields")
 
 

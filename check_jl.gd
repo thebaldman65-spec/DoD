@@ -2,17 +2,23 @@
 #
 #   §0   JK's SEVEN RULINGS: answered, archived struck, every living citation re-pointed; the correction to the writing rule
 #        written where the rule lives.
-#   §1   A SPEND IS A FREE ACTION: it rides the body's own declaration beside its action, is bought first on the body's turn and
-#        charges no delay (C01, driven), one a turn (C02), never a side's action (C04); a Rally while two bodies stand (C03); the
-#        reserve a declared spend sets aside, beside its own body's; the plate names both.
-#   §2   FOUR HEXES: carriers derived off the data (C08); each read at its door, each door on its own line (C05, C06); Fester
+#   §1   A SPEND IS A FREE ACTION: it rides the body's own declaration beside its action — every kind the rule gives a spend
+#        (`check_jk`'s, the designer's answer since KJ) declares one, and no other kind does — is bought first on the body's turn
+#        and charges no delay (C01, driven), one a turn (C02), never a side's action (C04); a Rally while two bodies stand (C03);
+#        the reserve a declared spend sets aside, beside its own body's; the plate names both. Since KJ the Orc Chief and the Orc
+#        Brute rally, and a body holding two spends, or a heal and a Raise, is given its kit for the drive: no kind holds either.
+#   §2   FOUR HEXES: carriers derived off the data (C08) — every hex but the three the designer's picks left without one (KJ's:
+#        Gall, Sap and Mire, a ruling owed); each read at its door, each door on its own line (C05, C06); Fester
 #        cleansable by what every run owns, on the absence too (C07); each priced by what it denies off JA's census (C09) and
-#        cooled by JI's line (C10); each on the hero's plate (C11); the selection aims each at a hero who does not carry it.
+#        cooled by JI's line (C10); each on the hero's plate (C11); the selection takes a hex's blow as its attacks (since KJ the
+#        Rot Behemoth's Fester, the Hexer's Sap gone).
 #   §3   THE READING: the record carries the warband's blows a fight and each hex's uptime, as the kept table holds them (C12).
-#   §4   WHAT IS DELIBERATELY NOT DONE: the fill, the cap, the heals and the three spends' figures and cooldowns unmoved (C13);
-#        twenty-one kinds, fifty moves beside the spends and the hexes (fifty-two since JO §2, the hexes riding blows among
-#        them); the deck closed at twenty-five (C14).
-#   §5   THE TEXTS FOLLOW THE CONSTANTS: what each hex does, stated off its constant wherever it is stated (R01).
+#   §4   WHAT IS DELIBERATELY NOT DONE: the fill, the cap, the heals and the three spends' figures and cooldowns unmoved (C13),
+#        each kind's spends JK's row cut by the rule since KJ; twenty-one kinds, fifty moves beside the spends and the hexes
+#        (fifty-two since JO §2, the hexes riding blows among them), counted on the warband as KJ found it; the deck closed at
+#        twenty-five (C14).
+#   §5   THE TEXTS FOLLOW THE CONSTANTS: what each hex does, stated off its constant wherever it is stated (R01); a hex no move
+#        lays states no clock.
 #   §6   THE PLAYER'S FILES, as this gate found them.
 #
 #   Every needle is the rule's own words, never the batch code beside them (EA §2).
@@ -23,6 +29,8 @@ extends SceneTree
 const Gate = preload("res://gate_fixture.gd")
 # JI's LINE AND ITS BREAK PRICE (JO §1): the one blow every gate on the line prices through.
 const JI = preload("res://check_ji.gd")
+# BATCH KJ — THE RULE ON WHO SPENDS, stated once in `check_jk` (`kj_ruled_spends`, the designer's answer): §1 and §4 read it there.
+const JK = preload("res://check_jk.gd")
 
 # BATCH JS — SEVEN KINDS JOINED THE WARBAND AFTER THIS GATE LANDED (JS §1–§3): the Frozen Plains' six and its boss. Each
 # is named here and read apart, so this gate goes on asking its own question of the warband its batch left; `check_js` holds
@@ -42,6 +50,11 @@ const KINDS := 21
 # Sap and Fester ride two of the fifty, folded onto them.
 const MOVES_BEFORE := 52
 const HEXES := ["gall", "sap", "mire", "fester"]
+# BATCH KJ — THE THREE HEXES THE DESIGNER's PICKS LEFT WITHOUT A CARRIER, a ruling owed: Gall's carriers (the Orc Archer, the
+# Spore Lobber) are tier 1, a basic alone; the moves that laid Sap (the Hexer's, the Blightcap's, the Stillwrought's) and the
+# Grave Totem's Mire were not picked. Every other hex keeps the rule; each of the three is asked to stand without one, so a
+# carrier given back reds until its name goes from here.
+const KJ_NO_CARRIER := ["gall", "sap", "mire"]
 # THE HEX SPECIAL JL BUILT — a hex dealing nothing, rolling no miss — gone since JO §2, the designer's: no warband move lays a status
 # on a hero unless it deals damage. A hex's carrier is the kind whose move lays it (`_lays`); §2 asks that no move carries the special.
 const HEX_SPECIAL := "warband_hex"
@@ -347,6 +360,14 @@ func _count(src: String, needle: String) -> int:
 	return Gate.strip_comments(src).count(needle)
 
 
+# BATCH KJ — A KIND's MOVE BY ITS SPECIAL, OFF ITS CONFIG: for a drive that needs a body holding what no one kind holds since KJ.
+func _kind_move(kind: String, special: String) -> Ability:
+	for a in Enemies.config(kind)["abilities"]:
+		if String((a as Ability).special) == special:
+			return a
+	return null
+
+
 # ── §0 — JK's SEVEN RULINGS ───────────────────────────────────────────────────
 
 func _s0_the_rulings() -> void:
@@ -395,13 +416,20 @@ func _s1_the_shape(s: Node, free: bool) -> void:
 func _s1_every_kind_declares(s: Node, free: bool) -> void:
 	print("\n§1 — every kind declares a spend beside its action, on a board that wants one")
 	if not free:
-		ok(false, "§1: a kind declares no spend beside its action — no free spend in the tree")
+		ok(false, "§1: a kind the rule gives a spend declares none beside its action — no free spend in the tree")
 		return
 	var f: BattleUnit = _foes(s)[0]
 	var data: Dictionary = Enemies._load()
+	# BATCH KJ — THE KINDS THE RULE GIVES A SPEND (`check_jk`'s `kj_ruled_spends`, the designer's answer): JL asked it of every
+	# kind; since KJ the tougher kinds hold one, so each of those declares its spend beside its action and every other kind none.
+	var before: Dictionary = Gate.warband_before_kj()
 	var none: Array = []
 	var as_action: Array = []
+	var ruled_on := 0
 	for kind in data:
+		var ruled: Array = JK.kj_ruled_spends(String(kind), data[kind], before)
+		if not ruled.is_empty():
+			ruled_on += 1
 		_as_kind(f, String(kind))
 		_spend_board(s)
 		f.intent = {}
@@ -409,26 +437,32 @@ func _s1_every_kind_declares(s: Node, free: bool) -> void:
 		var act: Variant = f.intent.get("ability")
 		if act is Ability and String((act as Ability).special).begins_with("malice_"):
 			as_action.append(String(kind))
-		if _rider_special(f) == "":
-			none.append("%s declared %s and no spend" % [kind, (act as Ability).display_name if act is Ability else "nothing"])
+		var rode := _rider_special(f)
+		if (rode == "") != ruled.is_empty() or (rode != "" and not ruled.has(rode)):
+			none.append("%s declared %s and %s, the rule %s" % [kind, (act as Ability).display_name if act is Ability else "nothing",
+				rode if rode != "" else "no spend", str(ruled)])
 		f.intent = {}
-	print("    CHECKED %d of %d kinds" % [data.size(), KINDS])
-	ok(none.is_empty(), "§1: a kind declares no spend beside its action on a board that wants one: %s" % [none])
+	print("    CHECKED %d of %d kinds; the rule gives %d a spend" % [data.size(), KINDS, ruled_on])
+	ok(none.is_empty(), "§1: a kind the rule gives a spend declares none beside its action on a board that wants one, or another declares one: %s" % [none])
 	ok(as_action.is_empty(), "§1: a kind declares a spend as its action: %s" % [as_action])
 	_pool(s, 0)
 
 
-# C01: THE DRIVE — a Raider declares a Rally beside its blow; its turn buys the Rally, pays for it, and charges the blow's delay alone.
+# C01: THE DRIVE — an Orc Chief declares a Rally beside its blow; its turn buys the Rally, pays for it, and charges the blow's delay
+# alone.
 func _s1_the_free_turn(s: Node, free: bool) -> void:
 	print("\n§1 — the free turn, driven: the spend bought, the body's own action taken, its own delay charged")
 	if not free:
 		ok(false, "§1: a spend consumed its body's turn — no free spend in the tree")
 		return
 	var f: BattleUnit = _foes(s)[1]
-	_as_kind(f, "raider")
+	# BATCH KJ — THE ORC CHIEF RALLIES: the designer's picks left the Raider a basic alone. The Orc Brute's one blow of another
+	# delay than its Rally is its Skullsplitter, a wind-up, whose plate names its charge and not its blow; an elite keeps its
+	# Rally (the designer's answer) beside a Strike of another delay, so the drive takes the Chief.
+	_as_kind(f, "chief")
 	_spend_board(s)
 	# THE BLOW MUST NOT SHARE THE SPEND's DELAY, or a turn the spend took would read as the blow's (the new text's reader's M1): the
-	# Raider declares again until its blow is one whose delay differs from the Rally's, and says which it declared.
+	# Chief declares again until its blow is one whose delay differs from the Rally's, and says which it declared.
 	var act: Variant = null
 	var sp := ""
 	var spend_delay := -1.0
@@ -438,10 +472,12 @@ func _s1_the_free_turn(s: Node, free: bool) -> void:
 		act = f.intent.get("ability")
 		sp = _rider_special(f)
 		spend_delay = (_rider(f)["ability"] as Ability).delay if sp != "" else -1.0
-		if act is Ability and absf((act as Ability).delay - spend_delay) > 0.01:
+		# BATCH KJ — and a blow struck this turn, never a wind-up's charge.
+		if act is Ability and absf((act as Ability).delay - spend_delay) > 0.01 and String((act as Ability).special) != "windup":
 			break
-	ok(sp == "malice_rally" and act is Ability and (act as Ability).damage > 0 and absf((act as Ability).delay - spend_delay) > 0.01,
-		"§1: the premise — the Raider declares a Rally beside a blow of another delay (%s, %s)" % [sp, str(act)])
+	ok(sp == "malice_rally" and act is Ability and (act as Ability).damage > 0 and absf((act as Ability).delay - spend_delay) > 0.01
+			and String((act as Ability).special) != "windup",
+		"§1: the premise — the Orc Chief declares a Rally beside a blow of another delay (%s, %s)" % [sp, str(act)])
 	if not (act is Ability):
 		return
 	var ab: Ability = act
@@ -450,7 +486,7 @@ func _s1_the_free_turn(s: Node, free: bool) -> void:
 	var lab: Variant = f.get("_intent_label")
 	var line := (lab as Label).text if lab is Label else ""
 	var hover := (lab as Label).tooltip_text if lab is Label else ""
-	print("    the Raider's plate: '%s'; its hover opens '%s'" % [line, hover.get_slice("\n", 0)])
+	print("    the Chief's plate: '%s'; its hover opens '%s'" % [line, hover.get_slice("\n", 0)])
 	ok(line.find("Rally") >= 0 and line.find(ab.display_name) > line.find("Rally") and hover.begins_with("First, free: Rally"),
 		"§1: the plate does not name the spend and the move, the spend first, or its hover does not say the spend comes first and free: '%s' / '%s'" % [line, hover.get_slice("\n", 0)])
 	var t0 := f.next_time
@@ -464,7 +500,7 @@ func _s1_the_free_turn(s: Node, free: bool) -> void:
 	var want := ab.delay * 100.0 / f.effective_speed() * f.momentum_delay_mult()
 	var rallied := _foes(s).filter(func(e): return (e as BattleUnit).has_status("warband_rally")).size()
 	var paid := _spent(s) - spent0
-	print("    a Raider's turn: %s then %s; its clock moved %.2f (its blow's %.2f, a spend's %.2f); %d of %d standing rallied; the pool paid %d of %d" % [
+	print("    a Chief's turn: %s then %s; its clock moved %.2f (its blow's %.2f, a spend's %.2f); %d of %d standing rallied; the pool paid %d of %d" % [
 		sp, ab.display_name, dt, want, 2.5 * 100.0 / f.effective_speed(), rallied, _foes(s).size(), paid, m0])
 	ok(absf(dt - want) < 0.01, "§1: the body's turn charged %.2f, not its own action's delay %.2f — the spend took the turn or a delay of its own" % [dt, want])
 	ok(rallied == _foes(s).size() and paid == _const_i(s, "MALICE_RALLY_PRICE"), "§1: the free Rally was not bought: %d of %d rallied, the pool paid %d" % [rallied, _foes(s).size(), paid])
@@ -474,14 +510,20 @@ func _s1_the_free_turn(s: Node, free: bool) -> void:
 	_pool(s, 0)
 
 
-# C02: ONE SPEND A TURN — a Totemist on a board that wants a Raise and an Entrench buys one of them on its turn.
+# C02: ONE SPEND A TURN — a body holding a Raise and an Entrench, on a board that wants both, buys one of them on its turn.
 func _s1_one_a_turn(s: Node, free: bool) -> void:
 	print("\n§1 — one spend a turn")
 	if not free:
 		ok(false, "§1: two spends were bought on one turn — no free spend in the tree")
 		return
 	var f: BattleUnit = _foes(s)[0]
-	_as_kind(f, "totemist")
+	# BATCH KJ — A BODY HOLDING TWO SPENDS IS MADE FOR THE DRIVE: the designer's answer gives each spender one, so no kind holds a
+	# Raise and an Entrench since KJ (the Totemist held both); the Ritual Chanter's kit is given the Bog Troll's Entrench, and the
+	# rule this drives — one spend a turn — is the turn's, whatever a list holds.
+	_as_kind(f, "chanter")
+	var kj_entrench := _kind_move("bog_troll", "malice_entrench")
+	if kj_entrench != null:
+		f.abilities.append(kj_entrench)
 	var corpse := _spend_board(s)
 	f.intent = {}
 	s.call("_declare_intent", f)
@@ -497,7 +539,7 @@ func _s1_one_a_turn(s: Node, free: bool) -> void:
 		kinds += 1
 	if _foes(s).any(func(e): return (e as BattleUnit).has_status("warband_entrench")):
 		kinds += 1
-	print("    a Totemist's turn on a board wanting a Raise and an Entrench: %d riding its declaration, %d bought, %d kinds laid; the pool paid %d" % [
+	print("    a Chanter given an Entrench, its turn on a board wanting a Raise and an Entrench: %d riding its declaration, %d bought, %d kinds laid; the pool paid %d" % [
 		riders, bought, kinds, _spent(s) - spent0])
 	ok(riders == 1 and bought == 1 and kinds == 1, "§1: two spends were bought on one turn (%d riding, %d bought, %d laid)" % [riders, bought, kinds])
 	for e in _foes(s):
@@ -505,7 +547,7 @@ func _s1_one_a_turn(s: Node, free: bool) -> void:
 	_pool(s, 0)
 
 
-# C03: A RALLY WHILE TWO BODIES STAND — with two standing a Raider declares one; with one, none.
+# C03: A RALLY WHILE TWO BODIES STAND — with two standing an Orc Brute declares one; with one, none.
 func _s1_two_bodies(s: Node, free: bool) -> void:
 	print("\n§1 — a Rally while two or more bodies stand")
 	ok(_const_i(s, "MALICE_RALLY_BODIES") == 2, "§1: a Rally waits for %d standing bodies, not two" % _const_i(s, "MALICE_RALLY_BODIES"))
@@ -513,7 +555,8 @@ func _s1_two_bodies(s: Node, free: bool) -> void:
 		ok(false, "§1: a Rally is not declared while two bodies stand — no free spend in the tree")
 		return
 	var f: BattleUnit = _foes(s)[1]
-	_as_kind(f, "raider")
+	# BATCH KJ — the Orc Brute's Rally, the Raider's gone with the designer's picks.
+	_as_kind(f, "brute")
 	_spend_board(s)
 	var keep: Array = []
 	var others := _foes(s).filter(func(e): return e != f)
@@ -558,8 +601,9 @@ func _s1_the_reserve(s: Node, free: bool) -> void:
 		return
 	var f: BattleUnit = _foes(s)[1]
 	var g: BattleUnit = _foes(s)[2]
-	_as_kind(f, "raider")
-	_as_kind(g, "shieldmaster")
+	# BATCH KJ — an Orc Brute's Rally beside a Bog Troll's Entrench: the Raider and the Shieldmaster hold no spend since KJ.
+	_as_kind(f, "brute")
+	_as_kind(g, "bog_troll")
 	_spend_board(s)
 	var price := _const_i(s, "MALICE_RALLY_PRICE")
 	_pool(s, price)
@@ -570,13 +614,18 @@ func _s1_the_reserve(s: Node, free: bool) -> void:
 	g.intent = {}
 	s.call("_declare_intent", g)
 	var g_spend := _rider_special(g)
-	print("    a Raider's Rally set aside %d of %d; the pool's free share %d; the Shieldmaster beside it declared %s" % [held, price, free_left, g_spend if g_spend != "" else "no spend"])
+	print("    a Brute's Rally set aside %d of %d; the pool's free share %d; the Bog Troll beside it declared %s" % [held, price, free_left, g_spend if g_spend != "" else "no spend"])
 	ok(held == price and free_left == 0 and g_spend == "", "§1: a declared spend did not set its price aside (held %d of %d, free %d, the next body bought %s)" % [held, price, free_left, g_spend])
 	f.intent = {}
 	g.intent = {}
 	# A TOTEMIST's HEAL AND ITS SPEND: one short of both prices, the heal and no spend; at both, both.
 	var t: BattleUnit = _foes(s)[0]
 	_as_kind(t, "totemist")
+	# BATCH KJ — A TOTEMIST GIVEN THE RITUAL CHANTER's RAISE: the designer's picks left the Totemist its heal and no spend, and no
+	# kind holds a heal and a Raise since KJ; the reserve's arithmetic this drives is the declaration's, whatever a list holds.
+	var kj_raise := _kind_move("chanter", "malice_raise")
+	if kj_raise != null:
+		t.abilities.append(kj_raise)
 	var corpse := _spend_board(s)
 	var hurt: BattleUnit = _foes(s)[3]
 	hurt.hp = int(hurt.max_hp * 0.3)
@@ -621,7 +670,7 @@ func _s1_the_reserve(s: Node, free: bool) -> void:
 # ── §2 — FOUR HEXES ───────────────────────────────────────────────────────────
 
 # C08: THE CARRIERS, DERIVED OFF THE DATA — every hex has one, and the Orc Hexer carries one or more: its Sap, since JM §0 moved
-# Gall onto the Orc Archer (check_jm §0 holds who carries Gall).
+# Gall onto the Orc Archer (check_jm §0 holds who carries Gall). Since KJ every hex but KJ's three (`KJ_NO_CARRIER`).
 func _s2_the_carriers() -> void:
 	print("\n§2 — who carries each hex, off the data")
 	var data: Dictionary = Enemies._load()
@@ -639,9 +688,25 @@ func _s2_the_carriers() -> void:
 	for h2 in HEXES:
 		if (carriers[h2] as Array).has("hexer"):
 			hexer += 1
-	print("    %s; the Orc Hexer carries %d" % [str(carriers), hexer])
-	ok(none.is_empty(), "§2: a hex has no carrier: %s" % [none])
-	ok(hexer >= 1, "§2: the Orc Hexer carries %d hexes, not one or more" % hexer)
+	# BATCH KJ — KJ's THREE STAND WITHOUT A CARRIER (`KJ_NO_CARRIER`, a ruling owed): every other hex still has one, and each of
+	# the three still has none.
+	var unborne: Array = none.filter(func(h): return not KJ_NO_CARRIER.has(h))
+	var borne_again: Array = KJ_NO_CARRIER.filter(func(h): return not none.has(h))
+	# AND THE ORC HEXER: the hex it carried before KJ is one of KJ's three, so it is asked whether a blow of its kit lays a status
+	# on a hero where that hex stood (Choking Hex, the designer's pick).
+	var hexer_then: Array = []
+	for a0 in (Gate.warband_before_kj().get("hexer", {}) as Dictionary).get("abilities", []):
+		if _lays(a0) != "":
+			hexer_then.append(_lays(a0))
+	var hexer_lays := ""
+	for a1 in (data.get("hexer", {}) as Dictionary).get("abilities", []):
+		if int(a1.get("damage", 0)) > 0 and String((a1.get("applies_status", {}) as Dictionary).get("id", "")) != "":
+			hexer_lays = String((a1.get("applies_status", {}) as Dictionary).get("id", ""))
+	var hexer_kj := not hexer_then.is_empty() and hexer_then.all(func(h): return KJ_NO_CARRIER.has(h)) and hexer_lays != ""
+	print("    %s; the Orc Hexer carries %d (before KJ %s; its blow lays %s); KJ's three, without a carrier: %s" % [
+		str(carriers), hexer, str(hexer_then), hexer_lays if hexer_lays != "" else "nothing", str(KJ_NO_CARRIER)])
+	ok(unborne.is_empty() and borne_again.is_empty(), "§2: a hex has no carrier outside KJ's three, or one of KJ's three has one again: %s, %s" % [unborne, borne_again])
+	ok(hexer >= 1 or hexer_kj, "§2: the Orc Hexer carries %d hexes, not one or more — nor, since KJ, does a blow of its kit lay a status where its hex stood" % hexer)
 	# THE KEPT TABLE SAYS WHO CARRIES WHAT AS THE DATA DOES.
 	var rows := _doc(KEPT_HEXES).split("\n", false)
 	var said := {}
@@ -657,7 +722,12 @@ func _s2_the_carriers() -> void:
 			if not said.has("%s/%s" % [k, h3]):
 				missing.append("%s/%s" % [k, h3])
 	var extra: Array = said.keys().filter(func(x): return not (carriers.get(String(x).split("/")[1], []) as Array).has(String(x).split("/")[0]))
-	ok(rows.size() > 1 and missing.is_empty() and extra.is_empty(), "§2: the kept table does not say who carries each hex as the data does: missing %s, extra %s" % [missing, extra])
+	# BATCH KJ — JO's TABLE STANDS AS JO's RECORD (three gates beside this one read it): a row for one of KJ's three hexes is a
+	# carrier the designer's picks took, printed as the record, and any other row the data does not bear reds.
+	var kj_taken: Array = extra.filter(func(x): return KJ_NO_CARRIER.has(String(x).split("/")[1]))
+	var unborne_rows: Array = extra.filter(func(x): return not KJ_NO_CARRIER.has(String(x).split("/")[1]))
+	print("    [record] the kept table's carriers the designer's picks took: %s" % str(kj_taken))
+	ok(rows.size() > 1 and missing.is_empty() and unborne_rows.is_empty(), "§2: the kept table does not say who carries each hex as the data does: missing %s, extra %s" % [missing, unborne_rows])
 
 
 # C05: GALL AT THE ONE DOOR EVERY HEAL PASSES — three paths, each on its own line: a cast's heal, a heal the warband casts on a hero
@@ -909,7 +979,8 @@ func _s2_the_prices(s: Node) -> void:
 			if row == null or absf(float(row[0]) - worth) > 0.051 or int(row[1]) != have:
 				wrong.append("the kept table prices %s's %s at %s, its blow on the line is %.1f" % [kind, id, str(row), worth])
 	print("    CHECKED %d hexes, each on a blow" % checked)
-	ok(checked >= HEXES.size(), "§2: the walk priced %d hexes, not four or more" % checked)
+	# BATCH KJ — ONE FOR EACH HEX A MOVE LAYS: KJ's three have no carrier (§2's carriers), so the walk prices the rest.
+	ok(checked >= HEXES.size() - KJ_NO_CARRIER.size(), "§2: the walk priced %d hexes, not one for each hex a move lays" % checked)
 	ok(specials.is_empty(), "§2: a move is still a hex that deals nothing and rolls no miss: %s" % [specials])
 	ok(wrong.is_empty(), "§2: a hex rides no blow, or one not cooled off the line: %s" % [wrong])
 
@@ -944,14 +1015,16 @@ func _s2_the_plate(s: Node, hexes: bool) -> void:
 
 # THE SELECTION (JO §2): the Orc Hexer's Bone Rattle, carrying Sap, is chosen as its attacks are — among the moves that deal damage —
 # and is still chosen once every hero carries Sap, since a blow is never withheld for the status it lays. JL's hex, aimed past the
-# draws at a hero who did not carry it and never once all did, went with the hex special.
+# draws at a hero who did not carry it and never once all did, went with the hex special. Since KJ the Rot Behemoth's Wretched
+# Bellow, carrying Fester: the designer's picks took the Hexer's Sap (`KJ_NO_CARRIER`).
 func _s2_the_selection(s: Node, hexes: bool) -> void:
 	print("\n§2 — the selection: a hex's blow chosen as an attack is")
 	if not hexes:
 		ok(false, "§2: the selection lays no hex — no hex in the tree")
 		return
 	var f: BattleUnit = _foes(s)[2]
-	_as_kind(f, "hexer")
+	# BATCH KJ — the Rot Behemoth and its Fester, a kind that still carries a hex.
+	_as_kind(f, "behemoth")
 	for h in _heroes(s):
 		_clean(h)
 	var picked := {}
@@ -962,21 +1035,21 @@ func _s2_the_selection(s: Node, hexes: bool) -> void:
 		if ab is Ability:
 			var nm := (ab as Ability).display_name
 			picked[nm] = int(picked.get(nm, 0)) + 1
-	var host := _hex_host(f, "sap")
+	var host := _hex_host(f, "fester")
 	var name := host.display_name if host != null else "?"
-	print("    the Hexer's choices over 40 on a clean board: %s" % str(picked))
-	ok(host != null and int(picked.get(name, 0)) >= 1 and picked.size() >= 2, "§2: the Hexer's selection does not take the blow that carries Sap among its attacks: %s" % str(picked))
+	print("    the Behemoth's choices over 40 on a clean board: %s" % str(picked))
+	ok(host != null and int(picked.get(name, 0)) >= 1 and picked.size() >= 2, "§2: the Behemoth's selection does not take the blow that carries Fester among its attacks: %s" % str(picked))
 	var e: BattleUnit = _foes(s)[0]
 	for h2 in _heroes(s):
-		s._apply_status(h2, "sap", 3, 0, 0, e)
+		s._apply_status(h2, "fester", 3, 0, 0, e)
 	var again := 0
 	for _j in 30:
 		f.cooldowns = {}
 		var c2: Dictionary = s.call("_choose_enemy_action", f)
 		if c2.get("ability") is Ability and (c2["ability"] as Ability).display_name == name:
 			again += 1
-	print("    with every hero carrying Sap: %s chosen %d of 30" % [name, again])
-	ok(again >= 1, "§2: the Hexer withholds the blow that lays Sap once every hero carries it (%d of 30)" % again)
+	print("    with every hero carrying Fester: %s chosen %d of 30" % [name, again])
+	ok(again >= 1, "§2: the Behemoth withholds the blow that lays Fester once every hero carries it (%d of 30)" % again)
 	for h3 in _heroes(s):
 		_clean(h3)
 	_as_kind(f, "shieldmaster")
@@ -1037,7 +1110,10 @@ func _s4_not_done(s: Node) -> void:
 	if absf(_unit_f("MALICE_ENTRENCH_MULT") - 2.0) > 0.0001:
 		moved.append("MALICE_ENTRENCH_MULT %s" % str(_unit_f("MALICE_ENTRENCH_MULT")))
 	# THE SPENDS' COOLDOWNS: each kind's spends as JK's kept table holds them.
+	# BATCH KJ — CUT BY THE RULE (`check_jk`'s `kj_ruled_spends`, the designer's answer): KJ took the spends off every kind the rule
+	# leaves none and moved no figure, so each spend the data holds stands at JK's cooldown and each one gone is one the rule took.
 	var data: Dictionary = Enemies._load()
+	var before: Dictionary = Gate.warband_before_kj()
 	for r in _doc(KEPT_SPENDS).split("\n", false).slice(1):
 		var c := String(r).split("\t")
 		if c.size() < 6 or not data.has(c[0]):
@@ -1046,10 +1122,20 @@ func _s4_not_done(s: Node) -> void:
 		for a in data[c[0]]["abilities"]:
 			if String(a.get("special", "")).begins_with("malice_"):
 				have.append("%s %d" % [String(a["display_name"]), int(a.get("cooldown", 0))])
-		if c[5] != ", ".join(PackedStringArray(have)):
-			moved.append("%s's spends %s, JK's '%s'" % [c[0], str(have), c[5]])
+		var ruled: Array = JK.kj_ruled_spends(c[0], data[c[0]], before)
+		var cut := []
+		for cell in c[5].split(", ", false):
+			var nm := String(cell).rsplit(" ", true, 1)[0]
+			for a0 in (before.get(c[0], {}) as Dictionary).get("abilities", []):
+				if String(a0.get("display_name", "")) == nm and ruled.has(String(a0.get("special", ""))):
+					cut.append(cell)
+		if ", ".join(PackedStringArray(have)) != ", ".join(PackedStringArray(cut)):
+			moved.append("%s's spends %s, JK's '%s' cut by the rule %s" % [c[0], str(have), c[5], str(cut)])
 	ok(moved.is_empty(), "§4: the fill, the cap, a heal's price or a spend's figure moved: %s" % [moved])
 	ok((_run.MODIFIERS as Dictionary).size() == DECK_CLOSED_AT, "§4: the deck holds %d, not the twenty-five it closed at" % (_run.MODIFIERS as Dictionary).size())
+	# BATCH KJ — THE WARBAND AS KJ FOUND IT (`Gate.warband_before_kj()`): KJ re-cut every kit by the designer's picks, so the moves
+	# JL left are counted on the kept copy, as a later batch's kinds are set aside by ADDED_SINCE.
+	data = before
 	var moves := 0
 	var hex_moves := 0
 	for k3 in data:
@@ -1080,8 +1166,10 @@ func _s5_the_texts(s: Node, hexes: bool) -> void:
 		for a in Enemies._load()[kind]["abilities"]:
 			if _lays(a) != "":
 				turns[_lays(a)] = int(a["applies_status"]["turns"])
-	var sentence := "Gall cuts the healing every hero receives by %d%% for %d turns; Sap cuts what a hero's resource bar gains by %d%% for %d turns; Mire makes a hero act %d%% slower for %d turns; Fester deals %d%% of its applier's Attack a stack at each of the hero's turn starts and gains a stack each turn, until it is cleansed." % [
-		gall, int(turns.get("gall", -1)), sap, int(turns.get("sap", -1)), mire, int(turns.get("mire", -1)), fester]
+	# BATCH KJ — A HEX NO MOVE LAYS HAS NO CLOCK TO STATE: the turns are the laying move's (`applies_status.turns`), and since KJ
+	# Gall, Sap and Mire have none (§2's `KJ_NO_CARRIER`), so each of those is stated by its constant alone.
+	var sentence := "Gall cuts the healing every hero receives by %d%%%s; Sap cuts what a hero's resource bar gains by %d%%%s; Mire makes a hero act %d%% slower%s; Fester deals %d%% of its applier's Attack a stack at each of the hero's turn starts and gains a stack each turn, until it is cleansed." % [
+		gall, _clock(turns, "gall"), sap, _clock(turns, "sap"), mire, _clock(turns, "mire"), fester]
 	ok(_flat(_block(_doc("res://docs/state.md"), HEXES_HEAD)).contains(sentence), "§5: the state does not state what each hex does off the constants: '%s'" % sentence)
 	ok(_untagged(_doc("res://docs/master.html")).contains(sentence), "§5: the master document does not state what each hex does off the constants: '%s'" % sentence.left(160))
 	ok(_flat(_block(_doc("res://docs/state.md"), "## WHERE THE PROJECT IS")).contains(sentence), "§5: the WHERE block does not state what each hex does off the constants")
@@ -1110,6 +1198,11 @@ func _s5_the_texts(s: Node, hexes: bool) -> void:
 					if String(ln).length() > 44:
 						off.append("%s's %s runs past 44 characters" % [kind, (ab as Ability).display_name])
 	ok(off.is_empty(), "§5: a hex's text does not state its figure off the constant: %s" % [off])
+
+
+# BATCH KJ — " for N turns" where a move lays the hex, "" where none does.
+func _clock(turns: Dictionary, h: String) -> String:
+	return (" for %d turns" % int(turns[h])) if turns.has(h) else ""
 
 
 # ── §6 — THE PLAYER's FILES ───────────────────────────────────────────────────

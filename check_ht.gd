@@ -143,11 +143,24 @@ func _log_text(scene: Node) -> String:
 	return String((scene.get("history") as RichTextLabel).get_parsed_text())
 
 
-# The enemy mender's rite, built off the data as the warband's own is — never a copy.
+# The enemy mender's rite, built off the data as the warband's own was — never a copy.
+# BATCH KJ — NO KIND CARRIES THE RITE SINCE KJ's PICKS: the Ritual Chanter's kit is Warding Chant and Raise (the designer's),
+# and `battle.gd`'s `cleanse_allies` arm stands, with its support-half lookup. So the arm is driven with a rite of this gate's
+# own: the Chanter's rite as the warband held it before KJ (`Gate.warband_before_kj()`, KI's data byte for byte), made an
+# Ability as `Enemies.config` makes a kit's entry. §1's assertions are the arm's, and none moved.
 func _the_rite() -> Ability:
-	for ab in Enemies.config("chanter").get("abilities", []):
-		if (ab as Ability).special == "cleanse_allies":
-			return ab
+	var before: Dictionary = Gate.warband_before_kj().get("chanter", {})
+	for ad in before.get("abilities", []):
+		if String((ad as Dictionary).get("special", "")) != "cleanse_allies":
+			continue
+		var d: Dictionary = (ad as Dictionary).duplicate(true)
+		d.erase("rung")
+		for key in Enemies.AB_INT_KEYS:
+			if d.has(key):
+				d[key] = int(d[key])
+		if String(d.get("target", "")) == "ally":
+			d["target"] = Ability.Target.ALLY
+		return Ability.make(d)
 	return null
 
 
@@ -209,7 +222,16 @@ func _code_only(line: String) -> String:
 
 # Every function body in a file, comments stripped: [[name, body], …].
 func _bodies(path: String) -> Array:
-	var src := Gate.strip_comments(FileAccess.get_file_as_string(path))
+	return _windows(Gate.strip_comments(FileAccess.get_file_as_string(path)))
+
+
+# BATCH KJ §1 — A FUNCTION's BODY ENDS WHERE THE FUNCTION DOES (IT §3b; the positional census's MISSES row on `_bodies`,
+# REPAIRED AT KJ §1 by the touch that gave §1 a rite of its own): the first line after a function's head that is neither
+# blank nor indented closes it, so a top-level `const`, `var` or `signal` between two functions is no longer read as the
+# earlier one's body. At KJ 67 bodies of the two scripts carried one (19 of 148, 48 of 524), among them the nameplate's
+# tables (eleven literals) swept as `_refresh_chips`' and the companions' table as `_resolve_special`'s; the population
+# held, 32 functions. A `static func`, so `check_kj` drives it on text whose answer is known.
+static func _windows(src: String) -> Array:
 	var out: Array = []
 	var name := ""
 	var body := ""
@@ -219,6 +241,10 @@ func _bodies(path: String) -> Array:
 			if name != "":
 				out.append([name, body])
 			name = line.get_slice("(", 0).replace("static func ", "").replace("func ", "").strip_edges()
+			body = ""
+		elif name != "" and line.strip_edges() != "" and not line.begins_with("\t") and not line.begins_with(" "):
+			out.append([name, body])
+			name = ""
 			body = ""
 		if name != "":
 			body += line + "\n"
@@ -242,7 +268,7 @@ func _s1_the_rite() -> void:
 	var a: BattleUnit = foes[0]
 	var chanter: BattleUnit = foes[2]
 	var rite := _the_rite()
-	ok(rite != null, "§1: the Ritual Chanter's rite is not in the data — nothing to drive")
+	ok(rite != null, "§1: the Ritual Chanter's rite is not in the warband kept before KJ — nothing to drive")
 	if rite == null:
 		scene.queue_free()
 		await process_frame

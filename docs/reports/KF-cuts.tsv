@@ -178,3 +178,10 @@ fortified	Fortified	—	buff	a party ward laid by its own writer; helps its bear
 standard	Standard Bearer	—	buff	the Standard Bearer's aura on an ally; helps its bearer
 unrelenting	Unrelenting Assault	—	buff	Constitution gained on the hero's own blows; helps its bearer
 charging	Charging	—	buff	an enemy's declared wind-up (DISPEL_NEVER); an enemy's plate is unframed
+silenced	Silenced	Sd	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+branded	Branded	Bm	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+doomed	Doomed	Dm	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+singled_out	Singled Out	S!	debuff	in DEBUFF_IDS — the game's registry of debuffs, which Iron Will counts and most cleanses lift
+guarding	Guarding	Gd	buff	an enemy's own boon; an enemy's plate is unframed
+hunkered	Hunkered	Hk	buff	an enemy's own boon; an enemy's plate is unframed
+fury	Fury	Fy	buff	an enemy's own boon; an enemy's plate is unframed

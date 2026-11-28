@@ -445,6 +445,15 @@ func _s1e_the_long_silence() -> void:
 	if s == null or h == null or foes.is_empty():
 		await _clear(s)
 		return
+	# BATCH KJ — the fixture's warband is tier 1 since KJ, each kit a basic and nothing else, so the enemy arm below had
+	# no second attack to spend: the first foe takes the Wolfrider's kit off the data (its basic and Harrying Bite)
+	# before the Silence is stamped, so the stamp reads that kit.
+	(foes[0] as BattleUnit).abilities = Enemies.config("wolfrider")["abilities"]
+	# And every foe is made deep: the bot's picks below are cast through the real door, and a foe one cast felled (KJ's bands
+	# cut its health) is a death the put-back cannot undo — the Wolfrider-kitted foe was the one the enemy half reads.
+	for f0 in foes:
+		(f0 as BattleUnit).max_hp = 100000
+		(f0 as BattleUnit).hp = 100000
 	var crush: Ability = s.call("_find_ability", h, "Crushing Blow")
 	ok(crush != null, "§1e: the Warrior holds Crushing Blow (his class kit)")
 	if crush == null:

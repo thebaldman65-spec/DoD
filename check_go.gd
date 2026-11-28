@@ -216,8 +216,14 @@ func _blow(s: Node, foe: BattleUnit, victim: BattleUnit, sd: int) -> int:
 	foe.cooldowns.clear()
 	seed(sd)
 	var before := victim.hp
+	var had: Array = victim.statuses.map(func(st): return st.id)
 	await s._resolve(foe, foe.abilities[0], victim, "good")
 	foe.attack = atk_was
+	# BATCH KJ — a tier-1 basic can bite (the Raider's lays Sunder), and a bite this blow laid would make the next blow this
+	# gate measures a harder one: what the foe's blow laid on its victim comes off, so each reading is one bare blow.
+	for st in victim.statuses.duplicate():
+		if not had.has(st.id) and String(st.get("src_name", "")) == foe.unit_name:
+			victim.remove_status(String(st.id))
 	return before - victim.hp
 
 

@@ -21,7 +21,8 @@
 #        `check_ji`'s `TUNED` (C12).
 #   §6   THE RECORD: the twelve rulings answered and archived, the pool's sentence and rule in the state and the master
 #        document off the constants (R01), the reading with its before figures and the pool's own (C09, H02).
-#   §7   WHAT IS DELIBERATELY NOT DONE: the deck at twenty-five (C13); no enemy kind or move added.
+#   §7   WHAT IS DELIBERATELY NOT DONE: the deck at twenty-five (C13); no enemy kind or move added to the warband as KJ found it
+#        (its kept copy: KJ's rework is the designer's picks).
 #   §8   THE PLAYER's FILES, as this gate found them.
 #
 #   Every needle is the rule's own words, never the batch code beside them (EA §2). Every driven arm asks first whether the
@@ -848,7 +849,9 @@ func _figures(cell: String) -> Array:
 func _s7_not_done() -> void:
 	print("\n§7 — the deck closed, and no enemy kind or move added")
 	ok((_run.MODIFIERS as Dictionary).size() == DECK_CLOSED_AT, "§7: the deck holds %d, not the twenty-five it closed at" % (_run.MODIFIERS as Dictionary).size())
-	var data: Dictionary = Enemies._load()
+	# BATCH KJ — THE WARBAND AS KJ FOUND IT (`Gate.warband_before_kj()`): KJ re-cut every kit by the designer's picks, so the moves
+	# JJ left are counted on the kept copy, as a later batch's kinds are set aside by ADDED_SINCE.
+	var data: Dictionary = Gate.warband_before_kj()
 	var moves := 0
 	for k in data:
 		# JK §1 — the warband's Malice spends are JK's moves, held by `check_jk` §4; the moves beside them (fifty-two since JO §2) are

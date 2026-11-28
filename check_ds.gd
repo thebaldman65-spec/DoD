@@ -19,6 +19,8 @@
 #   §2c  **THE FAULT.** The refusal is IDENTITY against `_cheapest_attack`,
 #        not `cost > 0` — asserted so that the `cost > 0` version fails it
 #   §2d  the fallback cannot starve, driven through `_revalidate_intent`
+#        (§2c and §2d ask it of the Wolfrider's kit since KJ cut the Orc Raider,
+#        the board's first foe, to its basic alone)
 #
 # ── WHY §2c IS SHAPED THE WAY IT IS, WHICH IS THE WHOLE POINT OF THIS GATE ──
 # Heads Down's first version refused any ability with `cost > 0`, on the
@@ -400,6 +402,15 @@ func _heads_down(scene: Node, src: String) -> void:
 		"an UNBROKEN boss refused the silence — it has joined `_apply_status`'s carve-out, which exists for effects that take a whole turn, and this one never does")
 	foe.is_boss = false
 
+	# BATCH KJ — §2c AND §2d ASK THEIR QUESTION OF THE WOLFRIDER's KIT: KJ cut the Orc Raider, the board's first foe, to its basic
+	# alone (the designer's tier-1 pick), so no body the fixture fields holds a second zero-cost move. The foe takes the
+	# Wolfrider's real kit — Lunging Bite, its basic, and Harrying Bite, a second free move — built by `Enemies.config` as the
+	# battle builds one (`check_jw`'s `_as_kind` shape), and the fault is measured on that kit.
+	var wr_cfg := Enemies.config("wolfrider")
+	foe.abilities = wr_cfg["abilities"]
+	foe.unit_name = String(wr_cfg.get("unit_name", "wolfrider"))
+	foe.cooldowns = {}
+	foe.intent = {}
 	_fault(scene, foe)
 	await _fallback(scene, ss, foe)
 	_policy(src)

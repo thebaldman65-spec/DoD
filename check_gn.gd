@@ -606,8 +606,14 @@ func _blow(s: Node, foe: BattleUnit, victim: BattleUnit) -> int:
 	foe.cooldowns.clear()
 	seed(GN_SEED + 7)
 	var before := victim.hp
+	var had: Array = victim.statuses.map(func(st): return st.id)
 	await s._resolve(foe, foe.abilities[0], victim, "good")
 	var lost := before - victim.hp
+	# BATCH KJ — a tier-1 basic can bite (the Raider's lays Sunder), and a bite this blow laid would arm the next
+	# reading against a softer hero: whatever the blow laid comes off, so the hero is put back as he was.
+	for st in victim.statuses.duplicate():
+		if not had.has(st.id):
+			victim.remove_status(String(st.id))
 	foe.attack = atk_was
 	victim.max_hp = mhp_was
 	victim.hp = mhp_was
