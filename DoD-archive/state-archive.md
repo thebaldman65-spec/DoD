@@ -17,6 +17,50 @@ heading stands in both files. **Since JE §3 it also takes what `CLAUDE.md` clos
 
 ---
 
+## ARCHIVED AT KL — 2026-11-28, FROM `docs/state.md` AS KK LEFT IT (`6c116af`)
+
+*KJ's three questions, answered after KJ and built at KK (KK's RULINGS OWED), two items of FOUND AT JN that KL's Blood Tribute closed, and FOUND AT JS's freeze edges, which KL's Entomb overtook (`docs/reports/KL.md`). Every other line KL touched stays in `docs/state.md`, re-worded in place.*
+
+### KJ's RULINGS OWED — ITS CLOSED ITEMS (archived at KL; the section stays in `docs/state.md`)
+
+9. **FIGURES NO ANSWER SET — PUT WITH THEIR OPTIONS.** War Cry has the Maul's blow (34 damage, 56 Break damage, every 3 turns,
+   answer 6) and, which no question asked, the Maul's **20 Rage a cast and slow recovery (4.0, where a basic is 2.0)**;
+   Skullsplitter keeps Overhead Crush's 3.5; the four hex moves recover in 2.5, their basics in 2.0. **The options**: (a) each as
+   built (the recommendation: the elites paid that for the Maul, and a hex move costs a little more than the blow it rides);
+   (b) War Cry at no Rage and 2.0, the hex moves at 2.0; (c) War Cry at 20 Rage and 2.0, the rest as built. **Reversing it**:
+   keys in `data/enemies.json`. **ANSWERED (a), *"As built"*: nothing moved** (KK's RULINGS OWED).
+10. **WAR CRY's DAMAGE TYPE, WHICH NO ANSWER SET — PUT WITH ITS OPTIONS.** KJ built every War Cry physical.
+   The Mauls it replaced struck in the zone's type — the Huntmaster's nature, the Warlord's frost, the Thane's shadow (KG's
+   *"The zone's"*, KH's *"Each copies its Orc"*) — and answer 6's *"the Maul's blow"* named no type. **The options**: (a) each in
+   its Maul's type (the recommendation: KG's ruling kept); (b) physical on all four, as built. **Reversing it**: a key each.
+   **ANSWERED (a), BUILT AT KK**: each War Cry in the type of the blow it took the place of, the Chief's physical (`check_kj` §1).
+11. **BRAND's LENGTH, WHICH THE PAGE's WORDS LEAVE OPEN — PUT WITH ITS OPTIONS.** *"Brands a hero for 3 turns"*: KJ's Rot Brand laid
+   Branded for 3, as every status is laid, and a clock ticks at its bearer's turn start, so the hero paid on two turns (a
+   Silence, meant for one, is laid for 2). **The options**: (a) laid for 4, three turns paid, as the words read (the
+   recommendation); (b) laid for 3, two, as built. **Reversing it**: one key. **ANSWERED (a), BUILT AT KK**: laid for 4, the
+   card's 3 typed and held by `check_kj` §2, the hover's line the turns bound.
+
+### FOUND AT JN AND NOT FIXED (KL's CUT) — ITS CLOSED ITEMS (archived at KL; the section stays in `docs/state.md`)
+
+- **THE PLATE's INTENT GLYPH CHANGES ON EIGHT MOVES** (the blocks' reader): `_intent_category` reads a move whose damage is under the unit's hardest as *afflict* and one whose Break damage exceeds its damage as *crush*; at the raised figures Sundering Strike, Poison Arrow, Withering Hex, Ride-by Slash, Flame Lick and Swampy Grasp read *strike* where they read *afflict*, and Overhead Crush and Blood Tribute *strike* where they read *crush*. On the LOOK-LIST. *Since KJ `_intent_category` reads a status move against the body's other moves, a tie the status's, so a hex move at its basic's damage reads Afflict; seven of the eight moves are in no kit, Blood Tribute the one left.*
+  *Closed at KL: all eight are in no kit, Blood Tribute a passive since KL (the designer's answer 1).*
+- **BLOOD TRIBUTE's BAND IS ITS FRESH FIGURE's**: at 42 it priced 1.40 at JN, and since JO §1 at 44, its Break priced, 1.42, with none of its warband fallen and 3.15 with five; JI's line bands it 2 off the fresh blow, as it banded it 0 before.
+  *Closed at KL: Blood Tribute is a passive — no blow, no band (the designer's answer 1).*
+- **THE CONTENT HOLE IS CLOSED FOR EIGHT OF ITS ELEVEN** (the close-read; JN's ruling 1, accepted at JO §0): of the eleven kinds the hole named, the eight whose second move deals damage attack with a basic and a move at the line since JN §1; **the Orc Shaman, the Orc Shieldmaster and the Orc Ritual Chanter still attack with a basic alone** — the Shaman's Healing Wave prices under the line as a heal (0.53 at JN; lower since JO §1 priced Chain Lightning's Break) and does not cool, Shielding and Cleansing Rite are unpriced — and the Orc Totemist, outside the eleven, holds one damaging move too — and the Grave Totem, outside them, two since JO §2 gave Mire damage. No move was authored (the brief's §3). Since JS the Sleetveil Matron, a basic beside a heal and two spends, is a fourth by construction (JS's ruling 2); since KG the Peat Witch, the Orc Shaman's kit by the designer's answer 2, a fifth; since KH the Grove Tender, the Shaman's kit again, a sixth, and the Heartwood Sentinel, the Shieldmaster's basic beside Shielding, a seventh (the designer's answer 3). *Answered at KJ: a tier-2 kind carries a basic and one move by the designer's picks, so a mender or a guard that attacks with its basic alone is the rule, not a hole.*
+  *Answered at KJ, as it says, and archived at KL.*
+
+### FOUND AT JS AND NOT FIXED — ITS CLOSED ITEMS (archived at KL; the section stays in `docs/state.md`)
+
+- **A SINGLE-PICK CLEANSE TAKES SAP BEFORE THE FREEZE, A PARRY DOES NOT STOP IT, A FEINT CAN SEND IT TO AN ESCORT, AND A COMPANION
+  SPENDS IT** (JS §3): JQ §2's aim takes a hex first, so a hero sapped and frozen in the Titan's fight (its escort could draw the Orc Hexer,
+  a sniper since JR, until KF; since KF it draws no Sap carrier) keeps the freeze; the strike loop lays a status on any blow that did not kill, so a parried Entomb freezes, where a
+  Block and a miss do not; a Swordmaster's Feint redirects the declared Entomb onto a fellow of the Titan's, which freezes for a turn
+  (`_recast_writes`' comment); and Entomb and Hailstorm reach a hero's companion — a frozen beast ticks with its master and has no turn to
+  lose, so the blow's freeze is spent for nothing. *Since KJ no kind lays Sap and Hailstorm is gone; the Stillwrought's Silenced, outside `HEX_IDS` (KJ's RULINGS OWED, item 6), is taken by its turns left.*
+  *Overtaken at KL: Entomb lays a Chilled stack, not a freeze (the designer's answer 2), so no warband move lays the freeze these edges were of; a parried or Feinted Entomb chills, as any blow lays its status.*
+
+---
+
 ## ARCHIVED AT KI — 2026-11-27, FROM `docs/state.md` AS AFTER KH LEFT IT (`b3cc2ad`)
 
 *The designer answered KH's three-part question in conversation on 26 November (*"Play it as built"*; After KH, `b3cc2ad`; `docs/reports/KI.md` §0), the last of KH's RULINGS OWED open: KH's RULINGS OWED, struck. Its item 5 still calls its three parts the designer's to read, as it stood; the struck head is the answer.*

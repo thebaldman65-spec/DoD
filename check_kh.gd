@@ -233,7 +233,8 @@ func _s2_rosters() -> void:
 	var scar := _roster_of("scarlands")
 	var fk: Array = Enemies.kinds_for_roster(forest)
 	var sk: Array = Enemies.kinds_for_roster(scar)
-	var astray: Array = TO_SCARLANDS.filter(func(k): return fk.has(k) or not sk.has(k))
+	# BATCH KL — a kind taken out of the data since (`Enemies.RETIRED`: the Orc Slinger, the designer's) stands in no roster.
+	var astray: Array = TO_SCARLANDS.filter(func(k): return not Enemies.RETIRED.has(k) and (fk.has(k) or not sk.has(k)))
 	ok(astray.is_empty(), "§2: %s — want each in the Scarlands' roster and not the Forest's" % str(astray))
 	var kept: Array = FOREST_KEEPS.filter(func(k): return not fk.has(k) or sk.has(k))
 	ok(kept.is_empty(), "§2: %s — want each in the Forest's roster and not the Scarlands'" % str(kept))

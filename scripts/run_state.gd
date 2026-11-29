@@ -335,6 +335,9 @@ const ZONE_DEFS := {
 	"drowned_barrow": {"name": "The Drowned Barrow", "boss": "bone_shepherd", "roster": 6},
 }
 const ZONE_ORDER := ["forest", "scarlands", "frozen_plains", "drowned_barrow"]
+# BATCH KL — THE TWO ZONES THAT WEAR THE FOREST's ART (JS §1, JW §1) WEAR IT IN THEIR OWN COLOUR, on the map, the event screen
+# and in battle, so neither is taken for the Forest of Old; a zone that gains its own art leaves this list.
+const PLACEHOLDER_TINT := {"The Frozen Plains": Color(0.70, 0.84, 1.0), "The Drowned Barrow": Color(0.72, 0.86, 0.74)}
 var active_relics: Array = []  # up to 3 relic ids chosen at the draft
 # BATCH KD — WHO HOLDS A RELIC (CX's ruling; JY's ruling 12, answered at JZ): {relic id: party index}, for a HELD relic
 # (`Relics.is_held`) only: a holder is made only through `hand_relic`, and a load restores the saved ones (`_repair_relic_holders`). A held relic in `active_relics` with no entry is OWED
@@ -4778,6 +4781,13 @@ func _drop_stale_offer_options() -> void:
 # - `pending_event`: an id the event table does not hold opens a screen with no choice and no way
 #   out, so it is cleared and the node stays spent.
 func _drop_stale_save_keys() -> void:
+	# BATCH KL — A RETIRED KIND ON A SAVED MAP OR IN A SAVED ENCOUNTER READS AS ITS STAND-IN (`Enemies.RETIRED`).
+	for kl_slot in map:
+		for kl_node in kl_slot:
+			if kl_node is Dictionary and kl_node.has("enemies"):
+				kl_node["enemies"] = (kl_node["enemies"] as Array).map(func(k): return String(Enemies.RETIRED.get(String(k), String(k))))
+	if encounter.has("enemies"):
+		encounter["enemies"] = (encounter["enemies"] as Array).map(func(k): return String(Enemies.RETIRED.get(String(k), String(k))))
 	pending_item_offers = pending_item_offers.filter(func(id): return ITEM_INFO.has(String(id)))
 	for id in items.keys():
 		if not ITEM_INFO.has(String(id)):

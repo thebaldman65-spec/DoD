@@ -58,6 +58,12 @@ static func resists_for(kind: String) -> Dictionary:
 	return _load().get(kind, {}).get("resists", {})
 
 
+# BATCH KL — A KIND TAKEN OUT OF THE DATA, AND THE KIND THAT STANDS IN ITS PLACE (the designer's, 28 November: *"lets remove
+# orc slingers, archers take their place"*): a body a saved map or encounter still names reads as its stand-in, here at the
+# config and at the load (`Run._drop_stale_save_keys`).
+const RETIRED := {"slinger": "archer"}
+
+
 # Kinds belonging to a ROSTER (the JSON "zones" tags are roster ids —
 # a zone def in run_state maps each slot it can host to one of these,
 # so rosters travel with zone identity, never with run position).
@@ -79,6 +85,7 @@ static func kinds_for_roster(roster: int) -> Array:
 # and it is a filter over authored content rather than a second kit. The tag
 # is stripped before Ability.make, because Ability has no such property.
 static func config(kind: String, rung := MAX_RUNG) -> Dictionary:
+	kind = String(RETIRED.get(kind, kind))
 	var src: Dictionary = _load().get(kind, _load()["raider"])
 	var cfg: Dictionary = src.duplicate(true)
 	cfg["is_hero"] = false

@@ -6,7 +6,7 @@
 # What this gate asserts, section by section (`docs/reports/KJ.md` has the working):
 #
 #   §1  THE TIERS AND THE KITS, IN THE DATA: a kind's tier is its `power` (the builder's cost), 1 to 3 for every regular kind,
-#       the Orc Totemist and the Rotfiend at 2; a tier-N kind carries N moves; a tier-1 kind carries no Malice spend, a tier-3
+#       the Orc Totemist and the Rotfiend at 2; a tier-N kind carries N moves and passives (a passive in a move's place, KL); a tier-1 kind carries no Malice spend, a tier-3
 #       kind and an elite exactly one, Raise only on the Ritual Chanter and the Grave Totem beside the bosses' own; each
 #       tier's health stands in its band; five tier-1 basics carry their signature effect at the ruled chance; every new move
 #       carries the figures the designer ruled; the four elites carry one War Cry, each in the type of the blow it took the
@@ -162,8 +162,9 @@ func _s1_data() -> void:
 		var spends: Array = kit.filter(func(a): return SPENDS.has(String(a.get("special", ""))))
 		if p <= 3:
 			per_tier[p] = int(per_tier[p]) + 1
-			if kit.size() != p:
-				bad_count.append("%s: tier %d carries %d" % [kind, p, kit.size()])
+			var kit_n: int = kit.size() + (v.get("passives", []) as Array).size()
+			if kit_n != p:
+				bad_count.append("%s: tier %d carries %d" % [kind, p, kit_n])
 			if p == 1 and not spends.is_empty():
 				bad_spend.append("%s (tier 1) spends" % kind)
 			if p == 3 and spends.size() != 1:
@@ -181,7 +182,7 @@ func _s1_data() -> void:
 	ok(int(per_tier[1]) > 0 and int(per_tier[2]) > 0 and int(per_tier[3]) > 0, "§1: a tier holds no kind: %s" % str(per_tier))
 	ok(int((_data["totemist"] as Dictionary)["power"]) == 2 and int((_data["rotfiend"] as Dictionary)["power"]) == 2,
 		"§1: the Orc Totemist or the Rotfiend is not at tier 2 (A1)")
-	ok(bad_count.is_empty(), "§1: a kind's moves are not its tier's count: %s" % [bad_count])
+	ok(bad_count.is_empty(), "§1: a kind's moves and passives are not its tier's count: %s" % [bad_count])
 	ok(bad_spend.is_empty(), "§1: a kind's spends are not its tier's (A3): %s" % [bad_spend])
 	ok(bad_band.is_empty(), "§1: a kind's health is outside its tier's band (A2): %s" % [bad_band])
 	var bad_bite: Array = []
@@ -691,16 +692,16 @@ func _s3_combos() -> void:
 		"§3: the charged blow did not strike every hero and clear the charges")
 	s.queue_free()
 	await Gate.frames(self, 2)
-	# Rage Company: skirmishers aim at a hero under half.
+	# Rage Company: the warband aims at the weakest hero (KL: no threshold, no taunt).
 	s = await _battle("Rage Company", ["wolfrider", "chief"])
 	var hs3: Array = s.get("heroes")
-	hs3[1].hp = int(hs3[1].max_hp * float(s.get("BLOOD_WATER_AT"))) - 1
+	hs3[1].hp = int(hs3[1].max_hp * 0.4)
 	var wr := _body(s, "wolfrider")
 	var drawn := 0
 	for i in 12:
 		if (s.call("_choose_enemy_action", wr, 1) as Dictionary).get("target") == hs3[1]:
 			drawn += 1
-	ok(drawn == 12, "§3: Blood in the Water drew %d of 12 picks to the hero under half" % drawn)
+	ok(drawn == 12, "§3: Blood in the Water drew %d of 12 picks to the weakest hero" % drawn)
 	s.queue_free()
 	await Gate.frames(self, 2)
 	# Guardian Circle: the warband takes less for each tank standing.

@@ -83,7 +83,10 @@ const HELD := {"totemist/Healing Wave": 3, "bog_troll/Regenerate": 3, "chief/Chi
 	"peat_witch/Entrench": 2,
 	# BATCH KH §1 — the Grove Tender's Entrench at the Shaman's 2 and the Bristleback's Rally at the Wolfrider's 2, the
 	# designer's (RECORD_KH, answer 3: *Each copies its Orc* — "Same ... cooldowns").
-	"grove_tender/Entrench": 2, "bristleback/Rally": 2}
+	"grove_tender/Entrench": 2, "bristleback/Rally": 2,
+	# BATCH KL — the Ash-Wrought Tyrant's three waits at the data's figures, the designer's (RECORD_KL, answer 5: *"Keep today's
+	# waits"*): Cinder Cleave burns since KL, so the line prices his basic higher and would move all three.
+	"ash_tyrant/Immolating Wave": 4, "ash_tyrant/Tyrant's Verdict": 2, "ash_tyrant/Rally": 3}
 # An area blow reaches the party's four heroes; so does an every-ally heal.
 const REACH := 4
 # A heal is priced as the health it restores, a share of the body healed (the three arms of `_resolve_special`).

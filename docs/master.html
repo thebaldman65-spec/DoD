@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Dawn of Decay — Master Design Document</title></head>
 <body>
-<p align="right"><b>Last updated: 2026-11-27 (Batch KK &mdash; War Cry in each elite's own type, and a Brand's three turns)</b></p>
+<p align="right"><b>Last updated: 2026-11-28 (Batch KL &mdash; a passive shows itself, Blood Tribute a passive, and a ready move first)</b></p>
 <h1>DAWN OF DECAY — Master Design Document</h1>
 <p><i>The single authoritative reference for what is CURRENTLY in the game — it describes
 the present build only (the timestamp above is bumped on every edit); the history of
@@ -428,7 +428,7 @@ Scarlands meets no Orc. A zone's fights are set when its map is made, so a run s
 three different zones of the four at random, one a stage, so a run
 takes one of 24 shapes; a simulator draws as the player's run does, and a simulator can hold the first three
 (DOD_ZONE_ROTATION=0: the Forest, the Scarlands, the Frozen Plains); every zone keeps the same 16-slot generated shape. The Frozen Plains and the Drowned Barrow show the Forest's art
-on their maps, their events and their battles: neither has any of its own. Enemies past the first stage are tinted redder, and the
+on their maps, their events and their battles, each tinted a colour of its own &mdash; the Frozen Plains blue, the Drowned Barrow green &mdash; so neither is taken for the Forest: neither has any art of its own. Enemies past the first stage are tinted redder, and the
 stage sets the stat multiplier (§4.3). The third stage ends in a zone boss like the other two, and
 the <b>END BOSS</b> stands in a seventeenth slot after it: the run ends on the END BOSS's
 death.</li>
@@ -762,7 +762,7 @@ consumed.</li>
 <li><b>Armor:</b> flat % damage reduction. Fortify +10%; Broken ×0.7; Sunder ×0.65; Armor
 Penetration ignores a fraction.</li>
 <li><b>Damage types (7):</b> physical, fire, frost, arcane, nature, shadow, holy. Every enemy
-kind but six carries a deliberate resist AND vulnerability profile (the Orc Raider only resists; the Orc Whelp, the Orc Slinger, the Grave Husk, the Rotfiend and the Bone Shepherd are only soft; see the bestiary §9) — themes
+kind but five carries a deliberate resist AND vulnerability profile (the Orc Raider only resists; the Orc Whelp, the Grave Husk, the Rotfiend and the Bone Shepherd are only soft; see the bestiary §9) — themes
 inherit them, so a warband reads strong against some damage types and soft to others, and
 the theme name carries tactical information.</li>
 <li><b>Vulnerabilities:</b> a unit can be soft to a damage type — a negative resist, typically
@@ -1041,7 +1041,7 @@ charges, Deadfall, and the dormant Crushing Blows, Melt Armor, Endurance, Scent 
 Waiting Guard, Enraged and Holy Capacitor &mdash; is <b>drawn</b> on the plate, after the core rune's chip and before the
 statuses: it never ticks down, no cleanse or Dispel takes it, nothing that counts statuses or debuffs counts it, and it is
 no Sanctity event. Its figure comes off the hero (his banked charges, his Faith, his companion's Loyalty), and it goes
-when that figure does, or when the body falls.</p>
+when that figure does, or when the body falls. <b>A warband body's passive chips are drawn the same way</b> &mdash; its kind's passive (Blood Tribute) and its fight's combo, each reading what it gives that body now (&sect;9).</p>
 <p><b>CONJUNCTIONS &mdash; two afflictions meeting on one body make a third.</b> A pair the game
 knows becomes ONE status with one chip, which says what it is made of: a status built from two
 is <b>second-degree</b>, from three <b>third-degree</b>, each stronger than the last &mdash; Rupture is a
@@ -1100,10 +1100,9 @@ per win.</p>
 <h3>4.8 Enemy AI</h3>
 <p>Enemies hunt the most wounded hero 40% of the time and pick randomly otherwise; if any
 hero is Broken they exploit it
-with their hardest affordable hit that is not cooling. Mocked enemies must attack the taunting Warrior — a taunt
+with their hardest affordable hit that is not cooling. <b>Otherwise a move comes before the basic attack</b>: an enemy uses a move that has a cooldown, other than its basic attack, whenever one is ready &mdash; off its cooldown and paid for &mdash; at random among them, and otherwise picks at random between its basic attack and any move with no cooldown. Mocked enemies must attack the taunting Warrior — a taunt
 also overrides support casts. Below a taunt, a hero <b>Singled Out</b> by War Cry draws every blow the warband readies, and two combos aim
-too: Focus Fire's archers at the hero carrying the most Poison, Blood in the Water's skirmishers at the most wounded hero under half its
-health (&sect;9). <b>Support behaviors run before attacks:</b> a healer heals
+too: Focus Fire's archers at the hero carrying the most Poison, and Blood in the Water's whole warband at the hero with the weakest health, the lowest share of its own &mdash; regardless of taunts, so no taunt pulls a body of it, though a hero Singled Out still draws them, the aim taken again as the blow lands, so a blow declared at a hero who has fallen goes at the next weakest (&sect;9). <b>Support behaviors run before attacks:</b> a healer heals
 whenever its warband's pool, Malice, can pay and one of its warband is missing at least half of what the heal would
 restore &mdash; the Orc Totemist's, the Orc Shaman's, the Sleetveil Matron's, the Peat Witch's and the Grove Tender's Healing Wave the most wounded (friendly tanks and supports first, and a hurt elite before them
 under Field Medic), and the
@@ -3122,11 +3121,11 @@ an enemy is a data edit that automatically enrolls it in every theme wanting its
 Role-based Attack matches heroes — <b>Damage 100 (the Hollow Crown 115) / Tank 75 (the Withered Warden and the Icewrought Titan 100) / Support 50</b> — and ability
 damage is a % of it. <i>Art note: all kinds still share the orc sheet (tint + scale only),
 so new enemies read as tinted orcs until per-kind art lands — a known, accepted limit.</i></p>
-<p><b>Every ordinary kind has a tier, 1, 2 or 3, and its tier is how many moves it carries.</b> A tier-1 kind has its basic
+<p><b>Every ordinary kind has a tier, 1, 2 or 3, and its tier is how many moves it carries, a passive counting as one.</b> <b>A passive takes a move's place</b>: it works without a turn, and the Orc Bloodcaller's Blood Tribute is the first. A tier-1 kind has its basic
 attack and nothing else; a tier-2 kind its basic attack and one move more; a tier-3 kind its basic attack and two, one of them its
 Malice spend (below). The tier is also what the kind costs the fight builder (the budget, below), and each tier holds its health in
 a band of its own: <b>85–110</b> at tier 1, <b>110–160</b> at tier 2 and
-<b>250–300</b> at tier 3. Nine kinds stand at tier 1, twenty at tier 2 and
+<b>250–300</b> at tier 3. Eight kinds stand at tier 1, twenty at tier 2 and
 seven at tier 3. <b>The elites and the bosses stand above the tiers</b>: an elite costs 4, a zone boss
 7 and the Hollow Crown 9, the figure the table's Tier column gives each elite and zone boss (the Hollow Crown, the end boss, has no row). <b>Five tier-1 basics bite</b>, each
 laying its status on a hit 30% of the time: the Orc Raider's Slash lays Sunder for 2 turns, the Orc Archer's Arrow Shot and the
@@ -3136,8 +3135,8 @@ Dazed for 2.</p>
 counting every hero an area blow reaches, the Burn, Poison or Fester it lays and its Break damage &mdash; a point of it at what a
 hero's turn deals, spread over the Break bar a hero fills &mdash; and a heal at the health it restores &mdash;
 takes a cooldown of that enemy's own turns, longer the bigger it is: the Orc Totemist's Healing Wave (held where the line would cool it less), the Rot Behemoth's Wretched
-Bellow, the Orc Chief's Heavy Strike, the Ash Hurler's Siege Stone, the Orc Bloodcaller's Blood Tribute, the Antlered Huntmaster's
-Goring Charge, the Withered Warden's Roots of Wrath, the Ash-Wrought Tyrant's Immolating Wave and Tyrant's Verdict and the Hollow
+Bellow, the Orc Chief's Heavy Strike, the Ash Hurler's Siege Stone, the Antlered Huntmaster's
+Goring Charge, the Withered Warden's Roots of Wrath, the Ash-Wrought Tyrant's Immolating Wave and Tyrant's Verdict (each held at its wait by the designer) and the Hollow
 Crown's Hollow Wail and The Long Dark; in the Frozen Plains the Sleetveil Matron's Healing Wave, the Icewrought Titan's Entomb and
 the Rimeclad Warlord's Glacial Hew; and in the Drowned Barrow the Rotfiend's Corpse Explosion, the Bone Shepherd's Soul Leech and
 Noxious Fumes and the Drowned Thane's Sunken Cleave. <b>A move a kind is built around waits a set number of its own turns</b>,
@@ -3211,7 +3210,6 @@ it surfaces at once.</p>
 <tr><th>Enemy</th><th>Tier</th><th>Roles</th><th>Zones</th><th>HP</th><th>Kit (every move it carries, its basic attack first)</th></tr>
 <tr><td>Orc Raider</td><td>1</td><td>skirmisher</td><td>2</td><td>110</td><td>Slash (30% Sunder 2t). Physical resist 10% — otherwise the neutral baseline orc.</td></tr>
 <tr><td>Orc Whelp (pale)</td><td>1</td><td>skirmisher</td><td>2</td><td>90</td><td>Fast, frail: Frenzied Nip. Soft to nature AND shadow (young flesh, weak will).</td></tr>
-<tr><td>Orc Slinger (tan)</td><td>1</td><td>sniper</td><td>2</td><td>100</td><td>Ranged: Stone Sling. Soft to frost (bare sling fingers).</td></tr>
 <tr><td>Orc Totemist (teal)</td><td>2</td><td>mender</td><td>2</td><td>110</td><td>Weak support: Totem Jab; Healing Wave (25% max to the most wounded hurt ally, tanks and supports first, paid in Malice). Nature resist 25%; soft to shadow (spirit-open).</td></tr>
 <tr><td>Orc Archer (red)</td><td>1</td><td>sniper·hexer</td><td>2</td><td>110</td><td>Arrow Shot (30% Poison 3t). Physical resist 5%; soft to frost.</td></tr>
 <tr><td>Orc Shieldmaster (orange)</td><td>2</td><td>bulwark</td><td>2</td><td>150</td><td>Strike; Shield Guard (Guarding 2t: the first single blow each turn aimed at another of its warband lands on it). Physical resist 15%; soft to arcane (the shield stops steel, not raw magic).</td></tr>
@@ -3223,8 +3221,9 @@ shadow (corruptible spirits).</td></tr>
 <tr><td>Ashblade (ember)</td><td>2</td><td>skirmisher</td><td>2</td><td>135</td><td>Cinder Slash (fire); Cinder Flank (fire, Cinder Slash's blow, a Flank). Fire resist 50%; soft to frost.</td></tr>
 <tr><td>Orc Ritual Chanter (pale gold)</td><td>2</td><td>mender</td><td>2</td><td>110</td><td>Fast (speed 105) ranged support: Warding Chant; Raise (a fallen body of its warband back up, paid in Malice). Holy resist 25%; soft to shadow AND physical — kill it first, or play around it.</td></tr>
 <tr><td>Orc Bloodcaller (crimson)</td><td>2</td><td>hexer</td><td>2</td><td>125</td>
-<td>Ragged Cut; Blood Tribute (shadow) — +25% damage and Break damage per ally fallen this
-battle: unremarkable fresh, hits like a Chief as the last one standing. The kill-order
+<td>Ragged Cut; <b>Blood Tribute</b>, a passive in its second move's place &mdash; each of its warband that falls gives its
+attacks 25% more damage and Break damage for the rest of the fight, said in the log, floated over it and read on its chip:
+unremarkable fresh, dangerous as the last one standing. The kill-order
 question, stated as an enemy. Shadow resist 25%; soft to holy AND nature.</td></tr>
 <tr><td>Grave Totem (dusk, large)</td><td>2</td><td>mender·hexer</td><td>1</td><td>110</td><td>Speed 130, trivially Broken (Con 60): Grasping Roots (nature, 60% Cripple 2t); Raise (a fallen body of its warband back up, paid in Malice). Physical resist 35%, shadow 50%; soft to fire AND holy at 50% — a resist puzzle, not a stat check.</td></tr>
 <tr><td>Orc Brute (brown, large)</td><td>3</td><td>brute</td><td>2</td><td>260</td><td>Smash; Skullsplitter (84 dmg, 50 BD: raised one turn, it lands the next on the hero it was raised at; Break, Freeze or Stun the Brute to cancel it); Rally. Physical resist 10%; soft to shadow (dumb muscle, weak mind).</td></tr>
@@ -3245,7 +3244,7 @@ Stinging Pollen (nature, every ally); Healing Wave, paid in Malice. Nature resis
 <tr><td>Blightcap (sickly violet)</td><td>2</td><td>hexer·sniper</td><td>1</td><td>120</td><td>Ranged, the Orc Hexer's figures in nature: Rot Bolt; Rot Brand (Rot Bolt's blow, and Branded 4t, its next 3 turns). Nature resist 50%; soft to fire.</td></tr>
 <tr><td>Antlered Huntmaster (elite, forest green)</td><td>4</td><td>elite</td><td>1</td><td>250</td><td>The Forest of Old's elite, the Orc Chief's figures in nature: Rage user: Spear Thrust (+15 Rage); Goring Charge 30R; War Cry 20R (nature, 56 BD, Singles Out the hero it strikes 2t); Rally. Nature resist 50%; soft to fire.</td></tr>
 <tr><td>Ash-Wrought Tyrant (boss)</td><td>7</td><td>boss</td><td>2</td><td>370</td><td>Rage
-user (20 starting), unique fire kit: Cinder Cleave (+15 Rage); Immolating Wave 30R
+user (20 starting), unique fire kit: Cinder Cleave (two allies, Burn 3t on each; +15 Rage); Immolating Wave 30R
 (fire on every ally, 80% Burn 2t); Tyrant's Verdict 20R (heavy fire, 70% Sunder 2t); Rally. Fire
 50%, physical 10%; soft to frost.</td></tr>
 <tr><td>Grave Husk (bone)</td><td>1</td><td>skirmisher</td><td>6</td><td>90</td><td>Fast, frail: Rattling Swipe. Soft to nature AND shadow.</td></tr>
@@ -3261,8 +3260,7 @@ Chill Touch (frost); Healing Wave (25% max to the most wounded hurt ally, tanks 
 to fire.</td></tr>
 <tr><td>The Stillwrought (dusk blue)</td><td>2</td><td>hexer</td><td>4</td><td>120</td><td>Ranged frost caster: Stillbolt (frost); Stillness (frost, Stillbolt's blow, and Silenced). Frost resist 50%; soft to fire.</td></tr>
 <tr><td>Icewrought Titan (boss)</td><td>7</td><td>boss</td><td>4</td><td>460</td><td>The Frozen Plains' boss:
-Glacier Fist (frost); Entomb (frost, freezes one hero solid: a turn lost, unless a Block, a miss, Ironclad or Hallowed stops it, and a
-cleanse lifts it); Entrench. Frost resist 50%; soft to fire.</td></tr>
+Glacier Fist (frost); Entomb (frost, a stack of Chilled 3t on one ally, unless a Block, a miss or Hallowed stops it); Entrench. Frost resist 50%; soft to fire.</td></tr>
 <tr><td>Rimeclad Warlord (elite, deep ice)</td><td>4</td><td>elite</td><td>4</td><td>250</td><td>The Frozen Plains' elite, the Orc Chief's figures in frost: Rage user: Frostbrand Cut (frost, +15 Rage); Glacial Hew 30R (frost); War Cry 20R (frost, 56 BD, Singles Out the hero it strikes 2t); Rally. Frost resist 50%; soft to fire.</td></tr>
 <tr><td>Rotfiend (bog green)</td><td>2</td><td>skirmisher</td><td>6</td><td>110</td><td>Fast, frail: Sodden Claw; Corpse Explosion (every ally, a stack of Black Rot each; it dies, and the neighbour with the lower share of its health heals 15% of its maximum, paid in Malice &mdash; only at half its health or less). Soft to nature AND shadow.</td></tr>
 <tr><td>Fen Lurker (fen teal)</td><td>3</td><td>brute</td><td>6</td><td>260</td><td>Swipe (two allies); Submerge (once a fight, under half its health while another of its warband can be picked: unpickable for 3 turns, still acting); Rally. Physical resist 10%; soft to shadow.</td></tr>
@@ -3300,7 +3298,7 @@ Combined Arms with fewer kinds standing, Bodyguards once the tanks fall or are B
 <b>The Rite</b> counts down from 4 on each healer's turn, and a healer that loses its turn &mdash; Stunned, Frozen or
 Broken &mdash; adds one; at zero every standing body of the warband heals to full, free of Malice, and the count starts again, so the
 healers fall first or lose their turns. <b>Static Charge</b> counts each heal the warband casts, and at 3 its next
-single blow strikes every hero, and the charges clear.</p>
+single blow strikes every hero, and the charges clear. <b>A combo shows itself, as a passive does</b>: a chip on each body it works through reads what it gives that body now (Pack Tactics' <i>+24%</i>, Bodyguards' <i>off</i> once the tanks are down, The Rite's count), and each time it raises or cuts a blow, draws one or raises a heal, the combat log says so in a line and its name floats over the body it works on.</p>
 <table border="1" cellpadding="4">
 <tr><th>Theme</th><th>Gameplay focus</th><th>Role recipe</th><th>Nodes</th><th>Combo (named beside MALICE)</th></tr>
 <tr><td>Warband</td><td>Balanced mix</td><td>skirmishers + snipers + bulwark + mender (≥3 kinds)</td><td>fight</td><td><b>Combined Arms</b>: While 3 or more kinds of the warband stand, its blows deal 15% more.</td></tr>
@@ -3311,7 +3309,7 @@ single blow strikes every hero, and the charges clear.</p>
 <tr><td>Ritual</td><td>Protect the menders</td><td>≥2 menders + bulwark (+hexers)</td><td>fight</td><td><b>The Rite</b>: Counts down on each healer's turn. At zero every body of the warband heals to full and the count restarts. A healer Stunned, Frozen or Broken on its turn adds one.</td></tr>
 <tr><td>Poison Volley</td><td>Ranged harassment</td><td>≥3 snipers (majority)</td><td>fight</td><td><b>Focus Fire</b>: Every archer aims at the hero with the most Poison, and that hero takes 15% more from archers.</td></tr>
 <tr><td>Lightning Storm</td><td>Magic, every ally</td><td>≥2 menders + hexers</td><td>fight</td><td><b>Static Charge</b>: Each heal the warband casts adds a charge. At 3 its next single blow strikes every hero, and the charges clear.</td></tr>
-<tr><td>Rage Company</td><td>Heavy offence</td><td>elite + brutes + ≥2 skirmishers</td><td>elite</td><td><b>Blood in the Water</b>: Every skirmisher aims at a hero under 50% of its health.</td></tr>
+<tr><td>Rage Company</td><td>Heavy offence</td><td>elite + brutes + ≥2 skirmishers</td><td>elite</td><td><b>Blood in the Water</b>: All enemies attack the target with the weakest health, regardless of taunts. A Singled Out hero still draws them.</td></tr>
 <tr><td>Guardian Circle</td><td>Guards and braces</td><td>≥3 bulwarks</td><td>fight</td><td><b>Interlocked Shields</b>: The warband takes 8% less from blows for each tank of it standing.</td></tr>
 <tr><td>Elite Patrol</td><td>Few high-value enemies (≤4)</td><td>elite + bulwark + mender (+brute)</td><td>elite</td><td><b>Field Medic</b>: Its healers heal the elite first, and their heals on it are 50% larger.</td></tr>
 <tr><td>Boss Escort</td><td>The boss and its court</td><td>the zone's own boss + any support roles</td><td>boss</td><td><b>Loyal Retinue</b>: While 2 or more of its escort stand, the boss takes 25% less from blows.</td></tr>
@@ -3358,7 +3356,7 @@ at least as tall as their stack, filling from its foot and flashing as it moves;
 it, below the combat log; hover either for how it fills, what it buys and which of the warband spend it. <b>Left of the MALICE
 row stands the fight's combo</b> when its recipe carries one (&sect;9): its name in capitals &mdash; COMBINED ARMS, ALPHA, THE RITE and
 the rest &mdash; with The Rite's count beside it, falling from 4 on each healer's turn, and Static Charge's charges out of 3
-beside it (STATIC CHARGE 0/3); hover the row for the combo's rule.
+beside it (STATIC CHARGE 0/3); hover the row for the combo's rule. The bodies it works through each wear its chip (&sect;9).
 <b>The fight's modifier stands in a strip of its own</b>,
 at the top of the screen between the turn strip and the combat log: <b>BARGAIN</b> when the heroes bought its terms at the
 offer, <b>IMPOSED</b> when Ruin's road laid it on a node a route cannot duck, then <b>one chip in the modifier's own

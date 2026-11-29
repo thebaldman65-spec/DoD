@@ -342,6 +342,8 @@ func _s2_the_mechanism() -> void:
 	for ch in a.get("_chips_root").get_children():
 		if ch is ColorRect and not ch.is_queued_for_deletion():
 			chips += 1
+	# BATCH KL — a display chip the body wears beside its statuses (since KL its fight's combo's) is not the Rupture's.
+	chips -= (a.get("display_chips") as Array).size()
 	ok(chips == 1, "§2b: a ruptured body draws %d chips — one, not three" % chips)
 	# §2d — COMPONENTS ARE PRESENCE.
 	ok(a.has_status("burn") and a.has_status("chilled") and a.status_stacks("chilled") == 1

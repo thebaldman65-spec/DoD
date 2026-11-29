@@ -50,6 +50,9 @@ const ADDED_SINCE := ["frostbitten_thrall", "icebound_bulwark", "hailcaster", "r
 	# BATCH KH §1 — AND THE FOREST OF OLD's OWN SEVEN, set aside as KG's three are.
 	"thornling", "bristleback", "spore_lobber", "heartwood_sentinel", "grove_tender", "blightcap", "antlered_huntmaster"]
 const KINDS := 21
+# BATCH KL — AND A KIND TAKEN OUT OF THE DATA SINCE (the Orc Slinger, the designer's), set aside as a kind added since is:
+# its kept row stands as the record of the warband this gate's batch left.
+const RETIRED_SINCE := ["slinger"]
 # JK's fifty, and since JO §2 Gall and Mire among them, each a blow given damage (Sap and Fester ride two of the fifty).
 const MOVES_BEFORE := 52
 # BATCH KJ — THE DESIGNER's ANSWER ON WHO SPENDS (KJ's A3, *the tougher enemies*): a spend stands on a kind of this tier or above —
@@ -425,7 +428,8 @@ func _s1_every_kind_buys(s: Node, spends: bool) -> void:
 		print("    %-16s buys %s; its selection on the board: %s" % [kind, str(mine), str(got)])
 	print("    CHECKED %d of %d kinds; %d spends on their lists; the kinds that own no cooling move of their own: %d, and %d of them hold a spend" % [
 		holds.size(), KINDS, _spends.size(), own_cooling, own_cooling_buy])
-	ok(holds.size() == KINDS + ADDED_SINCE.size(), "§1: the walk read %d kinds, not %d" % [holds.size(), KINDS + ADDED_SINCE.size()])
+	ok(holds.size() == KINDS + ADDED_SINCE.size() - RETIRED_SINCE.size(), "§1: the walk read %d kinds, not %d" % [holds.size(),
+		KINDS + ADDED_SINCE.size() - RETIRED_SINCE.size()])
 	# BATCH KJ — JK's `none.is_empty()` asked that every kind can buy; the designer's answer gave a spend to the tougher kinds, so
 	# this asks the rule of every kind, and the kinds holding none are printed as the record of what KJ took.
 	print("    [record] the kinds the rule gives a spend: %d; the kinds holding none since KJ: %d — %s" % [ruled_on, none.size(), str(none)])
@@ -440,6 +444,8 @@ func _s1_every_kind_buys(s: Node, spends: bool) -> void:
 	var wrong: Array = []
 	for r in rows.slice(1):
 		var c := String(r).split("\t")
+		if c.size() >= 6 and RETIRED_SINCE.has(c[0]) and not data.has(c[0]):
+			continue
 		if c.size() < 6 or not data.has(c[0]) or not before.has(c[0]):
 			wrong.append(String(r).left(60))
 			continue

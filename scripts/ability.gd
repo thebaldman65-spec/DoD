@@ -254,7 +254,7 @@ static func takes_delay_cap(sp: String) -> bool:
 # the strike in gave the card a free extra enemy attack with no gate on it. The
 # criterion decides whether an ability GRADES; it does not decide what an
 # orphaned bonus becomes, and those are two questions.
-const DAMAGE_SPECIALS := ["blood_tribute", "breaking_darkness", "call_wild",
+const DAMAGE_SPECIALS := ["breaking_darkness", "call_wild",
 	"call_wilds", "cinderfall", "cull", "feint", "guard_change", "gut_rip",
 	"harvest", "kill_command", "killing_frost", "precision_strike",
 	"primal_surge", "pyre_wake", "reprisal", "requiem", "savage_sweep",

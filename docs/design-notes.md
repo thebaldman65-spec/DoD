@@ -4,6 +4,16 @@ Why things are the way they are. master.html holds current truth,
 changelog.html holds what changed, this holds *why*. Newest first.
 Not exported to docx.
 
+## A passive shows itself, Blood Tribute a passive, and a ready move first (Batch KL) — 2026-11-28
+
+**Why every combo shows itself, not Blood Tribute alone.** The designer played a fight in which Blood Tribute never seemed to fire and Pack Tactics never seemed to work, and asked that *"when something similar to this happens"* the log, a chip and a float say so. A combo is a passive the warband carries: Pack Tactics was working, and nothing on the screen said it. One door serves both kinds, so a passive written later shows itself by going through it.
+
+**Why a passive counts toward the tier.** The designer: *"passive traits can take the place of an ability for an enemy."* The tier is how much an enemy brings; a passive brings what a move would, so the Bloodcaller stays at two.
+
+**Why a ready move comes first.** The designer saw enemies using one attack. Most bodies a player meets early are tier 1 and carry one move by the tier rule; a tier-2 or higher kind picked at random among everything ready, so its basic, always ready, came up about three times in four. The designer chose to see the moves: a move is used whenever it is ready.
+
+**Why the zones were tinted, not their rosters moved.** The probe found every Frozen Plains kind only in the Frozen Plains; the zone wore the Forest's picture. A tint is the honest stopgap until the art exists.
+
 ## War Cry in each elite's own type, and a Brand's three turns (Batch KK) — 2026-11-27
 
 **Why War Cry took the type of the blow it replaced.** KG gave the Frozen Plains' and the Drowned Barrow's new elites the Orc Chief's figures in their zone's type, frost and shadow, and KH gave the Forest of Old's Huntmaster its figures in nature. KJ put War Cry in each Maul's place untyped, which left three elites with one physical blow among their zone's typed ones. The designer's answer to KJ's question kept KG's and KH's rulings: War Cry is the blow it replaced, in its type. The Chief's Maul was physical, so its War Cry is.

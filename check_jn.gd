@@ -603,6 +603,9 @@ func _s1_the_population() -> void:
 		# held at the designer's figure; the line holds every other kind's second damaging move.
 		var ruled := JI.KJ_RULED.has("%s/%s" % [kind, name])
 		var band := int(JI.KJ_RULED["%s/%s" % [kind, name]]) if ruled else _figure(m)
+		# BATCH KL — AND A BAND HELD AT THE DATA's FIGURE (`check_ji`'s `HELD`: the Ash-Wrought Tyrant's, the designer's answer 5).
+		if JI.HELD.has("%s/%s" % [kind, name]):
+			band = int(JI.HELD["%s/%s" % [kind, name]])
 		var tag := "  (raised)" if raised else ("  (the designer's by hand; the line's band %d)" % _figure(m) if ruled else "")
 		print("    %-16s %-18s %5.2f of its basic, band %d, the data %d%s" % [kind, name, m, band, int(a.get("cooldown", 0)), tag])
 		if m < _line and not ruled:

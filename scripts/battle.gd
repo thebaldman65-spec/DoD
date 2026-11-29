@@ -1184,7 +1184,7 @@ const HONOR_GUARD_CUT := 0.4                  # Honor Guard: less the elite take
 const RITE_TURNS := 4                         # Ritual: the count, in healers' turns
 const FOCUS_FIRE_PCT := 0.15                  # Poison Volley: more the most-poisoned hero takes from archers
 const STATIC_CHARGES := 3                     # Lightning Storm: the heals that charge the next blow to strike every hero
-const BLOOD_WATER_AT := 0.5                   # Rage Company: the share of its health a hero falls under to draw the skirmishers
+const BLOOD_TRIBUTE_PCT := 0.25               # the Orc Bloodcaller's passive: damage and Break on its attacks, each fallen ally (KL)
 const INTERLOCK_CUT := 0.08                   # Guardian Circle: less the warband takes for each tank standing
 const FIELD_MEDIC_PCT := 0.5                  # Elite Patrol: larger the heals on the elite
 const RETINUE_ESCORTS := 2                    # Boss Escort: the escort that must stand
@@ -1445,6 +1445,9 @@ func _build_arena() -> void:
 	var tex: Texture2D = load(bg_by_zone.get(zone, bg_by_zone["Forest of Old"]))
 	var art := Sprite2D.new()
 	art.texture = tex
+	# BATCH KL — AND TINTED, so it is not taken for the Forest of Old (the designer read Frozen Plains kinds as the Forest's):
+	# the two zones that wear the Forest's art wear it in their own colour until their art exists (`Run.PLACEHOLDER_TINT`).
+	art.modulate = Run.PLACEHOLDER_TINT.get(zone, Color.WHITE)
 	# Zoomed out as far as the screen allows: the smallest scale that still
 	# fills the 1280x720 view (plus the ±8px screen-shake margin). Any
 	# smaller would show void at the edges. The real fix for oversized
@@ -2295,6 +2298,8 @@ func _spawn_units() -> void:
 	_draw_malice_strip()
 	# BATCH KJ — and the recipe's combo beside it, when the fight carries one.
 	_draw_combo_row()
+	# BATCH KL — and every passive's chip on the bodies it works through.
+	_kl_refresh_passives()
 
 	_apply_battle_modifier()
 	_stamp_fk_enemy_runes()
@@ -4149,6 +4154,7 @@ func _run_battle() -> void:
 			if _wasting_tick(u):
 				_check_end()
 			continue
+		_kl_refresh_passives()
 		u.tick_statuses()
 		u.tick_cooldowns()
 		# BATCH CI — FORMLESS'S OWED DOWNSIDE, PAID THE MOMENT THE WINDOW
@@ -7265,12 +7271,12 @@ func _recast_writes(u: BattleUnit, ab: Ability, t: BattleUnit) -> Array:
 		# `_apply_status(_, "frozen", …)` has exactly ONE call site, inside
 		# `_hold_freeze`, and it cannot produce that pairing — it needs a
 		# Cryomancer who died, let the ice land timed, and was resurrected.
-		# Since JS §3 the strike loop's status line lays it too, off the
-		# Icewrought Titan's Entomb: on a hero; on the Titan, a boss, by Umbral
-		# Mirror's rebound; and on an escort that is no boss when the Swordmaster's
-		# sold opening sends the declared Entomb to the Titan's fellow — so that
-		# pairing is reachable, and the error stays the safe one: the button errs
-		# toward allowing.
+		# From JS §3 to KL the strike loop's status line laid it too, off the
+		# Icewrought Titan's Entomb (on a hero; on the Titan by Umbral Mirror's
+		# rebound; on an escort by the Swordmaster's sold opening); since KL
+		# Entomb lays Chilled, so no warband move lays it, and a Downwind copy
+		# of a freeze is a timed one — the pairing is reachable still, by that
+		# copy, and the error stays the safe one: the button errs toward allowing.
 		# Allowing a wasted cast is the safe error; refusing a live one is not.
 		"glacial_prison":
 			var gp: Array = []
@@ -8963,7 +8969,8 @@ func _declare_intent(u: BattleUnit, ticks_ahead := 1) -> void:
 	# price aside (`_malice_free` reads it), and it is bought first on the body's turn and costs the body nothing: the body
 	# then acts as declared (`_enemy_turn`). ONE A DECLARATION, so one a turn. A taunt still keeps a body from buying, as it
 	# kept it from the support half; a move the Long Silence has spent is not bought.
-	if not u.has_status("mocked"):
+	# BATCH KL — and under Blood in the Water no taunt keeps a body from buying ("regardless of taunts", `_choose_enemy_action`).
+	if not u.has_status("mocked") or (_kj_combo == "Rage Company" and not u.is_hero):
 		var sp := _warband_spend(u, ticks_ahead, reserve)
 		if not sp.is_empty() and not u.silenced(sp[0] as Ability):
 			u.intent["spend"] = {"ability": sp[0], "target": sp[1], "malice": _malice_price(u, sp[0], sp[1])}
@@ -9084,7 +9091,7 @@ func _intent_ability_usable(u: BattleUnit, ab: Ability) -> bool:
 		return false
 	# BATCH DS — HEADS DOWN (Sharpshooter draft). THE ONE CONDITION THE WHOLE
 	# CARD IS, and its position is the entire design. `_choose_enemy_action`'s
-	# POLICY is untouched (BL §1's promise; it asks only the door's price, IN §3,
+	# POLICY was untouched until KL's ready move first (BL §1's promise; it asks only the door's price, IN §3,
 	# and its cooldown, JI §1), so the enemy still SELECTS freely a turn ahead
 	# and the suppression lands here, at re-validation,
 	# where the caller already logs "cannot bring X to bear — it falls back to
@@ -9095,7 +9102,8 @@ func _intent_ability_usable(u: BattleUnit, ab: Ability) -> bool:
 	# IDENTITY AGAINST `_cheapest_attack` RATHER THAN `cost > 0`.** The first
 	# version of this clause tested cost, on the assumption that an enemy's
 	# better options are the ones it pays for. **THEY ARE NOT: 46 OF THE 50 (70 OF 74 WITH JK's SPENDS, 74 OF 78 WITH JL's HEXES, 72 OF 76 SINCE JO §2 FOLDED TWO,
-	# 97 OF 107 SINCE KJ CUT EVERY KIT TO ITS TIER) ENEMY ABILITIES IN `data/enemies.json` COST ZERO** — Chain Lightning and
+	# 97 OF 107 SINCE KJ CUT EVERY KIT TO ITS TIER, 95 OF 105 SINCE KL TOOK BLOOD TRIBUTE AND STONE SLING) ENEMY ABILITIES IN
+	# `data/enemies.json` COST ZERO** — Chain Lightning and
 	# Healing Wave among them, and Sundering Strike and Poison Arrow until KJ cut them — so a cost
 	# test would have left the card refusing FOUR abilities in the whole game
 	# and reading as working the entire time. Measured, not assumed: a live
@@ -9306,6 +9314,9 @@ func _enemy_turn(u: BattleUnit) -> void:
 		_kj_charges = 0
 		_kj_refresh_combo_row()
 		_log("   → Static Charge: %s's %s strikes every hero" % [u.unit_name, d_ab.display_name], "#9cc8f0")
+		_kl_float(u, "Static Charge")
+	# BATCH KL — BLOOD IN THE WATER, AIMED AS THE BLOW GOES (`_kl_blood_water_aim`): the weakest hero now, a Singled Out one first.
+	d_target = _kl_blood_water_aim(u, d_ab, d_target, bool(decl.get("support", false)))
 	await _resolve(u, d_ab, d_target, "good")
 	if bool(decl.get("support", false)):
 		_forest_bite(u)
@@ -9315,12 +9326,14 @@ func _enemy_turn(u: BattleUnit) -> void:
 # is the whole of the refactor: the policy below is byte-for-byte the policy
 # that shipped in BK, and only WHEN it runs has moved. §1 forbids an AI rewrite
 # and this function is where that promise is kept — a diff that touches the
-# rules inside it is a diff that broke the promise.
+# rules inside it is a diff that broke the promise. **KL MOVED THE POLICY, BY THE
+# DESIGNER's ANSWERS**: a ready move before the basic, and Blood in the Water's
+# untaunted aim.
 # BATCH JI §1 — AND IT ASKS THE COOLDOWN, AS IT ASKS THE PRICE SINCE IN §3. A cooldown
 # is a rule of the door (`_intent_ability_usable` refuses a cooling move), not a
 # policy: the choice reads which moves will be ready when it resolves
 # (`_enemy_ready`, `ticks_ahead` of the unit's own turns away), and picks among them
-# exactly as it always did. Nothing about WHICH ready move it prefers moved.
+# as it did until KL. Since KL a ready move other than the basic comes first (`kl_moves`, the designer's answer 4).
 #
 # Returns {} when there is nothing to declare (no living heroes, no affordable
 # attack); resolution treats that as "fall back to the basic attack".
@@ -9329,7 +9342,10 @@ func _choose_enemy_action(u: BattleUnit, ticks_ahead := 1) -> Dictionary:
 	if living.is_empty():
 		return {}
 	var is_mocked := false
-	if u.has_status("mocked"):
+	# BATCH KL — BLOOD IN THE WATER: "regardless of taunts" — a Rage Company body is pulled by no taunt (here, Savage Presence and
+	# the Stalking Horse below); a Singled Out hero still draws it (`_kj_aim`, answer 3).
+	var kl_untaunted := _kj_combo == "Rage Company" and not u.is_hero
+	if u.has_status("mocked") and not kl_untaunted:
 		var mocker_idx := u.status_power("mocked")
 		# 100+ encodes a COMPANION taunt: the beast of heroes[idx - 100].
 		# The pull prefers the bear (it does the roaring); any living
@@ -9368,7 +9384,7 @@ func _choose_enemy_action(u: BattleUnit, ticks_ahead := 1) -> Dictionary:
 	# Only damaging, off-cooldown abilities count as attacks; support casts
 	# are chosen above.
 	# BATCH JW §3 — AND A BLOW ITS OWN CONDITION WITHHOLDS IS NONE (`_blow_withheld`: the Rotfiend's Corpse Explosion until it
-	# stands at half its health). Which ready blow it prefers is untouched.
+	# stands at half its health). Which ready blow it prefers was untouched until KL's ready move first (below).
 	var affordable: Array = u.abilities.filter(
 		func(a): return (_eff_cost(u, a) <= u.resource and a.damage > 0
 			and _enemy_ready(u, a, ticks_ahead) and not _blow_withheld(u, a)))
@@ -9396,11 +9412,15 @@ func _choose_enemy_action(u: BattleUnit, ticks_ahead := 1) -> Dictionary:
 		# Prefer finishing off wounded heroes; sometimes spread damage.
 		# Threatening Presence: Warriors draw 20% more of the random picks.
 		target = _lowest_hp(living) if randf() < 0.40 else _threat_pick(living)
-		ab = affordable.pick_random()
+		# BATCH KL — A READY MOVE BEFORE THE BASIC (the designer's answer 4, *"Ready move first"*): a body uses a move that cools,
+		# other than its basic (its kit's first), whenever one is ready and affordable, at random among them; otherwise it picks at
+		# random among the rest, its basic and any move with no cooldown (answer 6, *"Mix it with the basic"*).
+		var kl_moves: Array = affordable.filter(func(a): return a.cooldown > 0 and (u.abilities.is_empty() or a != u.abilities[0]))
+		ab = kl_moves.pick_random() if not kl_moves.is_empty() else affordable.pick_random()
 		# Savage Presence (Ursus): the LIVE bear draws 15% of attacks its
 		# way, scaled by the bond curve — a certainty at a deep enough bond,
 		# which is what an uncapped meter is supposed to buy.
-		for sp_c in companions:
+		for sp_c in ([] if kl_untaunted else companions):
 			if not sp_c.dead and sp_c.companion_kind == "ursus" \
 					and sp_c.pack_master != null and not sp_c.pack_master.dead \
 					and target != sp_c:
@@ -9423,7 +9443,7 @@ func _choose_enemy_action(u: BattleUnit, ticks_ahead := 1) -> Dictionary:
 		# Survivalist holding a draw AND an evasion can still be lost track of
 		# — the two are allowed to disagree, and the later roll winning is the
 		# honest order of events (he baited them, then slipped anyway).
-		for sh_h in living:
+		for sh_h in ([] if kl_untaunted else living):
 			if sh_h.has_status("stalking_horse") and target != sh_h:
 				if randf() < 0.01 * maxi(sh_h.status_power("stalking_horse"), 0):
 					logs.append(["   → Stalking Horse: %s draws %s away from %s" % [
@@ -9740,6 +9760,11 @@ func _warband_heal(caster: BattleUnit, body: BattleUnit, special: String, figure
 	var ask := fig if body.has_status("blight") else mini(fig, _malice_free(caster))
 	var got: int = body.heal_amount(ask, body != caster)
 	_malice_pay(maxi(body.hp - hp0, 0))
+	# BATCH KL — FIELD MEDIC (Elite Patrol), said on the heal it raises.
+	if got > 0 and _kj_combo == "Elite Patrol" and _kj_has_role(body, "elite") \
+			and special in ["healing_wave", "wild_growth", "totem_pulse"]:
+		_kl_fired(caster, "Field Medic", "%s's heal on %s is %d%% larger" % [caster.unit_name, body.unit_name,
+			int(round(FIELD_MEDIC_PCT * 100))])
 	return got
 
 
@@ -9831,7 +9856,7 @@ func _submerge(u: BattleUnit, ab: Ability) -> void:
 
 
 # THE ROTFIEND's CORPSE EXPLOSION: an area blow on the heroes' side as the data writes it (its damage, Break and Black Rot,
-# resolved as a plain copy — the Bloodcaller's pattern), then the Rotfiend dies through the one death door, so the pool fills a
+# resolved as a plain copy — the Bloodcaller's pattern until KL), then the Rotfiend dies through the one death door, so the pool fills a
 # kill's worth and a Raise can stand it back up (once a body, a fight), and then, of its living neighbours that can be picked
 # (`_adjacent_enemies`, the ADJACENT keyword), the one with the lower share of its health is healed `CORPSE_EXPLOSION_HEAL_PCT` of its own maximum health,
 # paid by Malice a point a point through `_warband_heal`, the one way Malice goes out to a heal (JJ §3).
@@ -10006,7 +10031,7 @@ const KJ_COMBOS := {
 	"Ritual": ["THE RITE", "Counts down on each healer's turn. At\nzero every body of the warband heals to\nfull and the count restarts. A healer\nStunned, Frozen or Broken on its turn\nadds one."],
 	"Poison Volley": ["FOCUS FIRE", "Every archer aims at the hero with the\nmost Poison, and that hero takes %d%%\nmore from archers." % [int(round(FOCUS_FIRE_PCT * 100))]],
 	"Lightning Storm": ["STATIC CHARGE", "Each heal the warband casts adds a\ncharge. At %d its next single blow\nstrikes every hero, and the charges\nclear." % [STATIC_CHARGES]],
-	"Rage Company": ["BLOOD IN THE WATER", "Every skirmisher aims at a hero under\n%d%% of its health." % [int(round(BLOOD_WATER_AT * 100))]],
+	"Rage Company": ["BLOOD IN THE WATER", "All enemies attack the target with the\nweakest health, regardless of taunts.\nA Singled Out hero still draws them."],
 	"Guardian Circle": ["INTERLOCKED SHIELDS", "The warband takes %d%% less from blows\nfor each tank of it standing." % [int(round(INTERLOCK_CUT * 100))]],
 	"Elite Patrol": ["FIELD MEDIC", "Its healers heal the elite first, and\ntheir heals on it are %d%% larger." % [int(round(FIELD_MEDIC_PCT * 100))]],
 	"Boss Escort": ["LOYAL RETINUE", "While %d or more of its escort stand,\nthe boss takes %d%% less from blows." % [RETINUE_ESCORTS, int(round(RETINUE_CUT * 100))]],
@@ -10164,7 +10189,8 @@ func _kj_silenced_from(u: BattleUnit, ab: Ability) -> bool:
 
 
 # Who the warband aims at, below a hero's taunt: a Singled Out hero (War Cry), then the recipe's draws — Focus Fire's archers at
-# the most-poisoned hero, Blood in the Water's skirmishers at a hero under half. Empty: the ordinary pick.
+# the most-poisoned hero, and since KL Blood in the Water's whole warband at the weakest hero (the lowest share of its health),
+# which no taunt pulls from it (`_choose_enemy_action`; the designer's words and answer 3). Empty: the ordinary pick.
 func _kj_aim(u: BattleUnit, living: Array) -> Array:
 	var singled: Array = living.filter(func(h): return h.has_status("singled_out"))
 	if not singled.is_empty():
@@ -10173,10 +10199,10 @@ func _kj_aim(u: BattleUnit, living: Array) -> Array:
 		var ff := _kj_focus_fire(living)
 		if ff != null:
 			return [ff]
-	if _kj_combo == "Rage Company" and _kj_has_role(u, "skirmisher"):
-		var low: Array = living.filter(func(h): return h.is_hero and h.hp < h.max_hp * BLOOD_WATER_AT)
-		if not low.is_empty():
-			return [_lowest_hp(low)]
+	if _kj_combo == "Rage Company" and not u.is_hero:
+		var bw_heroes: Array = living.filter(func(h): return h.is_hero)
+		if not bw_heroes.is_empty():
+			return [_lowest_hp(bw_heroes)]
 	return []
 
 
@@ -10239,18 +10265,28 @@ func _kj_out_mult(body: BattleUnit, hero: BattleUnit, ab: Ability) -> float:
 				kinds[e.enemy_kind] = true
 			if kinds.size() >= COMBINED_ARMS_KINDS:
 				m *= 1.0 + COMBINED_ARMS_PCT
+				_kl_fired(body, "Combined Arms", "%s strikes %d%% harder, %d kinds of its warband standing" % [body.unit_name,
+					int(round(COMBINED_ARMS_PCT * 100)), kinds.size()])
 		"Swarm":
 			if _kj_has_role(body, "skirmisher") or _kj_has_role(body, "sniper"):
 				m *= 1.0 + PACK_TACTICS_PCT * maxi(standing.size() - 1, 0)
+				if standing.size() > 1:
+					_kl_fired(body, "Pack Tactics", "%s strikes %d%% harder, %d of its warband beside it" % [body.unit_name,
+						int(round(PACK_TACTICS_PCT * 100 * (standing.size() - 1))), standing.size() - 1])
 		"Monster Den":
 			if not _kj_has_role(body, "brute") and standing.any(func(e): return _kj_has_role(e, "brute")):
 				m *= 1.0 + ALPHA_PCT
+				_kl_fired(body, "Alpha", "%s strikes %d%% harder while a brute stands" % [body.unit_name, int(round(ALPHA_PCT * 100))])
 		"Cursed Company":
 			if _kj_debuff_count(hero) >= CURSE_DEBUFFS:
 				m *= 1.0 + CURSE_PCT
+				_kl_fired(body, "Compounding Curse", "%s takes %d%% more, carrying %d of the warband's debuffs" % [hero.unit_name,
+					int(round(CURSE_PCT * 100)), _kj_debuff_count(hero)])
 		"Poison Volley":
 			if _kj_has_role(body, "sniper") and _kj_focus_fire(heroes) == hero:
 				m *= 1.0 + FOCUS_FIRE_PCT
+				_kl_fired(body, "Focus Fire", "%s takes %d%% more from the archers, the most poisoned" % [hero.unit_name,
+					int(round(FOCUS_FIRE_PCT * 100))])
 	return m
 
 
@@ -10264,12 +10300,19 @@ func _kj_in_mult(body: BattleUnit) -> float:
 		"Honor Guard":
 			if _kj_has_role(body, "elite") and standing.any(func(e): return e != body and not e.broken and _kj_has_role(e, "bulwark")):
 				m *= 1.0 - HONOR_GUARD_CUT
+				_kl_fired(body, "Bodyguards", "%s takes %d%% less while a tank of it stands unbroken" % [body.unit_name,
+					int(round(HONOR_GUARD_CUT * 100))])
 		"Guardian Circle":
 			var tanks: int = standing.filter(func(e): return _kj_has_role(e, "bulwark")).size()
 			m *= maxf(1.0 - INTERLOCK_CUT * tanks, 0.0)
+			if tanks > 0:
+				_kl_fired(body, "Interlocked Shields", "%s takes %d%% less, %d tank%s of its warband standing" % [body.unit_name,
+					mini(int(round(INTERLOCK_CUT * 100 * tanks)), 100), tanks, "" if tanks == 1 else "s"])
 		"Boss Escort":
 			if body.is_boss and standing.filter(func(e): return e != body).size() >= RETINUE_ESCORTS:
 				m *= 1.0 - RETINUE_CUT
+				_kl_fired(body, "Loyal Retinue", "%s takes %d%% less, its escort standing" % [body.unit_name,
+					int(round(RETINUE_CUT * 100))])
 	return m
 
 
@@ -10311,6 +10354,7 @@ func _kj_add_charge(body: BattleUnit, ab: Ability) -> void:
 	_kj_charges += 1
 	_log("   → Static Charge: %s's %s adds a charge (%d/%d)" % [body.unit_name, ab.display_name, _kj_charges,
 		STATIC_CHARGES], "#9cc8f0")
+	_kl_float(body, "Static Charge")
 	_kj_refresh_combo_row()
 
 
@@ -10332,6 +10376,7 @@ func _kj_rite_turn(u: BattleUnit) -> void:
 					e.refresh_bars()
 			_kj_rite_left = RITE_TURNS
 			_log("The Rite is complete — the warband rises whole", "#c070e0")
+			_kl_float(u, "The Rite")
 	_kj_refresh_combo_row()
 
 
@@ -10344,6 +10389,7 @@ func _kj_alpha_falls(u: BattleUnit) -> void:
 		return
 	for e in rest:
 		_apply_status(e, "dazed", ALPHA_DAZE_TURNS)
+		_kl_float(e, "Alpha")
 	_log("   → Alpha: the last brute falls, and its warband reels (Dazed)", "#e0a060")
 
 
@@ -10375,6 +10421,7 @@ func _draw_combo_row() -> void:
 
 
 func _kj_refresh_combo_row() -> void:
+	_kl_refresh_passives()
 	if _kj_combo_label == null or not is_instance_valid(_kj_combo_label):
 		return
 	var t := String(KJ_COMBOS[_kj_combo][0])
@@ -10383,6 +10430,141 @@ func _kj_refresh_combo_row() -> void:
 	elif _kj_combo == "Lightning Storm":
 		t += " %d/%d" % [_kj_charges, STATIC_CHARGES]
 	_kj_combo_label.text = t
+
+
+# ══ BATCH KL — A PASSIVE SHOWS ITSELF ═══════════════════════════════════════════════════════════════════════════════════
+#
+# The designer's, 28 November: *"there was no indication that blood tribute ever activated. when something similar to this
+# happens, i want it to be indicated in the battle log, a chip on the respective enemy, as well as float text that briefly
+# appears above the affected enemy to state it. passive traits can take the place of an ability for an enemy."* Two kinds of
+# passive work through a warband body without a turn: a KIND's own (`passives` in enemies.json — Blood Tribute, the first) and
+# the RECIPE's combo (`KJ_COMBOS`). Each carries a CHIP on every body it works through, its reading live, read again at the
+# fight's start, at every death and Raise and at every turn's start (`_kl_refresh_passives`); and each time one changes a blow,
+# a pick or a heal, `_kl_fired` writes the log's line and floats the passive's name over the body it works on (a steady float:
+# it draws no die). An event a combo already logs — Static Charge's charge, The Rite, Alpha's Daze — floats beside its line
+# (`_kl_float`).
+const KL_PASSIVE_COLOR := Color(0.92, 0.55, 0.62)
+const KL_COMBO_NAMES := {"Warband": "Combined Arms", "Swarm": "Pack Tactics", "Monster Den": "Alpha", "Cursed Company": "Compounding Curse",
+	"Honor Guard": "Bodyguards", "Ritual": "The Rite", "Poison Volley": "Focus Fire", "Lightning Storm": "Static Charge",
+	"Rage Company": "Blood in the Water", "Guardian Circle": "Interlocked Shields", "Elite Patrol": "Field Medic", "Boss Escort": "Loyal Retinue"}
+var _kl_floated := {}                         # "body id|passive" -> the frame it last floated (one float a body a frame)
+
+
+func _kl_has_passive(u: BattleUnit, pid: String) -> bool:
+	return u != null and not u.is_hero and u.passives.any(func(p): return String((p as Dictionary).get("id", "")) == pid)
+
+
+# The falls of a body's warband since the fight began, the body aside, each counted as it fell (`_on_unit_died`): what Blood
+# Tribute pays on. A Raise takes none back — the designer's *"for the rest of the fight"* (answer 1).
+var _kl_tribute := {}                         # a Bloodcaller -> the falls of its warband it has taken
+func _kl_fallen(u: BattleUnit) -> int:
+	return int(_kl_tribute.get(u, 0))
+
+
+func _kl_float(u: BattleUnit, pname: String) -> void:
+	if u == null or not is_instance_valid(u):
+		return
+	var key := "%d|%s" % [u.get_instance_id(), pname]
+	var f := Engine.get_process_frames()
+	if int(_kl_floated.get(key, -1)) == f:
+		return
+	_kl_floated[key] = f
+	u.float_text(pname.to_upper(), KL_PASSIVE_COLOR, false, true)
+
+
+# Blood in the Water's aim as the blow goes (the designer's *"all enemies attack the target with the weakest health"*): a body's
+# blow declared a turn ahead goes at the hero who is weakest NOW — a Singled Out hero first (answer 3) — said as it goes; a blow
+# a Feint sent to a fellow of the warband, a support cast and any other recipe's aim pass by unchanged; a hero who fell since the
+# declaration is no aim, and the blow goes at the weakest standing.
+func _kl_blood_water_aim(u: BattleUnit, ab: Ability, target: BattleUnit, support: bool) -> BattleUnit:
+	if _kj_combo != "Rage Company" or u == null or u.is_hero or ab == null or ab.damage <= 0 or support \
+			or (target != null and enemies.has(target)):
+		return target
+	var aim := _kj_aim(u, _hero_side())
+	if aim.is_empty():
+		return target
+	var t: BattleUnit = aim[0]
+	if not t.has_status("singled_out"):
+		_kl_fired(u, "Blood in the Water", "%s goes for the weakest, %s" % [u.unit_name, t.unit_name])
+	return t
+
+
+func _kl_fired(u: BattleUnit, pname: String, detail: String) -> void:
+	_log("   → %s: %s" % [pname, detail], "#e8a0b0")
+	_kl_float(u, pname)
+
+
+# What the recipe's combo shows on one body it works through: [the chip's short words, its hover], or [] for a body it does not.
+func _kl_combo_chip(b: BattleUnit, standing: Array) -> Array:
+	if _kj_combo == "" or not KJ_COMBOS.has(_kj_combo):
+		return []
+	var words := String(KJ_COMBOS[_kj_combo][1])
+	var now := ""
+	match _kj_combo:
+		"Warband":
+			var kinds := {}
+			for e in standing:
+				kinds[e.enemy_kind] = true
+			now = "+%d%%" % int(round(COMBINED_ARMS_PCT * 100)) if kinds.size() >= COMBINED_ARMS_KINDS else "off"
+		"Swarm":
+			if not (_kj_has_role(b, "skirmisher") or _kj_has_role(b, "sniper")):
+				return []
+			now = "+%d%%" % int(round(PACK_TACTICS_PCT * 100 * maxi(standing.size() - 1, 0)))
+		"Monster Den":
+			if _kj_has_role(b, "brute"):
+				return []
+			now = "+%d%%" % int(round(ALPHA_PCT * 100)) if standing.any(func(e): return _kj_has_role(e, "brute")) else "off"
+		"Cursed Company":
+			now = "+%d%%" % int(round(CURSE_PCT * 100))
+		"Honor Guard":
+			if not _kj_has_role(b, "elite"):
+				return []
+			now = "-%d%%" % int(round(HONOR_GUARD_CUT * 100)) if standing.any(func(e): return e != b and not e.broken \
+				and _kj_has_role(e, "bulwark")) else "off"
+		"Ritual":
+			if not _kj_has_role(b, "mender"):
+				return []
+			now = "%d" % _kj_rite_left
+		"Poison Volley":
+			if not _kj_has_role(b, "sniper"):
+				return []
+			now = "+%d%%" % int(round(FOCUS_FIRE_PCT * 100))
+		"Lightning Storm":
+			now = "%d/%d" % [_kj_charges, STATIC_CHARGES]
+		"Rage Company":
+			now = "aim"
+		"Guardian Circle":
+			var tanks: int = standing.filter(func(e): return _kj_has_role(e, "bulwark")).size()
+			now = "-%d%%" % mini(int(round(INTERLOCK_CUT * 100 * tanks)), 100)
+		"Elite Patrol":
+			if not _kj_has_role(b, "mender"):
+				return []
+			now = "+%d%%" % int(round(FIELD_MEDIC_PCT * 100))
+		"Boss Escort":
+			if not b.is_boss:
+				return []
+			now = "-%d%%" % int(round(RETINUE_CUT * 100)) if standing.filter(func(e): return e != b).size() >= RETINUE_ESCORTS else "off"
+	return [now, "The fight's combo.\n%s\nNow: %s" % [words, now]]
+
+
+# Every passive's chip, read again off the field: a kind's own, and the recipe's combo.
+func _kl_refresh_passives() -> void:
+	var standing := _kj_standing()
+	for e in enemies:
+		var b := e as BattleUnit
+		if b.dead:
+			continue
+		if _kl_has_passive(b, "blood_tribute"):
+			var n := _kl_fallen(b)
+			var pct := int(round(BLOOD_TRIBUTE_PCT * 100 * n))
+			b.set_display_chip("kl_blood_tribute", "Blood Tribute", "+%d%%" % pct, KL_PASSIVE_COLOR,
+				"A passive. Each of its warband that falls gives\nits attacks %d%% more damage and Break.\nNow: +%d%% (%d fallen)." % [
+				int(round(BLOOD_TRIBUTE_PCT * 100)), pct, n], n)
+		var c := _kl_combo_chip(b, standing)
+		if c.is_empty():
+			b.remove_display_chip("kl_combo")
+		else:
+			b.set_display_chip("kl_combo", String(KL_COMBO_NAMES.get(_kj_combo, _kj_combo)), String(c[0]), MALICE_COLOR, String(c[1]))
 
 
 func _cleansable_debuffs(u: BattleUnit) -> Array:
@@ -10550,7 +10732,8 @@ func _lowest_hp(pool: Array) -> BattleUnit:
 # eats the hit, and it cannot hold Faith.
 func _likeliest_target(pool: Array) -> BattleUnit:
 	for e in enemies:
-		if e.dead or not e.has_status("mocked"):
+		# BATCH KL — a taunt pulls no body of a Blood in the Water warband (`_choose_enemy_action`), so it names no target.
+		if e.dead or not e.has_status("mocked") or _kj_combo == "Rage Company":
 			continue
 		var m_idx: int = e.status_power("mocked")
 		if m_idx < 0 or m_idx >= heroes.size() or m_idx >= 100:
@@ -11032,6 +11215,9 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			attacker.start_cooldown(ab)
 	var dmg_mult := Ability.GRADE_DMG_MULT[grade] as float
 	var pr_mult := Ability.GRADE_BD_MULT[grade] as float
+	# BATCH KL — Blood Tribute's Break, as its damage (the strike loop, beside Rally).
+	if attacker != null and not attacker.is_hero and _kl_has_passive(attacker, "blood_tribute"):
+		pr_mult *= 1.0 + BLOOD_TRIBUTE_PCT * _kl_fallen(attacker)
 	var is_perfect := grade == "perfect"
 	# Shatter perfect: the echo of the blast comes back sooner (4cd).
 	if is_perfect and ab.display_name == "Shatter" and not debug_cooldowns_off:
@@ -12268,6 +12454,14 @@ func _resolve(attacker: BattleUnit, ab: Ability, target: BattleUnit, grade: Stri
 			# this line, so the pool's one-for-one and the reserve stand.
 			if attacker.has_status("warband_rally"):
 				raw *= 1.0 + MALICE_RALLY_PCT
+			# BATCH KL — BLOOD TRIBUTE, the Bloodcaller's passive: each fallen ally of its warband, `BLOOD_TRIBUTE_PCT` more (its Break
+			# rides `pr_mult`, at `_resolve`'s head), said in the log and over the body as it pays.
+			if not attacker.is_hero and _kl_has_passive(attacker, "blood_tribute"):
+				var kl_bt := _kl_fallen(attacker)
+				if kl_bt > 0:
+					raw *= 1.0 + BLOOD_TRIBUTE_PCT * kl_bt
+					_kl_fired(attacker, "Blood Tribute", "%s strikes %d%% harder, %d of its warband fallen" % [attacker.unit_name,
+						int(round(BLOOD_TRIBUTE_PCT * 100 * kl_bt)), kl_bt])
 			# BATCH KJ — THE REWORK's OUTGOING READS, beside Rally: a Flank move, a Doomed hero, a body in its Fury, and the
 			# recipe's combo (`_kj_out_mult`).
 			if not attacker.is_hero and strike_target.is_hero:
@@ -18046,6 +18240,13 @@ func _on_unit_died(u: BattleUnit) -> void:
 		_sync_rootbound()
 		# BATCH KJ — ALPHA (Monster Den): when the last brute falls, the rest of the warband is Dazed.
 		_kj_alpha_falls(u)
+		# BATCH KL — BLOOD TRIBUTE: each Bloodcaller standing takes the fall, said; then every passive's chip reads the field again.
+		for kl_e in enemies:
+			if kl_e != u and not kl_e.dead and _kl_has_passive(kl_e, "blood_tribute"):
+				_kl_tribute[kl_e] = _kl_fallen(kl_e) + 1
+				_kl_fired(kl_e, "Blood Tribute", "%s's fall feeds the rite: %s's attacks deal %d%% more damage and Break" % [
+					u.unit_name, kl_e.unit_name, int(round(BLOOD_TRIBUTE_PCT * 100 * _kl_fallen(kl_e)))])
+		_kl_refresh_passives()
 		# BATCH JJ §2 — A BODY OF THE WARBAND FALLS: its pool fills by a kill's worth, whoever dealt it.
 		# BATCH JQ §1 — UNLESS IT DIES FORSAKEN, AND THEN THE KILL FEEDS NOTHING. Every death of the warband passes here, from
 		# `unit._die`, before the body's statuses are cleared — a strike's, a handler's, a tick's, a debug kill's — so the mark
@@ -25901,21 +26102,6 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 			await _corpse_explosion(attacker, ab, target, grade)
 		"submerge":
 			_submerge(attacker, ab)
-		"blood_tribute":
-			# Orc Bloodcaller (Batch V): every fallen ally feeds the rite —
-			# +25% damage and Break damage per corpse. Resolved as a plain
-			# attack copy (the Hysteria pattern) so armor, resists, and
-			# crits all apply normally.
-			var bt_fallen := enemies.filter(func(e): return e.dead).size()
-			var bt_mult := 1.0 + 0.25 * bt_fallen
-			if bt_fallen > 0:
-				_log("%s: Blood Tribute — %d fallen feed the rite (+%d%% damage and Break)" % [
-					attacker.unit_name, bt_fallen, 25 * bt_fallen], "#c04868")
-			var bt_copy: Ability = Ability.make({"display_name": ab.display_name,
-				"damage": int(round(ab.damage * bt_mult)),
-				"pressure": int(round(ab.pressure * bt_mult)),
-				"dmg_type": ab.dmg_type, "anim": ab.anim, "delay": ab.delay})
-			await _resolve(attacker, bt_copy, target, grade)
 		"totem_pulse":
 			# Grave Totem (Batch V): every living ally knits back 6% of its
 			# OWN maximum — weak per body, real across a full field. The
@@ -25957,6 +26143,7 @@ func _resolve_special(attacker: BattleUnit, ab: Ability, target: BattleUnit,
 					ab.display_name, target.unit_name, target.hp, target.hp], "#c04868")
 				_declare_intent(target)
 				_rebuild_turn_bar()
+				_kl_refresh_passives()
 		"malice_rally":
 			# BATCH JK §1 — RALLY: every standing body of the warband strikes `MALICE_RALLY_PCT` harder for `MALICE_RALLY_TURNS` turns, read
 			# in the strike loop, which no heal passes; the pool pays `MALICE_RALLY_PRICE`.
@@ -30133,9 +30320,9 @@ func _gated_failure(u: BattleUnit, ab: Ability) -> void:
 #   `attacker.is_hero` — heroes striking enemies is the other bar's business.
 #   `ab.special != ""` — an ability with a special never reaches the ordinary
 #     strike loop, which is the only place this mitigation is applied, so a bar
-#     there would pause the fight and then reduce nothing. ONE enemy attack in
-#     the roster is skipped by this clause today: the Bloodcaller's BLOOD
-#     TRIBUTE. The Hurler's SIEGE STONE is NOT skipped — its `windup` hoists the
+#     there would pause the fight and then reduce nothing. The Bloodcaller's
+#     BLOOD TRIBUTE, the enemy attack this clause named, is a passive since KL
+#     and strikes nothing. The Hurler's SIEGE STONE is NOT skipped — its `windup` hoists the
 #     blow and deals nothing, and the landing comes back through here a turn
 #     later as a plain attack copy with no special at all, which is exactly when
 #     the brace should be offered.

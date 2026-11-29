@@ -4979,6 +4979,20 @@ same breath as the removal.
   every zone past the first two to kinds no other zone fields, and `check_kh` §2 the first two to each other — or says which
   nodes fall to `compose`'s plain fallback, and why.
 
+## STANDING DESIGN RULE — A PASSIVE SHOWS ITSELF (Batch KL, the designer's)
+> **When a passive works, the player is told three ways: a line in the combat log, a chip on the body it works through, and
+> its name floating over that body.** The designer, after a playtest (28 November): *"there was no indication that blood tribute
+> ever activated. when something similar to this happens, i want it to be indicated in the battle log, a chip on the respective
+> enemy, as well as float text that briefly appears above the affected enemy to state it. passive traits can take the place of an
+> ability for an enemy."*
+
+- **TWO KINDS OF PASSIVE, ONE DOOR** (`scripts/battle.gd`): a KIND's own (`passives` in `data/enemies.json`; Blood Tribute, the
+  Orc Bloodcaller's, the first) and the RECIPE's combo (`KJ_COMBOS`). `_kl_fired` writes the line and floats the name (a steady
+  float, which draws no die); `_kl_refresh_passives` reads every chip again at the fight's start, every death and Raise and every
+  turn's start. **A passive written later goes through that door, or it is the silent passive this rule retired** (KL's reading
+  of *"something similar"*: every combo is a passive the warband carries; `check_kl` §2 and §3).
+- **A PASSIVE TAKES A MOVE's PLACE**: a tier-N kind carries N moves and passives between them (`check_kl` §1, `check_kj` §1).
+
 ## STANDING DESIGN RULE — THE PROTECTED CORE IS THE BASELINE (Batch EB §1)
 > **A protected core may be cheaper and faster than a comparable draft card. The core is the
 > baseline; the draft card pays for the slot it occupies.** A measurement showing cores are cheaper

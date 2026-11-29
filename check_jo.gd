@@ -817,8 +817,11 @@ func _s2_the_aim() -> void:
 	print("\n§2 — the aim: chosen as the attacks are, through the draws and the evasions")
 	var choose := Gate.fn_body("scripts/battle.gd", "_choose_enemy_action", _cache)
 	var special := Gate.fn_body("scripts/battle.gd", "_resolve_special", _cache)
-	var pick := "ab = affordable.pick_random()"
-	ok(choose.contains(pick), "§2: the selection does not pick its blow from the attacks alone")
+	# BATCH KL — A READY MOVE FIRST (the designer's answer 4): the move is drawn from the attacks, the basic set aside while another
+	# is ready, and the attacks alone otherwise.
+	var pick := "ab = kl_moves.pick_random() if not kl_moves.is_empty() else affordable.pick_random()"
+	ok(choose.contains(pick) and choose.contains("var kl_moves: Array = affordable.filter("),
+		"§2: the selection does not pick its blow from the attacks alone")
 	var hex_arm := "\"warband_hex\":"
 	ok(not choose.contains("warband_hex") and not special.contains(hex_arm), "§2: a hex arm still stands in the selection or the specials")
 	ok(Gate.fn_body("scripts/battle.gd", "_hex_open", _cache) == "", "§2: the hexes' own aim (_hex_open) still stands")

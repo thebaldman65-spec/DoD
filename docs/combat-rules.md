@@ -99,6 +99,10 @@ NOT BE WRITTEN**; an ability obeys this rule by not passing `force`.
 **DECLARE ON SCHEDULE, RESOLVE ON TURN.** `_choose_enemy_action` is the SELECTION half lifted out
 of `_enemy_turn` **byte-for-byte** — only *when* it runs moved, and a diff touching the rules
 inside it breaks that promise.
+· **KL MOVED THE POLICY, BY THE DESIGNER's ANSWERS** (KL's report): a ready move that cools before the basic, a move with
+  no cooldown mixed with it (answers 4 and 6), and under Blood in the Water every body at the weakest hero, no taunt pulling it,
+  the aim taken again as the blow goes (answer 3; `battle._kl_blood_water_aim`). Where this block says the policy does not
+  move, or is untouched, it speaks of the selection before KL.
 · **THE PROMISE BINDS THE POLICY, AND THE SELECTION ASKS THE DOOR's COOLDOWN AS IT ASKS ITS PRICE (JI §1).** Which move it
   prefers and at whom is the policy and does not move — the hexes, which joined its random pick at JL §2 and went only at a hero
   who did not carry one, ride blows the attack half reaches since JO §2, so the promise stands with no exception beside it (JL's

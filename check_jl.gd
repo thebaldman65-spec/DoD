@@ -1037,8 +1037,18 @@ func _s2_the_selection(s: Node, hexes: bool) -> void:
 			picked[nm] = int(picked.get(nm, 0)) + 1
 	var host := _hex_host(f, "fester")
 	var name := host.display_name if host != null else "?"
-	print("    the Behemoth's choices over 40 on a clean board: %s" % str(picked))
-	ok(host != null and int(picked.get(name, 0)) >= 1 and picked.size() >= 2, "§2: the Behemoth's selection does not take the blow that carries Fester among its attacks: %s" % str(picked))
+	# BATCH KL — A READY MOVE BEFORE THE BASIC (the designer's answer 4): ready, the Bellow every time; cooling, the basic.
+	var cooling := {}
+	for _j in 12:
+		f.cooldowns = {name: 3}
+		var c2: Dictionary = s.call("_choose_enemy_action", f)
+		var ab2: Variant = c2.get("ability")
+		if ab2 is Ability:
+			cooling[(ab2 as Ability).display_name] = int(cooling.get((ab2 as Ability).display_name, 0)) + 1
+	f.cooldowns = {}
+	print("    the Behemoth's choices over 40 on a clean board: %s; over 12 with it cooling: %s" % [str(picked), str(cooling)])
+	ok(host != null and int(picked.get(name, 0)) == 40 and cooling.size() == 1 and not cooling.has(name),
+		"§2: the Behemoth's selection does not take the blow that carries Fester among its attacks: %s, cooling %s" % [str(picked), str(cooling)])
 	var e: BattleUnit = _foes(s)[0]
 	for h2 in _heroes(s):
 		s._apply_status(h2, "fester", 3, 0, 0, e)

@@ -305,6 +305,8 @@ func _draw_screen() -> void:
 		"res://assets/backgrounds/node_background_forest.png"))
 	var art := TextureRect.new()
 	art.texture = art_tex
+	# BATCH KL — a zone on the Forest's art wears its own colour (`Run.PLACEHOLDER_TINT`).
+	art.modulate = Run.PLACEHOLDER_TINT.get(Run.zone_name, Color.WHITE)
 	art.size = Vector2(1280, 720)
 	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED

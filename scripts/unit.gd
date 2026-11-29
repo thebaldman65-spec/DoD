@@ -1912,6 +1912,9 @@ var engine_chips: Array = []
 # three lists; `set_display_chip` is the one writer, `display_chip` the reader. A chip's `turns`
 # is shown and never counted down here — its owner's field is the clock (Enraged's timer).
 var display_chips: Array = []
+# BATCH KL — A WARBAND KIND's PASSIVES, off its `passives` in enemies.json ({id, display_name, description}): a passive takes a
+# move's place in the kit, works without a turn, and shows itself when it works (`Battle._kl_fired`, `_kl_refresh_passives`).
+var passives: Array = []
 
 # Battle-log hook (set by the battle scene) so talent procs that happen
 # inside this unit (Enraged, Unrelenting Assault) reach the combat log.
@@ -5717,14 +5720,16 @@ func heal_amount(amount: int, external := false) -> int:
 var _float_stack := 0  # staggers rapid floating texts so they don't overlap
 
 
-func float_text(text: String, color: Color, big := false) -> void:
+# BATCH KL — `steady` holds the label at the middle of its row, so a float that names a passive draws no die: a die drawn
+# there would move every seeded fight it shows in.
+func float_text(text: String, color: Color, big := false, steady := false) -> void:
 	var label := Label.new()
 	label.text = text
 	label.add_theme_font_size_override("font_size", 46 if big else 22)
 	label.add_theme_color_override("font_color", color)
 	label.add_theme_constant_override("outline_size", 8 if big else 4)
 	label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
-	label.position = Vector2(randf_range(-34, -6),
+	label.position = Vector2(-20.0 if steady else randf_range(-34, -6),
 		(-96 if big else -80) - _float_stack * 20)
 	label.z_index = 10
 	add_child(label)

@@ -188,9 +188,8 @@ func _consts(path: String) -> Dictionary:
 # A move of the warband's data, by its kind's key and its name.
 func _move(kind: String, name: String) -> Dictionary:
 	var data: Dictionary = Enemies._load()
-	if not data.has(kind):
-		return {}
-	for a in data[kind]["abilities"]:
+	# BATCH KL — a kind taken out of the data since (the Orc Slinger) is read where the warband stood before KJ, as a move KJ took out is.
+	for a in (data[kind]["abilities"] if data.has(kind) else []):
 		if String((a as Dictionary).get("display_name", "")) == name:
 			return a
 	# BATCH KJ — A DIAL's MOVE THAT KJ TOOK OUT OF ITS KIT (the designer's picks cut every kit to its tier) is read where the warband
@@ -334,7 +333,8 @@ func _s0_the_dials() -> void:
 		if mv.is_empty() or live != now:
 			pulled.append("%s is %s, the table says %s" % [r[3], live, now])
 		# "BACK TO" IS THE RECORD's FIGURE: JN's for the seven (JO-break's damage at JN), HEAD-before-JN's for the ten and their bands.
-		var unit := Enemies.unit_name(String(key[0]))
+		var unit := Enemies.unit_name(String(key[0])) if Enemies._load().has(String(key[0])) \
+			else String((Gate.warband_before_kj().get(String(key[0]), {}) as Dictionary).get("unit_name", String(key[0])))
 		var want := ""
 		if dial == "2":
 			var jr := _row_by(jo, 1, unit, 8, String(key[1]))
@@ -433,7 +433,9 @@ func _s1_the_count() -> void:
 	ok(over.is_empty(), "§1: a count was taken over more fights than the warband attacked in — it counts the attacks-off fights: %s" % [over])
 	ok(bad.is_empty(), "§1: a count is not a plain count: %s" % [bad])
 	# THE POPULATION, DERIVED: the four hexes, the ten JO re-derived, and every kind of the warband's data.
-	var kinds := (Enemies._load() as Dictionary).keys().filter(func(k): return not ADDED_SINCE.has(String(k))).size()
+	# BATCH KL — and a kind taken out of the data since (the Orc Slinger) still stands in the count, which was taken with it.
+	var kinds := (Enemies._load() as Dictionary).keys().filter(func(k): return not ADDED_SINCE.has(String(k))).size() \
+		+ ["slinger"].filter(func(k): return not Enemies._load().has(k)).size()
 	ok(int(counted.get("a hex laid", 0)) == 4 and int(counted.get("a re-derived move cast", 0)) == _rows(_doc("res://docs/reports/JO-break.tsv")).size()
 		and int(counted.get("a warband kind", 0)) == kinds and int(counted.get("heroes Broken", 0)) >= 1,
 		"§1: the count's population is not the four hexes, the ten and every kind (%s; %d kinds)" % [str(counted), kinds])

@@ -74,41 +74,6 @@
    }
   ]
  },
- "slinger": {
-  "unit_name": "Orc Slinger",
-  "power": 1,
-  "roles": [
-   "sniper"
-  ],
-  "zones": [
-   2
-  ],
-  "enemy_role": "damage",
-  "max_hp": 100,
-  "attack": 100,
-  "armor": 0.08,
-  "speed": 100.0,
-  "stability": 100,
-  "constitution": 80,
-  "is_ranged": true,
-  "tint": [
-   0.92,
-   0.82,
-   0.55
-  ],
-  "resists": {
-   "frost": -0.25
-  },
-  "abilities": [
-   {
-    "display_name": "Stone Sling",
-    "damage": 24,
-    "pressure": 20,
-    "delay": 2.0,
-    "anim": "attack01"
-   }
-  ]
- },
  "totemist": {
   "unit_name": "Orc Totemist",
   "power": 2,
@@ -1142,7 +1107,13 @@
     "pressure": 24,
     "resource_gain": 15,
     "delay": 2.0,
-    "anim": "attack01"
+    "anim": "attack01",
+    "choose_two": true,
+    "applies_status": {
+     "id": "burn",
+     "turns": 3
+    },
+    "description": "Strikes two heroes, and burns each\nfor 3 turns."
    },
    {
     "display_name": "Immolating Wave",
@@ -1325,17 +1296,13 @@
     "pressure": 20,
     "delay": 2.0,
     "anim": "attack01"
-   },
+   }
+  ],
+  "passives": [
    {
+    "id": "blood_tribute",
     "display_name": "Blood Tribute",
-    "cooldown": 2,
-    "special": "blood_tribute",
-    "damage": 44,
-    "pressure": 24,
-    "delay": 2.5,
-    "anim": "attack02",
-    "dmg_type": "shadow",
-    "description": "Grows stronger for every one of its\nwarband fallen this battle."
+    "description": "Grows stronger for every one of its\nwarband fallen this battle: each gives its\nattacks {=Battle.BLOOD_TRIBUTE_PCT*100}% more damage and Break."
    }
   ]
  },
@@ -1822,10 +1789,10 @@
     "anim": "attack02",
     "dmg_type": "frost",
     "applies_status": {
-     "id": "frozen",
-     "turns": 1
+     "id": "chilled",
+     "turns": 3
     },
-    "description": "Freezes one hero solid: a turn lost."
+    "description": "Lays a stack of Chilled on one hero."
    },
    {
     "display_name": "Entrench",

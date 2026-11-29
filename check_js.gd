@@ -21,9 +21,10 @@
 #        authorship — the kind each stands for, the second moves, what they lay, the spends, Sap's carriers, the Matron's Raise, the
 #        board, the kept table and the state's record — is asked of the six as KJ found them (`Gate.warband_before_kj()`); their
 #        shape and master's rows are read live.
-#   §3   THE ICEWROUGHT TITAN: the Frozen Plains' boss lays `frozen` on one hero for one turn with a blow (C10); DRIVEN on a real
-#        board — the freeze lands and costs the hero exactly one turn, a Block or a miss lays nothing, Ironclad and Hallowed refuse
-#        it, a cleanse lifts it (C11); no ability of its tagged with a rung, its kit the same at every rung (C12).
+#   §3   THE ICEWROUGHT TITAN: the Frozen Plains' boss lays one Chilled stack for 3 turns on one hero with a blow (C10; a freeze
+#        for one turn from JS to KL, the designer's answer 2 at KL); DRIVEN on a real board — the chill lands on a hit, a Block or
+#        a miss lays nothing, Hallowed refuses it and Ironclad does not, a cleanse lifts it, and it costs no turn (C11); no ability
+#        of its tagged with a rung, its kit the same at every rung (C12).
 #   §4   THE COUNT: the kept table carries the attacking fights' number on every row and says why a kind it never met was not met (C13).
 #   §5   WHAT IS DELIBERATELY NOT DONE: the warband's data with JS's additions taken out (and since KJ, KJ's rework set aside)
 #        reads as JR landed it, the Cleric's cut
@@ -90,8 +91,9 @@ const STANDS_FOR_ROSTER := 1
 # THE ROLE's ATTACK (master §9, `battle._enemy_config`'s comment): Damage 100, Tank 75, Support 50.
 const ROLE_ATTACK := {"damage": 100, "tank": 75, "support": 50}
 # A BREAK MOVE: its Break damage above its damage, so the plate declares it a crush.
-# THE STATUSES THE SEVEN LAY, every one standing before JS (C08): Slowed, Dazed, Sap and Frozen.
-const LAID := ["slow", "dazed", "sap", "frozen"]
+# THE STATUSES THE SEVEN LAY, every one standing before JS (C08): Slowed, Dazed, Sap and Frozen — and Chilled since KL's Entomb
+# (the designer's answer 2; C08 reads the warband KJ found, where Entomb froze).
+const LAID := ["slow", "dazed", "sap", "frozen", "chilled"]
 # STATUS_INFO's ids as JR landed them: their count and their digest (sorted, joined by `|`). A status authored reds here.
 const STATUS_IDS_AT_HEAD := 168
 const STATUS_IDS_MD5 := "73daa5a35fc15fe44b74bf493d079976"
@@ -109,8 +111,10 @@ const RECORD_HEAD := "### THE FROZEN PLAINS"
 const RECORD_SAYS := "each the least whole damage that clears the line"
 # ── §3's TITAN ────────────────────────────────────────────────────────────────
 const FREEZE := "Entomb"
-# THE FREEZE's LENGTH: one turn, the ordinary freeze's (JS's ruling 4) — the turn the card's *a turn lost* and master's rows state.
-const FREEZE_TURNS := 1
+# WHAT ENTOMB LAYS SINCE KL (the designer's answer 2, *"One Chilled stack"*): one stack of Chilled for 3 turns, the clock an
+# enemy's chill keeps; from JS to KL it froze for one turn (JS's ruling 4). The move keeps its name (`FREEZE`).
+const ENTOMB_LAYS := "chilled"
+const FREEZE_TURNS := 3
 const FOE := {"type": "fight", "theme": "Warband", "enemies": ["icewrought_titan"]}
 const SEATS := ["warrior", "mage", "cleric", "hunter"]
 const SCRATCH_PROFILE := "user://js_profile.json"
@@ -658,7 +662,7 @@ func _s2_the_six() -> void:
 			wrong.append("%s's Attack is %d, not its role's %d (C07)" % [k, int(kd.get("attack", 0)), int(ROLE_ATTACK.get(String(kd.get("enemy_role", "")), -1))])
 		# THE SIGNATURE: frost resisted, fire not, slower and more armoured than the kind it stands for.
 		var res: Dictionary = kd.get("resists", {})
-		var eq: Dictionary = data.get(String(spec[3]), {})
+		var eq: Dictionary = data.get(String(spec[3]), js_data.get(String(spec[3]), {}))
 		if not (float(res.get("frost", 0.0)) > 0.0 and float(res.get("fire", 0.0)) < 0.0):
 			wrong.append("%s does not resist frost and fall to fire: %s" % [k, str(res)])
 		if eq.is_empty() or not (float(kd.get("speed", 999.0)) < float(eq.get("speed", 0.0)) and float(kd.get("armor", 0.0)) > float(eq.get("armor", 1.0))):
@@ -802,6 +806,10 @@ func _zones_js(k: String, kd: Dictionary) -> Array:
 	if _before_jx.is_empty():
 		for kk in Enemies._load():
 			_before_jx[kk] = {"zones": ((Enemies._load()[kk] as Dictionary).get("zones", []) as Array).duplicate()}
+		# BATCH KL — AND A KIND TAKEN OUT OF THE DATA SINCE (the Orc Slinger), with its tags as KJ found them.
+		for kr in Gate.warband_before_kj():
+			if not _before_jx.has(kr):
+				_before_jx[kr] = {"zones": ((Gate.warband_before_kj()[kr] as Dictionary).get("zones", []) as Array).duplicate()}
 		Gate.rosters_before_jx(_before_jx)
 	return _zones(_before_jx.get(k, kd))
 
@@ -939,20 +947,20 @@ func _s2_the_master_rows(data: Dictionary) -> void:
 # ── §3 — THE ICEWROUGHT TITAN ─────────────────────────────────────────────────
 
 func _s3_the_titan_data() -> void:
-	print("\n§3 — the Icewrought Titan: the zone's boss, a blow that freezes one hero, no rung tag")
+	print("\n§3 — the Icewrought Titan: the zone's boss, a blow that chills one hero, no rung tag")
 	var data: Dictionary = Enemies._load()
 	ok(data.has(BOSS), "§3: the data holds no %s" % BOSS)
 	if not data.has(BOSS):
 		return
 	var kd: Dictionary = data[BOSS]
 	ok(bool(kd.get("is_boss", false)) and (kd.get("roles", []) as Array) == ["boss"], "§3: the Titan is not a boss: %s" % str(kd.get("roles", [])))
-	# C10 — A BLOW THAT LAYS `frozen` ON ONE HERO.
+	# C10 — A BLOW THAT LAYS `chilled` ON ONE HERO (since KL; `frozen` before).
 	var fz := _move(kd, FREEZE)
 	var st: Dictionary = fz.get("applies_status", {})
 	print("    %s: damage %d, Break %d, lays %s, %s, cools %d" % [FREEZE, int(fz.get("damage", 0)), int(fz.get("pressure", 0)), str(st), "every hero" if bool(fz.get("aoe", false)) else "one hero", int(fz.get("cooldown", 0))])
-	ok(String(st.get("id", "")) == "frozen" and int(st.get("turns", 0)) == FREEZE_TURNS, "§3: the Titan's %s lays no freeze of %d turn: %s" % [FREEZE, FREEZE_TURNS, str(st)])
+	ok(String(st.get("id", "")) == ENTOMB_LAYS and int(st.get("turns", 0)) == FREEZE_TURNS, "§3: the Titan's %s lays no chill of %d turns: %s" % [FREEZE, FREEZE_TURNS, str(st)])
 	ok(not bool(fz.get("aoe", false)) and String(fz.get("target", "")) != "ally" and int(fz.get("damage", 0)) > 0 and String(fz.get("special", "")) == "",
-		"§3: the Titan's freeze does not ride a blow at one hero — a blow, single, struck at the heroes, no special")
+		"§3: the Titan's chill does not ride a blow at one hero — a blow, single, struck at the heroes, no special")
 	var spends := (kd.get("abilities", []) as Array).filter(func(a): return String((a as Dictionary).get("special", "")).begins_with("malice_"))
 	ok(spends.size() == 1, "§3: the Titan holds %d Malice spends, not one" % spends.size())
 	# C12 — NO RUNG TAG, AND ITS KIT THE SAME AT EVERY RUNG.
@@ -1008,10 +1016,10 @@ func _clean(h: BattleUnit) -> void:
 	h.no_cover = 1
 
 
-# C11 — THE FREEZE RIDES A BLOW AS JO's RULING 5 SHAPES ONE: it lands on a hit and costs the hero one turn; a Block or a miss lays
-# nothing; Ironclad and Hallowed refuse it; a cleanse lifts it.
+# C11 — THE CHILL RIDES A BLOW AS JO's RULING 5 SHAPES ONE: it lands on a hit; a Block or a miss lays nothing; Hallowed refuses
+# it, and Ironclad, which bars a Stun, a Freeze and a Daze, does not; a cleanse lifts it (a freeze from JS to KL, Ironclad's then).
 func _s3_the_freeze(s: Node) -> void:
-	print("\n§3 — the freeze, driven: it lands on a hit and costs a turn; a Block, a miss, Ironclad and Hallowed stop it; a cleanse lifts it")
+	print("\n§3 — the chill, driven: it lands on a hit; a Block, a miss and Hallowed stop it, Ironclad does not; a cleanse lifts it")
 	if s == null:
 		ok(false, "§3: no board to drive")
 		return
@@ -1046,39 +1054,39 @@ func _s3_the_freeze(s: Node) -> void:
 	_clean(aim)
 	seed(5151)
 	await s._resolve(f, fz, aim, "good")
-	rows["hit"] = [aim.has_status("frozen"), aim.hp < aim.max_hp]
+	rows["hit"] = [aim.has_status(ENTOMB_LAYS), aim.hp < aim.max_hp]
 	# A BLOCK: the blow is blocked, and nothing rides it.
 	_clean(aim)
 	aim.block_chance = 10.0
 	await s._resolve(f, fz, aim, "good")
-	rows["block"] = [aim.has_status("frozen"), aim.hp < aim.max_hp]
+	rows["block"] = [aim.has_status(ENTOMB_LAYS), aim.hp < aim.max_hp]
 	# A MISS: a hero behind a Mirror Image takes a single blow's miss, as every single blow rolls one (the attacker's cover roll on).
 	_clean(aim)
 	f.no_cover = 0
 	s._apply_status(aim, "mirror", 3, 2)
 	await s._resolve(f, fz, aim, "good")
-	rows["miss"] = [aim.has_status("frozen"), aim.hp < aim.max_hp]
+	rows["miss"] = [aim.has_status(ENTOMB_LAYS), aim.hp < aim.max_hp]
 	f.no_cover = 1
-	# IRONCLAD AND HALLOWED refuse it at the status door.
+	# HALLOWED refuses it at the status door; IRONCLAD bars a Stun, a Freeze and a Daze, and lets a chill by.
 	_clean(aim)
 	s._apply_status(aim, "ironclad", 3, 0)
 	await s._resolve(f, fz, aim, "good")
-	rows["ironclad"] = [aim.has_status("frozen"), aim.hp < aim.max_hp]
+	rows["ironclad"] = [aim.has_status(ENTOMB_LAYS), aim.hp < aim.max_hp]
 	_clean(aim)
 	s._apply_status(aim, "sanctified", 3, 0)
 	await s._resolve(f, fz, aim, "good")
-	rows["hallowed"] = [aim.has_status("frozen"), aim.hp < aim.max_hp]
+	rows["hallowed"] = [aim.has_status(ENTOMB_LAYS), aim.hp < aim.max_hp]
 	# A CLEANSE lifts it: the single-pick cleanse every hero's door reaches.
 	_clean(aim)
 	await s._resolve(f, fz, aim, "good")
-	var lifted := aim.dispel_one_debuff() if aim.has_status("frozen") else ""
-	rows["cleanse"] = [aim.has_status("frozen"), lifted]
-	print("    [frozen, hurt]: %s" % str(rows))
-	ok(rows["hit"] == [true, true], "§3: the Titan's freeze did not land on a hero it struck: %s" % str(rows["hit"]))
-	ok(not bool(rows["block"][0]), "§3: a blocked blow still laid the freeze — the Block stops nothing riding it")
-	ok(rows["miss"] == [false, false], "§3: the freeze landed through a miss: %s" % str(rows["miss"]))
-	ok(not bool(rows["ironclad"][0]) and not bool(rows["hallowed"][0]), "§3: Ironclad or Hallowed did not refuse the freeze: %s" % str(rows))
-	ok(rows["cleanse"][0] == false and String(rows["cleanse"][1]) != "", "§3: a cleanse did not lift the freeze: %s" % str(rows["cleanse"]))
+	var lifted := aim.dispel_one_debuff() if aim.has_status(ENTOMB_LAYS) else ""
+	rows["cleanse"] = [aim.has_status(ENTOMB_LAYS), lifted]
+	print("    [chilled, hurt]: %s" % str(rows))
+	ok(rows["hit"] == [true, true], "§3: the Titan's chill did not land on a hero it struck: %s" % str(rows["hit"]))
+	ok(not bool(rows["block"][0]), "§3: a blocked blow still laid the chill — the Block stops nothing riding it")
+	ok(rows["miss"] == [false, false], "§3: the chill landed through a miss: %s" % str(rows["miss"]))
+	ok(bool(rows["ironclad"][0]) and not bool(rows["hallowed"][0]), "§3: Hallowed did not refuse the chill, or Ironclad did: %s" % str(rows))
+	ok(rows["cleanse"][0] == false and String(rows["cleanse"][1]) != "", "§3: a cleanse did not lift the chill: %s" % str(rows["cleanse"]))
 	aim.next_time = aim_next
 	Engine.time_scale = 1.0
 
@@ -1113,11 +1121,11 @@ func _s2_the_warden_heals(s: Node) -> void:
 	s.set("malice", was_pool)
 
 
-# IT COSTS ONE TURN, DRIVEN ON A BOARD THE BOT PLAYS: every hero held off the timeline (`next_time` INF) until the loop has passed to
-# the warband, then each struck by Entomb, then all four put due at the clock's now — so no hero's turn, a cleanse among them, falls
-# between a freeze and the turn it costs, and each loses its next turn before any thawed hero acts again: exactly one each.
+# IT COSTS NO TURN SINCE KL, DRIVEN ON A BOARD THE BOT PLAYS: every hero held off the timeline (`next_time` INF) until the loop has
+# passed to the warband, then each struck by Entomb, then all four put due at the clock's now — and each takes its next turn,
+# chilled and not frozen: none lost (from JS to KL the freeze cost exactly one each).
 func _s3_the_lost_turn(s: Node) -> void:
-	print("\n§3 — the freeze costs a turn, driven: every hero frozen at once, each passed by once and thawed")
+	print("\n§3 — the chill costs no turn, driven: every hero chilled at once, each taking its next turn")
 	if s == null:
 		ok(false, "§3: no board to drive the lost turn on")
 		return
@@ -1140,7 +1148,7 @@ func _s3_the_lost_turn(s: Node) -> void:
 	for h in heroes:
 		_clean(h)
 		at0[h] = _log_text(s).count("%s is frozen solid and loses their turn" % (h as BattleUnit).unit_name)
-		on0[h] = _log_text(s).count("→ Frozen on %s (" % (h as BattleUnit).unit_name)
+		on0[h] = _log_text(s).count("→ Chilled on %s (" % (h as BattleUnit).unit_name)
 	Engine.time_scale = 20.0
 	for h8 in heroes:
 		(h8 as BattleUnit).next_time = INF
@@ -1158,10 +1166,10 @@ func _s3_the_lost_turn(s: Node) -> void:
 	# could be read.
 	var landed := 0
 	for h6 in heroes:
-		if _log_text(s).count("→ Frozen on %s (" % (h6 as BattleUnit).unit_name) > int(on0[h6]):
+		if _log_text(s).count("→ Chilled on %s (" % (h6 as BattleUnit).unit_name) > int(on0[h6]):
 			landed += 1
 	var waited := 0
-	while waited < 6000 and heroes.any(func(h3): return (h3 as BattleUnit).has_status("frozen") and not (h3 as BattleUnit).dead) and not bool(s.get("battle_over")):
+	while waited < 6000 and heroes.any(func(h3): return (h3 as BattleUnit).next_time <= now and not (h3 as BattleUnit).dead) and not bool(s.get("battle_over")):
 		await process_frame
 		waited += 1
 	var lost := {}
@@ -1171,9 +1179,10 @@ func _s3_the_lost_turn(s: Node) -> void:
 		lost[(h4 as BattleUnit).unit_name] = n
 		total += n
 	var still := heroes.filter(func(h5): return (h5 as BattleUnit).has_status("frozen"))
-	print("    the loop passed to the warband in %d frames; %d of %d heroes frozen; turns lost %s in %d frames; still frozen: %d" % [passed, landed, heroes.size(), str(lost), waited, still.size()])
-	ok(landed == heroes.size() and still.is_empty() and total == heroes.size() and lost.values().all(func(v): return int(v) == 1),
-		"§3: the freeze did not cost each hero one turn and then thaw (frozen %d, turns lost %s, still frozen %d)" % [landed, str(lost), still.size()])
+	var acted := heroes.filter(func(h7): return (h7 as BattleUnit).next_time > now or (h7 as BattleUnit).dead).size()
+	print("    the loop passed to the warband in %d frames; %d of %d heroes chilled; turns lost %s; %d acted in %d frames; frozen: %d" % [passed, landed, heroes.size(), str(lost), acted, waited, still.size()])
+	ok(landed == heroes.size() and still.is_empty() and total == 0 and acted == heroes.size(),
+		"§3: the chill did not leave each hero its turn (chilled %d, turns lost %s, acted %d, frozen %d)" % [landed, str(lost), acted, still.size()])
 	Engine.time_scale = 1.0
 
 
